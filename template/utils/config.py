@@ -169,6 +169,12 @@ def config(cls):
     Returns the configuration object specific to this miner or validator after adding relevant arguments.
     """
     parser = argparse.ArgumentParser()
+
+    parser.add_argument("--logging.debug",default=False)
+    parser.add_argument("--logging.trace",default=False)
+    parser.add_argument("--logging.record_log",default=False)
+    bt.logging.error = lambda *args, **kwargs: None
+
     bt.wallet.add_args(parser)
     bt.subtensor.add_args(parser)
     bt.logging.add_args(parser)
