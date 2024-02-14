@@ -24,6 +24,8 @@ import traceback
 import bittensor as bt
 
 from template.base.neuron import BaseNeuron
+from helpers.constants.hint import Hint
+from helpers.constants import Const
 
 
 class BaseMinerNeuron(BaseNeuron):
@@ -50,12 +52,12 @@ class BaseMinerNeuron(BaseNeuron):
         # Attach determiners which functions are called when servicing a request.
         bt.logging.info(f"Attaching forward function to miner axon.")
 
-        Log(Log.COLOR_GREEN, Const.LOG_TYPE_LOCAL, "Attaching forward function to miner axon.")
+        Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_LOCAL, "Attaching forward function to miner axon.")
 
         self.axon.attach(
             forward_fn=self.forward,
-            blacklist_fn=self.blacklist,
-            priority_fn=self.priority,
+            # blacklist_fn=self.blacklist,
+            # priority_fn=self.priority,
         )
 
         # Instantiate runners
