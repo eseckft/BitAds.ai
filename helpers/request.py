@@ -12,7 +12,7 @@ class Request:
     def print_errors(self, errors):
         if len(errors) != 0:
             for error in errors:
-                if error is not 200:
+                if error != 200:
                     Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, Const.API_ERROR_CODES.get(error, "Unknown code error {}".format(error)), 0)
 
     def ping(self, hot_key, cold_key):
@@ -26,7 +26,7 @@ class Request:
             response_data = response.json()
             if len(response_data['errors']) != 0:
                 for error in response_data['errors']:
-                    if error is not 200:
+                    if error != 200:
                         Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS,
                             Const.API_ERROR_CODES.get(error, "Unknown code error {}".format(error)))
 
@@ -44,7 +44,7 @@ class Request:
 
             if len(response_data['errors']) != 0:
                 for error in response_data['errors']:
-                    if error is not 200:
+                    if error != 200:
                         Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, Const.API_ERROR_CODES.get(error, "Unknown code error {}".format(error)))
 
             return response_data
@@ -72,7 +72,7 @@ class Request:
 
             if len(response_data['errors']) != 0:
                 for error in response_data['errors']:
-                    if error is not 200:
+                    if error != 200:
                         Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, Const.API_ERROR_CODES.get(error, "Unknown code error {}".format(error)))
             else:
                 return response_data

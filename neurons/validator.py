@@ -191,7 +191,7 @@ class Validator(BaseValidatorNeuron):
     async def process_aggregation(self):
         global data_aggregations
         for aggregation in data_aggregations:
-
+            print('aggregation', aggregation)
             for uid in range(self.metagraph.n.item()):
                 if uid == self.uid:
                     continue
