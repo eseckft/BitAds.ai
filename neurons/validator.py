@@ -185,7 +185,7 @@ class Validator(BaseValidatorNeuron):
             if has_unique_link is False:
                 """
                 """
-                # Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[11])
+                Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[11])
         else:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[12])
             response_from_miner = self.dendrite.query(
