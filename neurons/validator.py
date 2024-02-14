@@ -144,23 +144,24 @@ class Validator(BaseValidatorNeuron):
 
                 if uid == self.uid:
                     continue
+
                 axon = self.metagraph.axons[uid]
 
                 if axon.hotkey not in miners:
                     continue
 
-                if self.block - self.metagraph.last_update[uid] < self.config.neuron.epoch_length:  # active
-                    thread = threading.Thread(target=self.sendMessage, args=(axon, campaign))
-                    thread.start()
-                else:
-                    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is not active")
+                #if self.block - self.metagraph.last_update[uid] < self.config.neuron.epoch_length:  # active
+                thread = threading.Thread(target=self.sendMessage, args=(axon, campaign))
+                thread.start()
+                #else:
+                #    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is not active")
 
             data_campaigns.pop(0)
             time.sleep(2)
             break
 
     def sendMessage(self, axon, campaign):
-        Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is active")
+        #Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is active")
         miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR,
                                                        campaign['product_unique_id'])
         if miner_has_unique_url is False:
@@ -193,7 +194,7 @@ class Validator(BaseValidatorNeuron):
                 deserialize=False,
                 timeout=60
             )
-            print('response_from_miner', response_from_miner)
+            #print('response_from_miner', response_from_miner)
 
     async def process_aggregation(self):
         global data_aggregations
