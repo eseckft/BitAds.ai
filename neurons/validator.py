@@ -52,6 +52,7 @@ data_campaigns = []
 data_aggregations = []
 
 v_current = False
+miners = []
 
 
 class Validator(BaseValidatorNeuron):
@@ -81,6 +82,7 @@ class Validator(BaseValidatorNeuron):
     async def process_ping(self):
         global timeout_ping
         global v_current
+        global miners
         need_ping = False
 
         if not timeout_ping or datetime.now() > timeout_ping:
@@ -99,6 +101,7 @@ class Validator(BaseValidatorNeuron):
             response = request.ping(Main.wallet_hotkey, Main.wallet_coldkey)
             if response['result']:
                 Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[4], 1)
+                miners = response['miners']
         return need_ping
 
     async def process(self):
@@ -138,9 +141,13 @@ class Validator(BaseValidatorNeuron):
             Hint.print_campaign_info(campaign)
 
             for uid in range(self.metagraph.n.item()):
+
                 if uid == self.uid:
                     continue
                 axon = self.metagraph.axons[uid]
+
+                if axon.hotkey not in miners:
+                    continue
 
                 if self.block - self.metagraph.last_update[uid] < self.config.neuron.epoch_length:  # active
                     thread = threading.Thread(target=self.sendMessage, args=(axon, campaign))
@@ -191,7 +198,6 @@ class Validator(BaseValidatorNeuron):
     async def process_aggregation(self):
         global data_aggregations
         for aggregation in data_aggregations:
-            print('aggregation', aggregation)
             for uid in range(self.metagraph.n.item()):
                 if uid == self.uid:
                     continue
