@@ -82,7 +82,7 @@ class Miner(BaseMinerNeuron):
 
         task = synapse.dummy_input
 
-        if task != False:
+        if task != False and len(task) != 0:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "I received a task of the campaign type")
             miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey,
                                                         Main.wallet_hotkey, File.TYPE_MINER,
@@ -99,10 +99,11 @@ class Miner(BaseMinerNeuron):
                 synapse.dummy_output = self.getCampaignUniqueId(task['product_unique_id'])
                 Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, "I created a new unique link for campaign " + task[
                     'product_unique_id'] + " and passed it to the validator.")
+
+            file.removeCampaign(Main.wallet_hotkey, File.TYPE_MINER, task['product_unique_id'])
         else:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, "Validator pinging")
 
-        file.removeCampaign(Main.wallet_hotkey, File.TYPE_MINER, task['product_unique_id'])
         return synapse
 
     async def blacklist(

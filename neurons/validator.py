@@ -187,13 +187,13 @@ class Validator(BaseValidatorNeuron):
                 # Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[11])
         else:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[12])
-            # response_from_miner = self.dendrite.query(
-            #     axons=[axon],
-            #     synapse=Task(dummy_input=[]),
-            #     deserialize=False,
-            #     timeout=60
-            # )
-            # print('response_from_miner', response_from_miner)
+            response_from_miner = self.dendrite.query(
+                axons=[axon],
+                synapse=Task(dummy_input=[]),
+                deserialize=False,
+                timeout=60
+            )
+            print('response_from_miner', response_from_miner)
 
     async def process_aggregation(self):
         global data_aggregations
