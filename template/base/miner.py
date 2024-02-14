@@ -49,12 +49,14 @@ class BaseMinerNeuron(BaseNeuron):
 
         # Attach determiners which functions are called when servicing a request.
         bt.logging.info(f"Attaching forward function to miner axon.")
+
+        Log(Log.COLOR_GREEN, Const.LOG_TYPE_LOCAL, "Attaching forward function to miner axon.")
+
         self.axon.attach(
             forward_fn=self.forward,
-            # blacklist_fn=self.blacklist,
-            # priority_fn=self.priority,
+            blacklist_fn=self.blacklist,
+            priority_fn=self.priority,
         )
-        bt.logging.info(f"Axon created: {self.axon}")
 
         # Instantiate runners
         self.should_exit: bool = False
@@ -104,8 +106,8 @@ class BaseMinerNeuron(BaseNeuron):
         try:
             while not self.should_exit:
                 while (
-                    self.block - self.metagraph.last_update[self.uid]
-                    < self.config.neuron.epoch_length
+                        self.block - self.metagraph.last_update[self.uid]
+                        < self.config.neuron.epoch_length
                 ):
                     # Wait before checking again.
                     time.sleep(1)
@@ -183,25 +185,27 @@ class BaseMinerNeuron(BaseNeuron):
         Raises:
             Exception: If there's an error while setting weights, the exception is logged for diagnosis.
         """
-        # try:
-        #     # --- query the chain for the most current number of peers on the network
-        #     chain_weights = torch.zeros(
-        #         self.subtensor.subnetwork_n(netuid=self.metagraph.netuid)
-        #     )
-        #     chain_weights[self.uid] = 1
-        #
-        #     # --- Set weights.
-        #     self.subtensor.set_weights(
-        #         wallet=self.wallet,
-        #         netuid=self.metagraph.netuid,
-        #         uids=torch.arange(0, len(chain_weights)),
-        #         weights=chain_weights.to("cpu"),
-        #         wait_for_inclusion=False,
-        #         version_key=self.spec_version,
-        #     )
-        #
-        # except Exception as e:
-        #     pass
+        try:
+            # --- query the chain for the most current number of peers on the network
+            chain_weights = torch.zeros(
+                self.subtensor.subnetwork_n(netuid=self.metagraph.netuid)
+            )
+            chain_weights[self.uid] = 1
+
+            # --- Set weights.
+            self.subtensor.set_weights(
+                wallet=self.wallet,
+                netuid=self.metagraph.netuid,
+                uids=torch.arange(0, len(chain_weights)),
+                weights=chain_weights.to("cpu"),
+                wait_for_inclusion=False,
+                version_key=self.spec_version,
+            )
+
+        except Exception as e:
+            bt.logging.error(
+                f"Failed to set weights on chain with exception: {e}"
+            )
 
         # bt.logging.info(f"Set weights: {chain_weights}")
 
