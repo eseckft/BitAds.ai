@@ -81,9 +81,6 @@ class BaseValidatorNeuron(BaseNeuron):
                     netuid=self.config.netuid,
                     axon=self.axon,
                 )
-                bt.logging.info(
-                    f"Running validator {self.axon} on network: {self.config.subtensor.chain_endpoint} with netuid: {self.config.netuid}"
-                )
             except Exception as e:
                 bt.logging.error(f"Failed to serve Axon with exception: {e}")
                 pass
@@ -123,6 +120,10 @@ class BaseValidatorNeuron(BaseNeuron):
 
         # Check that validator is registered on the network.
         self.sync()
+
+        bt.logging.info(
+            f"Running validator {self.axon} on network: {self.config.subtensor.chain_endpoint} with netuid: {self.config.netuid}"
+        )
 
         bt.logging.info(f"Validator starting at block: {self.block}")
 
@@ -209,6 +210,7 @@ class BaseValidatorNeuron(BaseNeuron):
         Sets the validator weights to the metagraph hotkeys based on the scores it has received from the miners. The weights determine the trust and incentive level the validator assigns to miner nodes on the network.
         """
 
+        # Check if self.scores contains any NaN values and log a warning if it does.
         if torch.isnan(self.scores).any():
             bt.logging.warning(
                 f"Scores contain NaN values. This may be due to a lack of responses from miners, or a bug in your reward functions."
@@ -317,19 +319,30 @@ class BaseValidatorNeuron(BaseNeuron):
         # shape: [ metagraph.n ]
         alpha: float = self.config.neuron.moving_average_alpha
         self.scores: torch.FloatTensor = alpha * scattered_rewards + (
-            1 - alpha
+                1 - alpha
         ) * self.scores.to(self.device)
         bt.logging.debug(f"Updated moving avg scores: {self.scores}")
 
     def save_state(self):
-        time.sleep(1)
+        """Saves the state of the validator to a file."""
+        # bt.logging.info("Saving validator state.")
+        #
+        # # Save the state of the validator to file.
+        # torch.save(
+        #     {
+        #         "step": self.step,
+        #         "scores": self.scores,
+        #         "hotkeys": self.hotkeys,
+        #     },
+        #     self.config.neuron.full_path + "/state.pt",
+        # )
 
     def load_state(self):
         """Loads the state of the validator from a file."""
-        bt.logging.info("Loading validator state.")
-
-        # Load the state of the validator from file.
-        state = torch.load(self.config.neuron.full_path + "/state.pt")
-        self.step = state["step"]
-        self.scores = state["scores"]
-        self.hotkeys = state["hotkeys"]
+        # bt.logging.info("Loading validator state.")
+        #
+        # # Load the state of the validator from file.
+        # state = torch.load(self.config.neuron.full_path + "/state.pt")
+        # self.step = state["step"]
+        # self.scores = state["scores"]
+        # self.hotkeys = state["hotkeys"]
