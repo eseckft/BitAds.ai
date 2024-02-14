@@ -172,7 +172,6 @@ if __name__ == "__main__":
         Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_LOCAL, Hint.M[1])
         while True:
             miner.process_ping()
-            miner.sync()
             time.sleep(20)
             if miner.should_exit:
                 bt.logging.warning("Ending miner...")
