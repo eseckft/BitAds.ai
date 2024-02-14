@@ -170,7 +170,7 @@ def config(cls):
     """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--logging.debug",default=False)
+    # parser.add_argument("--logging.debug",default=False)
     parser.add_argument("--logging.trace",default=False)
     parser.add_argument("--logging.record_log",default=False)
     bt.logging.error = lambda *args, **kwargs: None
