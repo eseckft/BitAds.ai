@@ -159,12 +159,7 @@ class Validator(BaseValidatorNeuron):
 
                 axons.append(axon)
 
-                #if self.block - self.metagraph.last_update[uid] < self.config.neuron.epoch_length:  # active
-                # thread = threading.Thread(target=self.sendMessage, args=(axon, campaign))
-                # thread.start()
-
-                #else:
-                #    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is not active")
+            campaign['uid'] = self.uid
 
             response_from_miner = self.dendrite.query(
                 axons=axons,
@@ -173,7 +168,8 @@ class Validator(BaseValidatorNeuron):
                 timeout=60
             )
 
-            print('response_from_miner', response_from_miner)
+            for response in response_from_miner:
+                print('response_from_miner', response)
 
             data_campaigns.pop(0)
             time.sleep(2)
