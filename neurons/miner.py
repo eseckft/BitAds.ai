@@ -78,7 +78,7 @@ class Miner(BaseMinerNeuron):
         self, synapse: Task
     ) -> Task:
         synapse.dummy_output = {}
-
+        print('synapse', synapse)
         task = synapse.dummy_input
         if task != False and len(task) != 0:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "I received a task of the campaign type")
