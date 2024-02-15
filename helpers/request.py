@@ -41,7 +41,6 @@ class Request:
         try:
             response = requests.get(url, headers = {'hot_key': hot_key, 'cold_key': cold_key})
             response_data = response.json()
-            print('response_data', response_data)
 
             if len(response_data['errors']) != 0:
                 for error in response_data['errors']:

@@ -52,7 +52,6 @@ class Miner(BaseMinerNeuron):
     """
 
     def __init__(self, config=None):
-        print('config', config)
         super(Miner, self).__init__(config=config)
         self.get_cc()
         self.prepare()
@@ -81,7 +80,6 @@ class Miner(BaseMinerNeuron):
         synapse.dummy_output = {}
 
         task = synapse.dummy_input
-        print('dummy_input', synapse)
         if task != False and len(task) != 0:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "I received a task of the campaign type")
             miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey,

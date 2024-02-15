@@ -163,7 +163,7 @@ class Validator(BaseValidatorNeuron):
 
             data_campaigns.pop(0)
             time.sleep(2)
-            break
+            # break
 
     def sendMessage(self, axon, campaign):
         #Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is active")
