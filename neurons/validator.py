@@ -178,9 +178,8 @@ class Validator(BaseValidatorNeuron):
                          "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[10])
                     file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, response.dummy_output)
                 if has_unique_link is False:
-                    """
-                    """
-                    Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[11])
+                    pass
+                    # Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[11])
 
             data_campaigns.pop(0)
             time.sleep(2)
