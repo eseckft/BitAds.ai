@@ -94,23 +94,19 @@ class Version (pydantic.BaseModel):
     minor_version: Optional[int] = None
     patch_version: Optional[int] = None
 
+class MapSynapse ( bt.Synapse ):
+    version: Optional[Version] = None
+
 """
 A specialized Synapse representing the status of a miner, 
 including its availability and memory resources.
 """
-class MinerStatus( bt.Synapse ):
-    dummy_input: dict
-    dummy_output: Optional[dict] = None
+class MinerStatus( MapSynapse  ):
+    free_memory: Optional[int] = None
+    available: Optional[bool] = None
 
-    def deserialize(self) -> "MinerStatus":
-        return self
-
-class SpeedTest( bt.Synapse ):
-    dummy_input: dict
-    dummy_output: Optional[dict] = None
-
-    def deserialize(self) -> "SpeedTest":
-        return self
+class SpeedTest( MapSynapse  ):
+    result: Optional[Dict] = None
 
 """
 Defines the status of a validator, particularly whether it is available for processing requests.
