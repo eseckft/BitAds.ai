@@ -52,6 +52,7 @@ class Miner(BaseMinerNeuron):
     """
 
     def __init__(self, config=None):
+        print('config', config)
         super(Miner, self).__init__(config=config)
         self.get_cc()
         self.prepare()

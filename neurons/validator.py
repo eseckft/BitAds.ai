@@ -125,8 +125,13 @@ class Validator(BaseValidatorNeuron):
 
                 if len(data_campaigns) > 0:
                     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[8] + str(len(data_campaigns)), 1)
+                else:
+                    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_BITADS, "There are no active campaigns for work.", 1)
                 if len(data_aggregations) > 0:
                     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[9] + str(len(data_aggregations)), 1)
+                else:
+                    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_BITADS, "There are no statistical data to establish the miners' rating.", 1)
+
 
         return need_process_campaign
 
