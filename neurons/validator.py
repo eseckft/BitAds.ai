@@ -169,40 +169,53 @@ class Validator(BaseValidatorNeuron):
             )
 
             for response in response_from_miner:
-                print('response_from_miner', response)
+                has_unique_link = False
+                minerHotKey = False
+                for res in response_from_miner:
+                    if res.dummy_output is not None:
+                        has_unique_link = True
+                        minerHotKey = res.dummy_output.hotKey
+                        Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER,
+                             "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[10])
+                        file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, res.dummy_output)
+                if has_unique_link is False:
+                    """
+                    """
+                    Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[11])
 
             data_campaigns.pop(0)
             time.sleep(2)
             # break
 
     def sendMessage(self, axon, campaign):
+        pass
         #Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is active")
         #miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR,
                                                        # campaign['product_unique_id'])
         #if miner_has_unique_url is False:
-        Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER,
-            "Miner: " + axon.hotkey + ". I send the task to the miner.", False)
+        # Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER,
+        #     "Miner: " + axon.hotkey + ". I send the task to the miner.", False)
+        #
+        # response_from_miner = self.dendrite.query(
+        #     axons=[axon],
+        #     synapse=Task(dummy_input=campaign),
+        #     deserialize=False,
+        #     timeout=60
+        # )
+        #
+        # print('response_from_miner', response_from_miner)
 
-        response_from_miner = self.dendrite.query(
-            axons=[axon],
-            synapse=Task(dummy_input=campaign),
-            deserialize=False,
-            timeout=60
-        )
-
-        print('response_from_miner', response_from_miner)
-
-        has_unique_link = False
-
-        for res in response_from_miner:
-            if res.dummy_output is not None:
-                has_unique_link = True
-                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[10])
-                file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, res.dummy_output)
-        if has_unique_link is False:
-            """
-            """
-            Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[11])
+        # has_unique_link = False
+        #
+        # for res in response_from_miner:
+        #     if res.dummy_output is not None:
+        #         has_unique_link = True
+        #         Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[10])
+        #         file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, res.dummy_output)
+        # if has_unique_link is False:
+        #     """
+        #     """
+        #     Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[11])
         # else:
         #     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[12])
         #     response_from_miner = self.dendrite.query(
