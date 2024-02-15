@@ -163,7 +163,7 @@ class Validator(BaseValidatorNeuron):
                     axons=[axon],
                     synapse=Task(dummy_input=campaign),
                     deserialize=False,
-                    timeout=60
+                    timeout=10
                 )
 
                 #else:
