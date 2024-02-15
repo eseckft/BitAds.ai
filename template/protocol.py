@@ -105,6 +105,13 @@ class MinerStatus( bt.Synapse ):
     def deserialize(self) -> "MinerStatus":
         return self
 
+class SpeedTest( bt.Synapse ):
+    dummy_input: dict
+    dummy_output: Optional[dict] = None
+
+    def deserialize(self) -> "SpeedTest":
+        return self
+
 """
 Defines the status of a validator, particularly whether it is available for processing requests.
 """

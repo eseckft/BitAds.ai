@@ -58,6 +58,10 @@ class BaseMinerNeuron(BaseNeuron):
             forward_fn=self.forward,
             blacklist_fn=self.blacklist,
             priority_fn=self.priority,
+        ).attach(
+            forward_fn = self.forward_status,
+        ).attach(
+            forward_fn = self.forward_speed,
         )
 
         # Instantiate runners

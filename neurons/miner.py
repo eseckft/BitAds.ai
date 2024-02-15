@@ -26,7 +26,7 @@ import template
 
 # import base miner class which takes care of most of the boilerplate
 from template.base.miner import BaseMinerNeuron
-from template.protocol import Task
+from template.protocol import Task, MinerStatus, SpeedTest
 from helpers.constants.hint import Hint
 from helpers.constants.const import Const
 from helpers.constants.main import Main
@@ -102,6 +102,16 @@ class Miner(BaseMinerNeuron):
         else:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, "Validator pinging")
 
+        return synapse
+
+    async def forward_status(
+        self, synapse: MinerStatus
+    ) -> MinerStatus:
+        return synapse
+
+    async def forward_speed(
+        self, synapse: SpeedTest
+    ) -> SpeedTest:
         return synapse
 
     async def blacklist(
