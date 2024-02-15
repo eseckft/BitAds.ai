@@ -145,6 +145,8 @@ class Validator(BaseValidatorNeuron):
 
             Hint.print_campaign_info(campaign)
 
+            axons = []
+
             for uid in range(self.metagraph.n.item()):
 
                 if uid == self.uid:
@@ -155,19 +157,23 @@ class Validator(BaseValidatorNeuron):
                 if axon.hotkey not in miners:
                     continue
 
+                axons.append(axon)
+
                 #if self.block - self.metagraph.last_update[uid] < self.config.neuron.epoch_length:  # active
                 # thread = threading.Thread(target=self.sendMessage, args=(axon, campaign))
                 # thread.start()
 
-                response_from_miner = self.dendrite.query(
-                    axons=[axon],
-                    synapse=Task(dummy_input=campaign),
-                    deserialize=False,
-                    timeout=10
-                )
-
                 #else:
                 #    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is not active")
+
+            response_from_miner = self.dendrite.query(
+                axons=axons,
+                synapse=Task(dummy_input=campaign),
+                deserialize=False,
+                timeout=60
+            )
+
+            print('response_from_miner', response_from_miner)
 
             data_campaigns.pop(0)
             time.sleep(2)
