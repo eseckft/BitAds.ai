@@ -79,9 +79,9 @@ class Miner(BaseMinerNeuron):
     ) -> Task:
         synapse.dummy_output = {}
         task = synapse.dummy_input
-        print('task', task)
+
         if task != False and len(task) != 0:
-            Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "I received a task of the campaign type")
+            Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Validator: " + task.uid + ". I received a task of the campaign type")
             miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey,
                                                         Main.wallet_hotkey, File.TYPE_MINER,
                                                         task['product_unique_id'])

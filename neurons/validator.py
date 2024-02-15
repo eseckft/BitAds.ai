@@ -159,7 +159,7 @@ class Validator(BaseValidatorNeuron):
 
                 axons.append(axon)
 
-            campaign['uid'] = self.uid
+            campaign['uid'] = Main.wallet_hotkey
 
             response_from_miner = self.dendrite.query(
                 axons=axons,
@@ -174,7 +174,8 @@ class Validator(BaseValidatorNeuron):
                 for res in response_from_miner:
                     if res.dummy_output is not None:
                         has_unique_link = True
-                        minerHotKey = res.dummy_output.hotKey
+                        # minerHotKey = res.dummy_output.hotKey
+                        print('res.dummy_output', res.dummy_output)
                         Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER,
                              "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[10])
                         file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, res.dummy_output)
