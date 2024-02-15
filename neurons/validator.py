@@ -171,13 +171,12 @@ class Validator(BaseValidatorNeuron):
             for response in response_from_miner:
                 has_unique_link = False
                 minerHotKey = ''
-                for res in response_from_miner:
-                    if res.dummy_output is not None:
-                        has_unique_link = True
-                        minerHotKey = res.dummy_output['hotKey']
-                        Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER,
-                             "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[10])
-                        file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, res.dummy_output)
+                if response.dummy_output is not None:
+                    has_unique_link = True
+                    minerHotKey = response.dummy_output['hotKey']
+                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER,
+                         "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[10])
+                    file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, response.dummy_output)
                 if has_unique_link is False:
                     """
                     """
