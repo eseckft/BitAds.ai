@@ -78,8 +78,8 @@ class Miner(BaseMinerNeuron):
         self, synapse: Task
     ) -> Task:
         synapse.dummy_output = {}
-
         task = synapse.dummy_input
+        print('task', task)
         if task != False and len(task) != 0:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "I received a task of the campaign type")
             miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey,
