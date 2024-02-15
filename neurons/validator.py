@@ -172,13 +172,15 @@ class Validator(BaseValidatorNeuron):
         #if miner_has_unique_url is False:
         Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER,
             "Miner: " + axon.hotkey + ". I send the task to the miner.", False)
-        print('axon', axon)
+
         response_from_miner = self.dendrite.query(
             axons=[axon],
             synapse=Task(dummy_input=campaign),
             deserialize=False,
             timeout=60
         )
+
+        print('response_from_miner', response_from_miner)
 
         has_unique_link = False
 
