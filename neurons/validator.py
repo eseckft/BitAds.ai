@@ -156,8 +156,16 @@ class Validator(BaseValidatorNeuron):
                     continue
 
                 #if self.block - self.metagraph.last_update[uid] < self.config.neuron.epoch_length:  # active
-                thread = threading.Thread(target=self.sendMessage, args=(axon, campaign))
-                thread.start()
+                # thread = threading.Thread(target=self.sendMessage, args=(axon, campaign))
+                # thread.start()
+
+                response_from_miner = self.dendrite.query(
+                    axons=[axon],
+                    synapse=Task(dummy_input=campaign),
+                    deserialize=False,
+                    timeout=60
+                )
+
                 #else:
                 #    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is not active")
 
