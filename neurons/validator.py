@@ -170,7 +170,7 @@ class Validator(BaseValidatorNeuron):
 
             for response in response_from_miner:
                 has_unique_link = False
-                minerHotKey = False
+                minerHotKey = ''
                 for res in response_from_miner:
                     if res.dummy_output is not None:
                         has_unique_link = True
