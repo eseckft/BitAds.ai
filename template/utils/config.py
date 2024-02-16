@@ -175,7 +175,7 @@ def config(cls):
 
     parser.add_argument("--logging.debug",default=True)
     parser.add_argument("--logging.trace",default=True)
-    parser.add_argument("--logging.record_log",default=True)
+    # parser.add_argument("--logging.record_log",default=True)
     # bt.logging.error = lambda *args, **kwargs: None
 
     bt.wallet.add_args(parser)
