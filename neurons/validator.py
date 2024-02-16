@@ -264,8 +264,8 @@ class Validator(BaseValidatorNeuron):
                                                  aggregation['product_item_unique_id'], File.TYPE_VALIDATOR, save_data)
                     break
             data_aggregations.pop(0)
-            time.sleep(2)
-            break
+            # time.sleep(2)
+            # break
 
         uids = self.metagraph.uids.tolist()
         # If there are more uids than scores, add more weights.
@@ -283,13 +283,13 @@ class Validator(BaseValidatorNeuron):
         await self.process_ping()
         await self.process()
 
-        if self.step % stepSize == 0:
-            if len(data_campaigns) > 0:
-                await self.process_campaign()
-            elif len(data_aggregations) > 0:
-                await self.process_aggregation()
+        # if self.step % stepSize == 0:
+        if len(data_campaigns) > 0:
+            await self.process_campaign()
+        elif len(data_aggregations) > 0:
+            await self.process_aggregation()
         # return await forward(self)
-        time.sleep(1)
+        # time.sleep(1)
 
 
 # The main function parses the configuration and runs the validator.
