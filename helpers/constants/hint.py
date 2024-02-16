@@ -18,8 +18,8 @@ class Hint:
     LOG_TEXTS = {
         1: "Miner running...",
 
-        3: "I'm pinging the server, updating the timestamp of activity.",
-        4: "The ping was successful, and the activity timestamp has been updated successfully.",
+        3: "Initiating ping to the server to update the activity timestamp.",
+        4: "Ping successful. Activity timestamp updated.",
 
         2: "Validator running...",
         5: "I'm making a request to the server to get a campaign allocation task for miners.",

@@ -146,13 +146,14 @@ class Validator(BaseValidatorNeuron):
             Hint.print_campaign_info(campaign)
 
             axons = []
+            ips = {}
 
             for uid in range(self.metagraph.n.item()):
-
                 if uid == self.uid:
                     continue
 
                 axon = self.metagraph.axons[uid]
+                ips[axon.hotkey] = str(axon.ip) + ":" + str(axon.port)
 
                 if axon.hotkey not in miners:
                     continue
@@ -174,8 +175,7 @@ class Validator(BaseValidatorNeuron):
                 if response.dummy_output is not None:
                     has_unique_link = True
                     minerHotKey = response.dummy_output['hotKey']
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER,
-                         "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[10])
+                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, str(ips[minerHotKey]) + ". " + Hint.LOG_TEXTS[10])
                     # file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, response.dummy_output)
                 if has_unique_link is False:
                     pass
@@ -257,8 +257,7 @@ class Validator(BaseValidatorNeuron):
                         version_key=int(hashlib.sha256(aggregation['id'].encode()).hexdigest(), 16) % (2 ** 64),
                     )
 
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR,
-                        "Miner " + aggregation['miner_wallet_address'] + " was rated " + str(rating) + ".")
+                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Miner with UID " + str(uid) + " for Campaign " + aggregation['product_unique_id'] + " he has the score " + str(rating) + ".")
 
                     save_data = {"U": u, "C": c, "D": d, "K": k, "Q": q, "E": e, "M": m, "Rating": rating}
                     file.saveMinerUniqueUrlScore(Main.wallet_hotkey, aggregation['product_unique_id'],
@@ -267,6 +266,14 @@ class Validator(BaseValidatorNeuron):
             data_aggregations.pop(0)
             time.sleep(2)
             break
+
+        uids = self.metagraph.uids.tolist()
+        # If there are more uids than scores, add more weights.
+        size_difference = len(uids) - len(self.scores)
+        new_scores = torch.zeros(size_difference, dtype=torch.float32)
+        self.scores = torch.cat((self.scores, new_scores))
+        del new_scores
+        bt.logging.info(f"Scores: {self.scores}")
 
     async def forward(self):
         global stepSize

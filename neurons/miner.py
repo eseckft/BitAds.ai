@@ -81,22 +81,18 @@ class Miner(BaseMinerNeuron):
         task = synapse.dummy_input
 
         if task != False and len(task) != 0:
-            Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Validator: " + task['uid'] + ". I received a task of the campaign type")
-            miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey,
-                                                        Main.wallet_hotkey, File.TYPE_MINER,
-                                                        task['product_unique_id'])
+            Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Received a campaign task with ID: " + task['product_unique_id'] + " from Validator: " + task['uid'])
+            miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey, Main.wallet_hotkey, File.TYPE_MINER, task['product_unique_id'])
 
             if miner_has_unique_url:
                 response = file.getUniqueUrl(Main.wallet_hotkey, Main.wallet_hotkey,
                                              File.TYPE_MINER, task['product_unique_id'])
                 synapse.dummy_output = response
-                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "I already have a link for campaign " + task[
-                    'product_unique_id'] + " and I am sending it to the validator.")
+                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Unique link for campaign ID: " + task['product_unique_id'] + " already generated. Sending it to the Validator: " + task['uid'])
             else:
                 file.saveCampaign(Main.wallet_hotkey, File.TYPE_MINER, task)
                 synapse.dummy_output = self.getCampaignUniqueId(task['product_unique_id'])
-                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, "I created a new unique link for campaign " + task[
-                    'product_unique_id'] + " and passed it to the validator.")
+                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, "Successfully created a unique link for campaign ID: " + task['product_unique_id'] + " and forwarded it to the Validator: " + task['uid'])
 
             file.removeCampaign(Main.wallet_hotkey, File.TYPE_MINER, task['product_unique_id'])
         else:
