@@ -226,6 +226,11 @@ class Validator(BaseValidatorNeuron):
 
     async def process_aggregation(self):
         global data_aggregations
+
+        minerUids = []
+        minerRatings = []
+        aggregationId = False
+
         for aggregation in data_aggregations:
             for uid in range(self.metagraph.n.item()):
                 if uid == self.uid:
@@ -247,15 +252,8 @@ class Validator(BaseValidatorNeuron):
 
                     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[7], 1)
 
-                    # Set the weights on chain via our subtensor connection.
-                    self.subtensor.set_weights(
-                        wallet=self.wallet,
-                        netuid=self.config.netuid,
-                        uids=[uid],
-                        weights=[rating],
-                        wait_for_finalization=True,
-                        version_key=int(hashlib.sha256(aggregation['id'].encode()).hexdigest(), 16) % (2 ** 64),
-                    )
+                    minerUids.append(uid)
+                    minerRatings.append(rating)
 
                     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Miner with UID " + str(uid) + " for Campaign " + aggregation['product_unique_id'] + " he has the score " + str(rating) + ".")
 
@@ -263,9 +261,25 @@ class Validator(BaseValidatorNeuron):
                     file.saveMinerUniqueUrlScore(Main.wallet_hotkey, aggregation['product_unique_id'],
                                                  aggregation['product_item_unique_id'], File.TYPE_VALIDATOR, save_data)
                     break
-            data_aggregations.pop(0)
+            aggregationId = aggregation['id']
             # time.sleep(2)
             # break
+
+        if aggregationId != False:
+            # Set the weights on chain via our subtensor connection.
+            self.subtensor.set_weights(
+                wallet=self.wallet,
+                netuid=self.config.netuid,
+                uids=minerUids,
+                weights=minerRatings,
+                wait_for_finalization=True,
+                version_key=int(hashlib.sha256(aggregationId.encode()).hexdigest(), 16) % (2 ** 64),
+            )
+
+        data_aggregations = []
+
+        # print('11111', self.set_weights())
+
 
         uids = self.metagraph.uids.tolist()
         # If there are more uids than scores, add more weights.
