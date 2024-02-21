@@ -54,7 +54,6 @@ data_aggregations = []
 v_current = False
 miners = []
 
-
 class Validator(BaseValidatorNeuron):
 
     def __init__(self, config=None):
@@ -247,6 +246,7 @@ class Validator(BaseValidatorNeuron):
                     e = u + (k * u * c)
                     m = 10000
                     rating = 1
+
                     if (e / m) * q < 1:
                         rating = (e / m) * q
 
@@ -262,11 +262,8 @@ class Validator(BaseValidatorNeuron):
                                                  aggregation['product_item_unique_id'], File.TYPE_VALIDATOR, save_data)
                     break
             aggregationId = aggregation['id']
-            # time.sleep(2)
-            # break
 
         if aggregationId != False:
-            # Set the weights on chain via our subtensor connection.
             self.subtensor.set_weights(
                 wallet=self.wallet,
                 netuid=self.config.netuid,
@@ -277,17 +274,18 @@ class Validator(BaseValidatorNeuron):
             )
 
         data_aggregations = []
+        self.update_scores(torch.FloatTensor(minerRatings).to(self.device), minerUids)
 
-        # print('11111', self.set_weights())
+    def rew(query: int, response: int) -> float:
+        """
+        Reward the miner response to the dummy request. This method returns a reward
+        value for the miner, which is used to update the miner's score.
 
+        Returns:
+        - float: The reward value for the miner.
+        """
 
-        uids = self.metagraph.uids.tolist()
-        # If there are more uids than scores, add more weights.
-        size_difference = len(uids) - len(self.scores)
-        new_scores = torch.zeros(size_difference, dtype=torch.float32)
-        self.scores = torch.cat((self.scores, new_scores))
-        del new_scores
-        bt.logging.info(f"Scores: {self.scores}")
+        return 1.0 if response == query * 2 else 0
 
     async def forward(self):
         global stepSize
