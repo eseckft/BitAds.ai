@@ -54,6 +54,11 @@ data_aggregations = []
 v_current = False
 miners = []
 
+u_max = False
+ctr_max = False
+wu = False
+wc = False
+
 class Validator(BaseValidatorNeuron):
 
     def __init__(self, config=None):
@@ -107,6 +112,10 @@ class Validator(BaseValidatorNeuron):
         global timeout_process
         global data_campaigns
         global data_aggregations
+        global u_max
+        global ctr_max
+        global wu
+        global wc
         need_process_campaign = False
 
         if not timeout_process or datetime.now() > timeout_process:
@@ -119,6 +128,11 @@ class Validator(BaseValidatorNeuron):
             Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[5], 2)
             response = request.getTask(Main.wallet_hotkey, Main.wallet_coldkey)
             if response['result']:
+                u_max = int(response['Umax'])
+                ctr_max = float(response['CTRmax'])
+                wu = float(response['Wu'])
+                wc = float(response['Wc'])
+
                 data_campaigns = response['campaign']
                 data_aggregations = response['aggregation']
 
@@ -225,6 +239,10 @@ class Validator(BaseValidatorNeuron):
 
     async def process_aggregation(self):
         global data_aggregations
+        global u_max
+        global ctr_max
+        global wu
+        global wc
 
         minerUids = []
         minerRatings = []
@@ -238,17 +256,29 @@ class Validator(BaseValidatorNeuron):
                 if axon.hotkey == aggregation['miner_wallet_address']:
                     file.saveMinerUniqueUrlStats(Main.wallet_hotkey, aggregation['product_item_unique_id'],
                                                  File.TYPE_VALIDATOR, aggregation)
-                    u = aggregation['visits_unique']
-                    c = (aggregation['count_through_rate_click'] / aggregation['visits']) * 100
-                    d = aggregation['visits'] - aggregation['duration_more_than_3_seconds']
-                    k = 20
-                    q = 1 - (d / aggregation['visits'])
-                    e = u + (k * u * c)
-                    m = 10000
-                    rating = 1
+                    #MINER SCORE = (Wu * Unorm) + (Wctr * CTRnorm)
+                    if aggregation['visits_unique'] == 0:
+                        ctr = 0
+                    else:
+                        ctr = (aggregation['count_through_rate_click'] / aggregation['visits_unique'])
+                    u_norm = aggregation['visits_unique'] / u_max
+                    ctr_norm = ctr / ctr_max
+                    rating =  (wu * u_norm) + (wc * ctr_norm)
+                    rating = round(rating, 5)
+                    if rating > 1:
+                        rating = 1
 
-                    if (e / m) * q < 1:
-                        rating = (e / m) * q
+                    # u = aggregation['visits_unique']
+                    # c = (aggregation['count_through_rate_click'] / aggregation['visits']) * 100
+                    # d = aggregation['visits'] - aggregation['duration_more_than_3_seconds']
+                    # k = 20
+                    # q = 1 - (d / aggregation['visits'])
+                    # e = u + (k * u * c)
+                    # m = 10000
+                    # rating = 1
+                    #
+                    # if (e / m) * q < 1:
+                    #     rating = (e / m) * q
 
                     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[7], 1)
 
@@ -257,7 +287,8 @@ class Validator(BaseValidatorNeuron):
 
                     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Miner with UID " + str(uid) + " for Campaign " + aggregation['product_unique_id'] + " he has the score " + str(rating) + ".")
 
-                    save_data = {"U": u, "C": c, "D": d, "K": k, "Q": q, "E": e, "M": m, "Rating": rating}
+                    # save_data = {"U": u, "C": c, "D": d, "K": k, "Q": q, "E": e, "M": m, "Rating": rating}
+                    save_data = {"ctr": ctr, "u_norm": u_norm, "ctr_norm": ctr_norm, "ctr_max": ctr_max, "wu": wu, "wc": wc, "u_max": u_max, "Rating": rating}
                     file.saveMinerUniqueUrlScore(Main.wallet_hotkey, aggregation['product_unique_id'],
                                                  aggregation['product_item_unique_id'], File.TYPE_VALIDATOR, save_data)
                     break
