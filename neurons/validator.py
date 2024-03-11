@@ -256,7 +256,6 @@ class Validator(BaseValidatorNeuron):
                 if axon.hotkey == aggregation['miner_wallet_address']:
                     file.saveMinerUniqueUrlStats(Main.wallet_hotkey, aggregation['product_item_unique_id'],
                                                  File.TYPE_VALIDATOR, aggregation)
-                    #MINER SCORE = (Wu * Unorm) + (Wctr * CTRnorm)
                     if aggregation['visits_unique'] == 0:
                         ctr = 0
                     else:
@@ -268,18 +267,6 @@ class Validator(BaseValidatorNeuron):
                     if rating > 1:
                         rating = 1
 
-                    # u = aggregation['visits_unique']
-                    # c = (aggregation['count_through_rate_click'] / aggregation['visits']) * 100
-                    # d = aggregation['visits'] - aggregation['duration_more_than_3_seconds']
-                    # k = 20
-                    # q = 1 - (d / aggregation['visits'])
-                    # e = u + (k * u * c)
-                    # m = 10000
-                    # rating = 1
-                    #
-                    # if (e / m) * q < 1:
-                    #     rating = (e / m) * q
-
                     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[7], 1)
 
                     minerUids.append(uid)
@@ -287,7 +274,6 @@ class Validator(BaseValidatorNeuron):
 
                     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Miner with UID " + str(uid) + " for Campaign " + aggregation['product_unique_id'] + " he has the score " + str(rating) + ".")
 
-                    # save_data = {"U": u, "C": c, "D": d, "K": k, "Q": q, "E": e, "M": m, "Rating": rating}
                     save_data = {"ctr": ctr, "u_norm": u_norm, "ctr_norm": ctr_norm, "ctr_max": ctr_max, "wu": wu, "wc": wc, "u_max": u_max, "Rating": rating}
                     file.saveMinerUniqueUrlScore(Main.wallet_hotkey, aggregation['product_unique_id'],
                                                  aggregation['product_item_unique_id'], File.TYPE_VALIDATOR, save_data)
