@@ -29,7 +29,6 @@ import bittensor as bt
 import template
 from template.validator import forward
 
-# import base validator class which takes care of most of the boilerplate
 from template.base.validator import BaseValidatorNeuron
 from helpers.constants.hint import Hint
 from helpers.constants.const import Const
@@ -166,12 +165,10 @@ class Validator(BaseValidatorNeuron):
                     continue
 
                 axon = self.metagraph.axons[uid]
-                ips[axon.hotkey] = str(axon.ip) + ":" + str(axon.port)
+                ips[axon.hotkey] = f"{axon.ip}:{axon.port}"
 
-                if axon.hotkey not in miners:
-                    continue
-
-                axons.append(axon)
+                if axon.hotkey in miners:
+                    axons.append(axon)
 
             campaign['uid'] = Main.wallet_hotkey
 
@@ -184,15 +181,12 @@ class Validator(BaseValidatorNeuron):
 
             for response in response_from_miner:
                 has_unique_link = False
-                minerHotKey = ''
                 if response.dummy_output is not None:
                     has_unique_link = True
-                    minerHotKey = response.dummy_output['hotKey']
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, str(ips[minerHotKey]) + ". " + Hint.LOG_TEXTS[10])
-                    # file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, response.dummy_output)
+                    miner_hot_key = response.dummy_output['hotKey']
+                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, str(ips[miner_hot_key]) + ". " + Hint.LOG_TEXTS[10])
                 if has_unique_link is False:
                     pass
-                    # Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + minerHotKey + ". " + Hint.LOG_TEXTS[11])
 
             data_campaigns.pop(0)
             time.sleep(2)
@@ -200,42 +194,6 @@ class Validator(BaseValidatorNeuron):
 
     def sendMessage(self, axon, campaign):
         pass
-        #Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + " is active")
-        #miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR,
-                                                       # campaign['product_unique_id'])
-        #if miner_has_unique_url is False:
-        # Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER,
-        #     "Miner: " + axon.hotkey + ". I send the task to the miner.", False)
-        #
-        # response_from_miner = self.dendrite.query(
-        #     axons=[axon],
-        #     synapse=Task(dummy_input=campaign),
-        #     deserialize=False,
-        #     timeout=60
-        # )
-        #
-        # print('response_from_miner', response_from_miner)
-
-        # has_unique_link = False
-        #
-        # for res in response_from_miner:
-        #     if res.dummy_output is not None:
-        #         has_unique_link = True
-        #         Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[10])
-        #         file.saveMinerUniqueUrl(Main.wallet_hotkey, axon.hotkey, File.TYPE_VALIDATOR, res.dummy_output)
-        # if has_unique_link is False:
-        #     """
-        #     """
-        #     Hint(Hint.COLOR_RED, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[11])
-        # else:
-        #     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, "Miner: " + axon.hotkey + ". " + Hint.LOG_TEXTS[12])
-        #     response_from_miner = self.dendrite.query(
-        #         axons=[axon],
-        #         synapse=Task(dummy_input=[]),
-        #         deserialize=False,
-        #         timeout=60
-        #     )
-            #print('response_from_miner', response_from_miner)
 
     async def process_aggregation(self):
         global data_aggregations
@@ -262,10 +220,8 @@ class Validator(BaseValidatorNeuron):
                         ctr = (aggregation['count_through_rate_click'] / aggregation['visits_unique'])
                     u_norm = aggregation['visits_unique'] / u_max
                     ctr_norm = ctr / ctr_max
-                    rating =  (wu * u_norm) + (wc * ctr_norm)
-                    rating = round(rating, 5)
-                    if rating > 1:
-                        rating = 1
+                    rating = round((wu * u_norm + wc * ctr_norm), 5)
+                    rating = min(rating, 1)
 
                     Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[7], 1)
 
@@ -281,12 +237,17 @@ class Validator(BaseValidatorNeuron):
             aggregationId = aggregation['id']
 
         if aggregationId != False:
+
+            print('minerUids', minerUids)
+            print('minerRatings', minerRatings)
+
             self.subtensor.set_weights(
                 wallet=self.wallet,
                 netuid=self.config.netuid,
                 uids=minerUids,
                 weights=minerRatings,
-                wait_for_finalization=True,
+                wait_for_finalization=False,
+                wait_for_inclusion=False,
                 version_key=int(hashlib.sha256(aggregationId.encode()).hexdigest(), 16) % (2 ** 64),
             )
 
@@ -294,14 +255,6 @@ class Validator(BaseValidatorNeuron):
         self.update_scores(torch.FloatTensor(minerRatings).to(self.device), minerUids)
 
     def rew(query: int, response: int) -> float:
-        """
-        Reward the miner response to the dummy request. This method returns a reward
-        value for the miner, which is used to update the miner's score.
-
-        Returns:
-        - float: The reward value for the miner.
-        """
-
         return 1.0 if response == query * 2 else 0
 
     async def forward(self):
@@ -312,13 +265,10 @@ class Validator(BaseValidatorNeuron):
         await self.process_ping()
         await self.process()
 
-        # if self.step % stepSize == 0:
         if len(data_campaigns) > 0:
             await self.process_campaign()
         elif len(data_aggregations) > 0:
             await self.process_aggregation()
-        # return await forward(self)
-        # time.sleep(1)
 
 
 # The main function parses the configuration and runs the validator.
