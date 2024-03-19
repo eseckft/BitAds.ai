@@ -42,6 +42,7 @@ timeout_ping = False
 
 v_current = False
 
+
 class Miner(BaseMinerNeuron):
     """
     Your miner neuron class. You should use this class to define your miner's behavior. In particular, you should replace the forward function with your own logic. You may also want to override the blacklist and priority functions according to your needs.
@@ -74,45 +75,71 @@ class Miner(BaseMinerNeuron):
     def prepare(self):
         file.create_dirs(File.TYPE_MINER)
 
-    async def forward(
-        self, synapse: Task
-    ) -> Task:
+    async def forward(self, synapse: Task) -> Task:
         synapse.dummy_output = {}
         task = synapse.dummy_input
 
         if task != False and len(task) != 0:
-            Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Received a campaign task with ID: " + task['product_unique_id'] + " from Validator: " + task['uid'])
-            miner_has_unique_url = file.unique_link_exists(Main.wallet_hotkey, Main.wallet_hotkey, File.TYPE_MINER, task['product_unique_id'])
+            Hint(
+                Hint.COLOR_GREEN,
+                Const.LOG_TYPE_VALIDATOR,
+                "Received a campaign task with ID: "
+                + task["product_unique_id"]
+                + " from Validator: "
+                + task["uid"],
+            )
+            miner_has_unique_url = file.unique_link_exists(
+                Main.wallet_hotkey,
+                Main.wallet_hotkey,
+                File.TYPE_MINER,
+                task["product_unique_id"],
+            )
 
             if miner_has_unique_url:
-                response = file.getUniqueUrl(Main.wallet_hotkey, Main.wallet_hotkey,
-                                             File.TYPE_MINER, task['product_unique_id'])
+                response = file.getUniqueUrl(
+                    Main.wallet_hotkey,
+                    Main.wallet_hotkey,
+                    File.TYPE_MINER,
+                    task["product_unique_id"],
+                )
                 synapse.dummy_output = response
-                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Unique link for campaign ID: " + task['product_unique_id'] + " already generated. Sending it to the Validator: " + task['uid'])
+                Hint(
+                    Hint.COLOR_GREEN,
+                    Const.LOG_TYPE_VALIDATOR,
+                    "Unique link for campaign ID: "
+                    + task["product_unique_id"]
+                    + " already generated. Sending it to the Validator: "
+                    + task["uid"],
+                )
             else:
                 file.saveCampaign(Main.wallet_hotkey, File.TYPE_MINER, task)
-                synapse.dummy_output = self.getCampaignUniqueId(task['product_unique_id'])
-                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, "Successfully created a unique link for campaign ID: " + task['product_unique_id'] + " and forwarded it to the Validator: " + task['uid'])
+                synapse.dummy_output = self.getCampaignUniqueId(
+                    task["product_unique_id"]
+                )
+                Hint(
+                    Hint.COLOR_GREEN,
+                    Const.LOG_TYPE_BITADS,
+                    "Successfully created a unique link for campaign ID: "
+                    + task["product_unique_id"]
+                    + " and forwarded it to the Validator: "
+                    + task["uid"],
+                )
 
-            file.removeCampaign(Main.wallet_hotkey, File.TYPE_MINER, task['product_unique_id'])
+            file.removeCampaign(
+                Main.wallet_hotkey, File.TYPE_MINER, task["product_unique_id"]
+            )
         else:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, "Validator pinging")
 
         return synapse
 
-    async def forward_status(
-        self, synapse: MinerStatus
-    ) -> MinerStatus:
+    async def forward_status(self, synapse: MinerStatus) -> MinerStatus:
         return synapse
 
-    async def forward_speed(
-        self, synapse: SpeedTest
-    ) -> SpeedTest:
+    async def forward_speed(self, synapse: SpeedTest) -> SpeedTest:
         return synapse
 
-    async def blacklist(
-        self, synapse: Task
-    ) -> typing.Tuple[bool, str]:
+    async def blacklist(self, synapse: Task) -> typing.Tuple[bool, str]:
         if synapse.dendrite.hotkey not in self.metagraph.hotkeys:
             # Ignore requests from unrecognized entities.
             bt.logging.trace(
@@ -144,7 +171,9 @@ class Miner(BaseMinerNeuron):
 
         if not timeout_ping or datetime.now() > timeout_ping:
             need_ping = True
-            timeout_ping = datetime.now() + timedelta(minutes=Const.VALIDATOR_MINUTES_TIMEOUT_PING)
+            timeout_ping = datetime.now() + timedelta(
+                minutes=Const.VALIDATOR_MINUTES_TIMEOUT_PING
+            )
 
         if need_ping:
             tmp_v = request.getV()
@@ -152,20 +181,37 @@ class Miner(BaseMinerNeuron):
                 v_current = tmp_v
             elif v_current != tmp_v:
                 command = "git pull origin master"
-                subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subprocess.Popen(
+                    command,
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
 
             Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[3], 2)
             response = request.ping(Main.wallet_hotkey, Main.wallet_coldkey)
-            if response['result']:
-                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[4], 1)
+            if response["result"]:
+                Hint(
+                    Hint.COLOR_GREEN,
+                    Const.LOG_TYPE_BITADS,
+                    Hint.LOG_TEXTS[4],
+                    1,
+                )
         return need_ping
 
     def getCampaignUniqueId(self, campaign_id):
-        response = request.getMinerUniqueId(campaign_id, Main.wallet_hotkey, Main.wallet_coldkey)
+        response = request.getMinerUniqueId(
+            campaign_id, Main.wallet_hotkey, Main.wallet_coldkey
+        )
         if response is not False:
-            response['product_unique_id'] = campaign_id
-            response['hotKey'] = Main.wallet_hotkey
-            file.saveMinerUniqueUrl(Main.wallet_hotkey, Main.wallet_hotkey, File.TYPE_MINER, response)
+            response["product_unique_id"] = campaign_id
+            response["hotKey"] = Main.wallet_hotkey
+            file.saveMinerUniqueUrl(
+                Main.wallet_hotkey,
+                Main.wallet_hotkey,
+                File.TYPE_MINER,
+                response,
+            )
 
         return response
 

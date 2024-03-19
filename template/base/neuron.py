@@ -127,8 +127,8 @@ class BaseNeuron(ABC):
     def check_registered(self):
         # --- Check for registration.
         if not self.subtensor.is_hotkey_registered(
-                netuid=self.config.netuid,
-                hotkey_ss58=self.wallet.hotkey.ss58_address,
+            netuid=self.config.netuid,
+            hotkey_ss58=self.wallet.hotkey.ss58_address,
         ):
             bt.logging.error(
                 f"Wallet: {self.wallet} is not registered on netuid {self.config.netuid}."
@@ -141,7 +141,7 @@ class BaseNeuron(ABC):
         Check if enough epoch blocks have elapsed since the last checkpoint to sync.
         """
         return (
-                self.block - self.metagraph.last_update[self.uid]
+            self.block - self.metagraph.last_update[self.uid]
         ) > self.config.neuron.epoch_length
 
     def should_set_weights(self) -> bool:
@@ -155,7 +155,7 @@ class BaseNeuron(ABC):
 
         # Define appropriate logic for when set weights.
         return (
-                self.block - self.metagraph.last_update[self.uid]
+            self.block - self.metagraph.last_update[self.uid]
         ) > self.config.neuron.epoch_length
 
     def save_state(self):
@@ -167,4 +167,3 @@ class BaseNeuron(ABC):
         bt.logging.warning(
             "load_state() not implemented for this neuron. You can implement this function to load model checkpoints or other useful data."
         )
-

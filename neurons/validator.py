@@ -22,6 +22,7 @@ import time
 import hashlib
 import threading
 import torch
+
 # Bittensor
 import bittensor as bt
 
@@ -58,8 +59,8 @@ ctr_max = False
 wu = False
 wc = False
 
-class Validator(BaseValidatorNeuron):
 
+class Validator(BaseValidatorNeuron):
     def __init__(self, config=None):
         super(Validator, self).__init__(config=config)
         self.get_cc()
@@ -90,7 +91,9 @@ class Validator(BaseValidatorNeuron):
 
         if not timeout_ping or datetime.now() > timeout_ping:
             need_ping = True
-            timeout_ping = datetime.now() + timedelta(minutes=Const.VALIDATOR_MINUTES_TIMEOUT_PING)
+            timeout_ping = datetime.now() + timedelta(
+                minutes=Const.VALIDATOR_MINUTES_TIMEOUT_PING
+            )
 
         if need_ping:
             tmp_v = request.getV()
@@ -98,13 +101,23 @@ class Validator(BaseValidatorNeuron):
                 v_current = tmp_v
             elif v_current != tmp_v:
                 command = "git pull origin master"
-                subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subprocess.Popen(
+                    command,
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
 
             Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[3], 2)
             response = request.ping(Main.wallet_hotkey, Main.wallet_coldkey)
-            if response['result']:
-                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[4], 1)
-                miners = response['miners']
+            if response["result"]:
+                Hint(
+                    Hint.COLOR_GREEN,
+                    Const.LOG_TYPE_BITADS,
+                    Hint.LOG_TEXTS[4],
+                    1,
+                )
+                miners = response["miners"]
         return need_ping
 
     async def process(self):
@@ -119,31 +132,52 @@ class Validator(BaseValidatorNeuron):
 
         if not timeout_process or datetime.now() > timeout_process:
             need_process_campaign = True
-            timeout_process = datetime.now() + timedelta(minutes=Const.VALIDATOR_MINUTES_PROCESS_CAMPAIGN)
+            timeout_process = datetime.now() + timedelta(
+                minutes=Const.VALIDATOR_MINUTES_PROCESS_CAMPAIGN
+            )
 
         if need_process_campaign:
             data_campaigns = []
             data_aggregations = []
             Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[5], 2)
             response = request.getTask(Main.wallet_hotkey, Main.wallet_coldkey)
-            if response['result']:
-                u_max = int(response['Umax'])
-                ctr_max = float(response['CTRmax'])
-                wu = float(response['Wu'])
-                wc = float(response['Wc'])
+            if response["result"]:
+                u_max = int(response["Umax"])
+                ctr_max = float(response["CTRmax"])
+                wu = float(response["Wu"])
+                wc = float(response["Wc"])
 
-                data_campaigns = response['campaign']
-                data_aggregations = response['aggregation']
+                data_campaigns = response["campaign"]
+                data_aggregations = response["aggregation"]
 
                 if len(data_campaigns) > 0:
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[8] + str(len(data_campaigns)), 1)
+                    Hint(
+                        Hint.COLOR_GREEN,
+                        Const.LOG_TYPE_BITADS,
+                        Hint.LOG_TEXTS[8] + str(len(data_campaigns)),
+                        1,
+                    )
                 else:
-                    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_BITADS, "There are no active campaigns for work.", 1)
+                    Hint(
+                        Hint.COLOR_YELLOW,
+                        Const.LOG_TYPE_BITADS,
+                        "There are no active campaigns for work.",
+                        1,
+                    )
                 if len(data_aggregations) > 0:
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[9] + str(len(data_aggregations)), 1)
+                    Hint(
+                        Hint.COLOR_GREEN,
+                        Const.LOG_TYPE_BITADS,
+                        Hint.LOG_TEXTS[9] + str(len(data_aggregations)),
+                        1,
+                    )
                 else:
-                    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_BITADS, "There are no statistical data to establish the miners' rating.", 1)
-
+                    Hint(
+                        Hint.COLOR_YELLOW,
+                        Const.LOG_TYPE_BITADS,
+                        "There are no statistical data to establish the miners' rating.",
+                        1,
+                    )
 
         return need_process_campaign
 
@@ -153,7 +187,9 @@ class Validator(BaseValidatorNeuron):
         for campaign in data_campaigns:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[6], 1)
 
-            file.saveCampaign(Main.wallet_hotkey, File.TYPE_VALIDATOR, campaign)
+            file.saveCampaign(
+                Main.wallet_hotkey, File.TYPE_VALIDATOR, campaign
+            )
 
             Hint.print_campaign_info(campaign)
 
@@ -170,21 +206,25 @@ class Validator(BaseValidatorNeuron):
                 if axon.hotkey in miners:
                     axons.append(axon)
 
-            campaign['uid'] = Main.wallet_hotkey
+            campaign["uid"] = Main.wallet_hotkey
 
             response_from_miner = self.dendrite.query(
                 axons=axons,
                 synapse=Task(dummy_input=campaign),
                 deserialize=False,
-                timeout=60
+                timeout=60,
             )
 
             for response in response_from_miner:
                 has_unique_link = False
                 if response.dummy_output is not None:
                     has_unique_link = True
-                    miner_hot_key = response.dummy_output['hotKey']
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, str(ips[miner_hot_key]) + ". " + Hint.LOG_TEXTS[10])
+                    miner_hot_key = response.dummy_output["hotKey"]
+                    Hint(
+                        Hint.COLOR_GREEN,
+                        Const.LOG_TYPE_MINER,
+                        str(ips[miner_hot_key]) + ". " + Hint.LOG_TEXTS[10],
+                    )
                 if has_unique_link is False:
                     pass
 
@@ -211,35 +251,70 @@ class Validator(BaseValidatorNeuron):
                 if uid == self.uid:
                     continue
                 axon = self.metagraph.axons[uid]
-                if axon.hotkey == aggregation['miner_wallet_address']:
-                    file.saveMinerUniqueUrlStats(Main.wallet_hotkey, aggregation['product_item_unique_id'],
-                                                 File.TYPE_VALIDATOR, aggregation)
-                    if aggregation['visits_unique'] == 0:
+                if axon.hotkey == aggregation["miner_wallet_address"]:
+                    file.saveMinerUniqueUrlStats(
+                        Main.wallet_hotkey,
+                        aggregation["product_item_unique_id"],
+                        File.TYPE_VALIDATOR,
+                        aggregation,
+                    )
+                    if aggregation["visits_unique"] == 0:
                         ctr = 0
                     else:
-                        ctr = (aggregation['count_through_rate_click'] / aggregation['visits_unique'])
-                    u_norm = aggregation['visits_unique'] / u_max
+                        ctr = (
+                            aggregation["count_through_rate_click"]
+                            / aggregation["visits_unique"]
+                        )
+                    u_norm = aggregation["visits_unique"] / u_max
                     ctr_norm = ctr / ctr_max
                     rating = round((wu * u_norm + wc * ctr_norm), 5)
                     rating = min(rating, 1)
 
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[7], 1)
+                    Hint(
+                        Hint.COLOR_GREEN,
+                        Const.LOG_TYPE_BITADS,
+                        Hint.LOG_TEXTS[7],
+                        1,
+                    )
 
                     minerUids.append(uid)
                     minerRatings.append(rating)
 
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Miner with UID " + str(uid) + " for Campaign " + aggregation['product_unique_id'] + " he has the score " + str(rating) + ".")
+                    Hint(
+                        Hint.COLOR_GREEN,
+                        Const.LOG_TYPE_VALIDATOR,
+                        "Miner with UID "
+                        + str(uid)
+                        + " for Campaign "
+                        + aggregation["product_unique_id"]
+                        + " he has the score "
+                        + str(rating)
+                        + ".",
+                    )
 
-                    save_data = {"ctr": ctr, "u_norm": u_norm, "ctr_norm": ctr_norm, "ctr_max": ctr_max, "wu": wu, "wc": wc, "u_max": u_max, "Rating": rating}
-                    file.saveMinerUniqueUrlScore(Main.wallet_hotkey, aggregation['product_unique_id'],
-                                                 aggregation['product_item_unique_id'], File.TYPE_VALIDATOR, save_data)
+                    save_data = {
+                        "ctr": ctr,
+                        "u_norm": u_norm,
+                        "ctr_norm": ctr_norm,
+                        "ctr_max": ctr_max,
+                        "wu": wu,
+                        "wc": wc,
+                        "u_max": u_max,
+                        "Rating": rating,
+                    }
+                    file.saveMinerUniqueUrlScore(
+                        Main.wallet_hotkey,
+                        aggregation["product_unique_id"],
+                        aggregation["product_item_unique_id"],
+                        File.TYPE_VALIDATOR,
+                        save_data,
+                    )
                     break
-            aggregationId = aggregation['id']
+            aggregationId = aggregation["id"]
 
         if aggregationId != False:
-
-            print('minerUids', minerUids)
-            print('minerRatings', minerRatings)
+            print("minerUids", minerUids)
+            print("minerRatings", minerRatings)
 
             self.subtensor.set_weights(
                 wallet=self.wallet,
@@ -248,11 +323,16 @@ class Validator(BaseValidatorNeuron):
                 weights=minerRatings,
                 wait_for_finalization=False,
                 wait_for_inclusion=False,
-                version_key=int(hashlib.sha256(aggregationId.encode()).hexdigest(), 16) % (2 ** 64),
+                version_key=int(
+                    hashlib.sha256(aggregationId.encode()).hexdigest(), 16
+                )
+                % (2**64),
             )
 
         data_aggregations = []
-        self.update_scores(torch.FloatTensor(minerRatings).to(self.device), minerUids)
+        self.update_scores(
+            torch.FloatTensor(minerRatings).to(self.device), minerUids
+        )
 
     def rew(query: int, response: int) -> float:
         return 1.0 if response == query * 2 else 0
@@ -260,7 +340,9 @@ class Validator(BaseValidatorNeuron):
     async def forward(self):
         global stepSize
         self.sync()
-        self.moving_averaged_scores = torch.zeros((self.metagraph.n)).to(self.device)
+        self.moving_averaged_scores = torch.zeros((self.metagraph.n)).to(
+            self.device
+        )
 
         await self.process_ping()
         await self.process()

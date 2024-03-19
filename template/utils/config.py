@@ -64,7 +64,7 @@ def add_args(cls, parser):
     # Netuid Arg: The netuid of the subnet to connect to.
     parser.add_argument("--netuid", type=int, help="Subnet netuid", default=1)
 
-    command_line = ' '.join(sys.argv[0:])
+    command_line = " ".join(sys.argv[0:])
     if "neurons/miner.py" in command_line:
         neuron_type = "miner"
     else:
@@ -173,8 +173,8 @@ def config(cls):
     """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--logging.debug",default=True)
-    parser.add_argument("--logging.trace",default=True)
+    parser.add_argument("--logging.debug", default=True)
+    parser.add_argument("--logging.trace", default=True)
     # parser.add_argument("--logging.record_log",default=True)
     # bt.logging.error = lambda *args, **kwargs: None
 

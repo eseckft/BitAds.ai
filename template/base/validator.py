@@ -319,7 +319,7 @@ class BaseValidatorNeuron(BaseNeuron):
         # shape: [ metagraph.n ]
         alpha: float = self.config.neuron.moving_average_alpha
         self.scores: torch.FloatTensor = alpha * scattered_rewards + (
-                1 - alpha
+            1 - alpha
         ) * self.scores.to(self.device)
         bt.logging.debug(f"Updated moving avg scores: {self.scores}")
 

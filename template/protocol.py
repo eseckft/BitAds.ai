@@ -77,39 +77,48 @@ class Dummy(bt.Synapse):
         return self.dummy_output
 
 
-
 class Task(bt.Synapse):
-
     dummy_input: dict
     dummy_output: Optional[dict] = None
 
     def deserialize(self) -> "Task":
         return self
 
+
 """
 Represents a software version with major, minor, and patch components.
 """
-class Version (pydantic.BaseModel):
+
+
+class Version(pydantic.BaseModel):
     major_version: Optional[int] = None
     minor_version: Optional[int] = None
     patch_version: Optional[int] = None
 
-class MapSynapse ( bt.Synapse ):
+
+class MapSynapse(bt.Synapse):
     version: Optional[Version] = None
+
 
 """
 A specialized Synapse representing the status of a miner, 
 including its availability and memory resources.
 """
-class MinerStatus( MapSynapse  ):
+
+
+class MinerStatus(MapSynapse):
     free_memory: Optional[int] = None
     available: Optional[bool] = None
 
-class SpeedTest( MapSynapse  ):
+
+class SpeedTest(MapSynapse):
     result: Optional[Dict] = None
+
 
 """
 Defines the status of a validator, particularly whether it is available for processing requests.
 """
-class ValidatorStatus( pydantic.BaseModel ):
+
+
+class ValidatorStatus(pydantic.BaseModel):
     available: Optional[bool] = None

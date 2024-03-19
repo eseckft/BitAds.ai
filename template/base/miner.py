@@ -52,16 +52,20 @@ class BaseMinerNeuron(BaseNeuron):
         # Attach determiners which functions are called when servicing a request.
         bt.logging.info(f"Attaching forward function to miner axon.")
 
-        Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_LOCAL, "Attaching forward function to miner axon.")
+        Hint(
+            Hint.COLOR_GREEN,
+            Const.LOG_TYPE_LOCAL,
+            "Attaching forward function to miner axon.",
+        )
 
         self.axon.attach(
             forward_fn=self.forward,
             blacklist_fn=self.blacklist,
             priority_fn=self.priority,
         ).attach(
-            forward_fn = self.forward_status,
+            forward_fn=self.forward_status,
         ).attach(
-            forward_fn = self.forward_speed,
+            forward_fn=self.forward_speed,
         )
 
         # Instantiate runners
@@ -112,8 +116,8 @@ class BaseMinerNeuron(BaseNeuron):
         try:
             while not self.should_exit:
                 while (
-                        self.block - self.metagraph.last_update[self.uid]
-                        < self.config.neuron.epoch_length
+                    self.block - self.metagraph.last_update[self.uid]
+                    < self.config.neuron.epoch_length
                 ):
                     # Wait before checking again.
                     time.sleep(1)

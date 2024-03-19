@@ -5,33 +5,53 @@ import requests
 from helpers.constants.hint import Hint
 from helpers.constants.const import Const
 
-class Request:
 
+class Request:
     folders_to_check = ["./helpers", "./neurons"]
-    
+
     def print_errors(self, errors):
         if len(errors) != 0:
             for error in errors:
                 if error != 200:
-                    Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, Const.API_ERROR_CODES.get(error, "Unknown code error {}".format(error)), 0)
+                    Hint(
+                        Hint.COLOR_RED,
+                        Const.LOG_TYPE_BITADS,
+                        Const.API_ERROR_CODES.get(
+                            error, "Unknown code error {}".format(error)
+                        ),
+                        0,
+                    )
 
     def ping(self, hot_key, cold_key):
-        print('request hash example: ', self.calculate_md5_for_files_in_folders(self.folders_to_check))
-
+        print(
+            "request hash example: ",
+            self.calculate_md5_for_files_in_folders(self.folders_to_check),
+        )
 
         url = Const.API_BITADS_DOMAIN + "subnetPing"
         response_data = {}
         try:
-            response = requests.get(url, headers = {'hot_key': hot_key, 'cold_key': cold_key})
+            response = requests.get(
+                url, headers={"hot_key": hot_key, "cold_key": cold_key}
+            )
             response_data = response.json()
-            if len(response_data['errors']) != 0:
-                for error in response_data['errors']:
+            if len(response_data["errors"]) != 0:
+                for error in response_data["errors"]:
                     if error != 200:
-                        Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS,
-                            Const.API_ERROR_CODES.get(error, "Unknown code error {}".format(error)))
+                        Hint(
+                            Hint.COLOR_RED,
+                            Const.LOG_TYPE_BITADS,
+                            Const.API_ERROR_CODES.get(
+                                error, "Unknown code error {}".format(error)
+                            ),
+                        )
 
         except requests.exceptions.HTTPError as errh:
-            Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "Http Error. " + str(errh))
+            Hint(
+                Hint.COLOR_RED,
+                Const.LOG_TYPE_BITADS,
+                "Http Error. " + str(errh),
+            )
 
         return response_data
 
@@ -39,13 +59,21 @@ class Request:
         url = Const.API_BITADS_DOMAIN + "getTask"
 
         try:
-            response = requests.get(url, headers = {'hot_key': hot_key, 'cold_key': cold_key})
+            response = requests.get(
+                url, headers={"hot_key": hot_key, "cold_key": cold_key}
+            )
             response_data = response.json()
 
-            if len(response_data['errors']) != 0:
-                for error in response_data['errors']:
+            if len(response_data["errors"]) != 0:
+                for error in response_data["errors"]:
                     if error != 200:
-                        Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, Const.API_ERROR_CODES.get(error, "Unknown code error {}".format(error)))
+                        Hint(
+                            Hint.COLOR_RED,
+                            Const.LOG_TYPE_BITADS,
+                            Const.API_ERROR_CODES.get(
+                                error, "Unknown code error {}".format(error)
+                            ),
+                        )
 
             return response_data
 
@@ -56,24 +84,41 @@ class Request:
         except requests.exceptions.Timeout as errt:
             Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "Timeout Error.")
         except requests.exceptions.RequestException as err:
-            Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "OOps: Something Else.")
+            Hint(
+                Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "OOps: Something Else."
+            )
         except ValueError:
-            Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "Invalid JSON received.")
+            Hint(
+                Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "Invalid JSON received."
+            )
 
         return False
+
     #
     def getMinerUniqueId(self, campaignId, hot_key, cold_key):
-        url = Const.API_BITADS_DOMAIN + "getGenerateMinerCampaignUrl?" + campaignId
+        url = (
+            Const.API_BITADS_DOMAIN
+            + "getGenerateMinerCampaignUrl?"
+            + campaignId
+        )
 
         try:
-            response = requests.get(url, headers = {'hot_key': hot_key, 'cold_key': cold_key})
+            response = requests.get(
+                url, headers={"hot_key": hot_key, "cold_key": cold_key}
+            )
             response.raise_for_status()
             response_data = response.json()
 
-            if len(response_data['errors']) != 0:
-                for error in response_data['errors']:
+            if len(response_data["errors"]) != 0:
+                for error in response_data["errors"]:
                     if error != 200:
-                        Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, Const.API_ERROR_CODES.get(error, "Unknown code error {}".format(error)))
+                        Hint(
+                            Hint.COLOR_RED,
+                            Const.LOG_TYPE_BITADS,
+                            Const.API_ERROR_CODES.get(
+                                error, "Unknown code error {}".format(error)
+                            ),
+                        )
             else:
                 return response_data
 
@@ -84,9 +129,13 @@ class Request:
         except requests.exceptions.Timeout as errt:
             Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "Timeout Error.")
         except requests.exceptions.RequestException as err:
-            Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "OOps: Something Else.")
+            Hint(
+                Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "OOps: Something Else."
+            )
         except ValueError:
-            Hint(Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "Invalid JSON received.")
+            Hint(
+                Hint.COLOR_RED, Const.LOG_TYPE_BITADS, "Invalid JSON received."
+            )
 
         return False
 
@@ -103,7 +152,7 @@ class Request:
         return hash_md5.hexdigest()
 
     def calculate_md5_for_files_in_folders(self, folders):
-        md5 = ''
+        md5 = ""
 
         for folder in folders:
             for root, dirs, files in os.walk(folder):
@@ -113,5 +162,5 @@ class Request:
                     md5 = md5 + md5_hash
 
         hash_md5 = hashlib.md5()
-        hash_md5.update(md5.encode('utf-8'))
+        hash_md5.update(md5.encode("utf-8"))
         return hash_md5.hexdigest()

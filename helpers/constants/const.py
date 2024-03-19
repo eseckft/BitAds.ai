@@ -1,5 +1,4 @@
 class Const:
-
     API_BITADS_DOMAIN = "https://api.bitads.ai/"
 
     LOG_TYPE_BITADS = "BITADS"
