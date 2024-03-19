@@ -37,17 +37,8 @@ class File:
                     f"Created directory: {path}",
                 )
 
-    def saveCampaign(self, wallet_address, type, task):
-        path = (
-            self.DIR_ROOT
-            + "/"
-            + type
-            + "/"
-            + wallet_address
-            + "/campaign_id/"
-            + task["product_unique_id"]
-            + ".json"
-        )
+    def save_campaign(self, wallet_address, type, task):
+        path = f"{self.DIR_ROOT}/{type}/{wallet_address}/campaign_id/{task['product_unique_id']}.json"
         with open(path, "w") as file:
             json.dump(task, file, indent=4)
             Hint(
@@ -56,19 +47,8 @@ class File:
                 "Save campaign to: " + path,
             )
 
-    def removeCampaign(self, wallet_address, type, campaignId):
-        path = (
-            self.DIR_ROOT
-            + "/"
-            + type
-            + "/"
-            + wallet_address
-            + "/campaign_id/"
-            + campaignId
-            + "_"
-            + wallet_address
-            + ".json"
-        )
+    def remove_campaign(self, wallet_address, type, campaign_id):
+        path = f"{self.DIR_ROOT}/{type}/{wallet_address}/campaign_id/{campaign_id}_{wallet_address}.json"
         if os.path.exists(path):
             os.remove(path)
             Hint(
@@ -77,19 +57,8 @@ class File:
                 "Remove campaign file: " + path,
             )
 
-    def saveMinerUniqueUrl(self, owner, wallet_address, type, data):
-        path = (
-            self.DIR_ROOT
-            + "/"
-            + type
-            + "/"
-            + owner
-            + "/unique_link/"
-            + data["product_unique_id"]
-            + "_"
-            + wallet_address
-            + ".json"
-        )
+    def save_miner_unique_url(self, owner, wallet_address, type, data):
+        path = f"{self.DIR_ROOT}/{type}/{owner}/unique_link/{data['product_unique_id']}_{wallet_address}.json"
         with open(path, "w") as file:
             json.dump(data, file, indent=4)
             Hint(
@@ -98,19 +67,8 @@ class File:
                 "Save campaign unique url to: " + path,
             )
 
-    def saveMinerUniqueUrlStats(self, owner, uniqueUrl, type, data):
-        path = (
-            self.DIR_ROOT
-            + "/"
-            + type
-            + "/"
-            + owner
-            + "/unique_link_stats/"
-            + data["product_unique_id"]
-            + "_"
-            + uniqueUrl
-            + ".json"
-        )
+    def save_miner_unique_url_stats(self, owner, unique_url, type, data):
+        path = f"{self.DIR_ROOT}/{type}/{owner}/unique_link_stats/{data['product_unique_id']}_{unique_url}.json"
         with open(path, "w") as file:
             json.dump(data, file, indent=4)
             Hint(
@@ -119,19 +77,10 @@ class File:
                 "Save campaign unique url statistics to: " + path,
             )
 
-    def saveMinerUniqueUrlScore(self, owner, uniqueId, uniqueUrl, type, data):
-        path = (
-            self.DIR_ROOT
-            + "/"
-            + type
-            + "/"
-            + owner
-            + "/unique_link_score/"
-            + uniqueId
-            + "_"
-            + uniqueUrl
-            + ".json"
-        )
+    def save_miner_unique_url_score(
+        self, owner, uniqueId, uniqueUrl, type, data
+    ):
+        path = f"{self.DIR_ROOT}/{type}/{owner}/unique_link_score/{uniqueId}_{uniqueUrl}.json"
         with open(path, "w") as file:
             json.dump(data, file, indent=4)
             Hint(
@@ -141,36 +90,11 @@ class File:
             )
 
     def unique_link_exists(self, owner, wallet_address, type, campaignId):
-        path = (
-            self.DIR_ROOT
-            + "/"
-            + type
-            + "/"
-            + owner
-            + "/unique_link/"
-            + campaignId
-            + "_"
-            + wallet_address
-            + ".json"
-        )
-        if not os.path.exists(path):
-            return False
+        path = f"{self.DIR_ROOT}/{type}/{owner}/unique_link/{campaignId}_{wallet_address}.json"
+        return os.path.exists(path)
 
-        return True
-
-    def getUniqueUrl(self, owner, wallet_address, type, campaignId):
-        path = (
-            self.DIR_ROOT
-            + "/"
-            + type
-            + "/"
-            + owner
-            + "/unique_link/"
-            + campaignId
-            + "_"
-            + wallet_address
-            + ".json"
-        )
+    def get_unique_url(self, owner, wallet_address, type, campaign_id):
+        path = f"{self.DIR_ROOT}/{type}/{owner}/unique_link/{campaign_id}_{wallet_address}.json"
         data = {}
         if os.path.exists(path):
             with open(path, "r") as file:

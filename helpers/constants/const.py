@@ -1,3 +1,6 @@
+from typing import Tuple
+
+
 class Const:
     API_BITADS_DOMAIN = "https://api.bitads.ai/"
 
@@ -6,10 +9,17 @@ class Const:
     LOG_TYPE_MINER = "MINER"
     LOG_TYPE_VALIDATOR = "VALIDATOR"
 
+    FOLDERS_TO_CHECK: Tuple[str] = (
+        "./helpers",
+        "./neurons",
+    )
+
+    # TODO: region move_to_config
     MINER_MINUTES_TIMEOUT_PING = 10
 
     VALIDATOR_MINUTES_TIMEOUT_PING = 10
     VALIDATOR_MINUTES_PROCESS_CAMPAIGN = 10
+    # endregion
 
     API_ERROR_CODES = {
         100: "Internal Server Error.",

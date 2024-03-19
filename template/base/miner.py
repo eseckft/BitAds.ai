@@ -16,6 +16,8 @@
 # DEALINGS IN THE SOFTWARE.
 
 import time
+from abc import ABC
+
 import torch
 import asyncio
 import threading
@@ -28,13 +30,15 @@ from helpers.constants.hint import Hint
 from helpers.constants import Const
 
 
-class BaseMinerNeuron(BaseNeuron):
+class BaseMinerNeuron(BaseNeuron, ABC):
+    _NEURON_TYPE = "miner"
+
     """
     Base class for Bittensor miners.
     """
 
     def __init__(self, config=None):
-        super().__init__(config=config)
+        super().__init__(config=config, timeout_ping=Const.MINER_MINUTES_TIMEOUT_PING)
 
         # Warn if allowing incoming requests from anyone.
         # if not self.config.blacklist.force_validator_permit:

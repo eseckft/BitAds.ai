@@ -20,6 +20,7 @@
 
 import copy
 import time
+from abc import ABC
 
 import torch
 import asyncio
@@ -29,16 +30,19 @@ import bittensor as bt
 from typing import List
 from traceback import print_exception
 
+from helpers.constants import Const
 from template.base.neuron import BaseNeuron
 
 
-class BaseValidatorNeuron(BaseNeuron):
+class BaseValidatorNeuron(BaseNeuron, ABC):
+    _NEURON_TYPE = "validator"
+
     """
     Base class for Bittensor validators. Your validator should inherit from this class.
     """
 
     def __init__(self, config=None):
-        super().__init__(config=config)
+        super().__init__(config=config, timeout_ping=Const.VALIDATOR_MINUTES_TIMEOUT_PING)
 
         # Save a copy of the hotkeys to local memory.
         self.hotkeys = copy.deepcopy(self.metagraph.hotkeys)

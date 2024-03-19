@@ -35,13 +35,6 @@ from helpers.request import Request
 from datetime import datetime, timedelta
 import subprocess
 
-file = File()
-request = Request()
-
-timeout_ping = False
-
-v_current = False
-
 
 class Miner(BaseMinerNeuron):
     """
@@ -52,84 +45,59 @@ class Miner(BaseMinerNeuron):
     This class provides reasonable default behavior for a miner such as blacklisting unrecognized hotkeys, prioritizing requests based on stake, and forwarding requests to the forward function. If you need to define custom
     """
 
-    def __init__(self, config=None):
-        super(Miner, self).__init__(config=config)
-        self.get_cc()
-        self.prepare()
-        # TODO(developer): Anything specific to your use case you can do here
-
-    def get_cc(self):
-        try:
-            Main.wallet_hotkey = self.wallet.hotkey.ss58_address
-            cc = File.get_cc()
-            if cc is not False:
-                Main.wallet_coldkey = cc
-            else:
-                Hint(Hint.COLOR_CYAN, Const.LOG_TYPE_LOCAL, Hint.M[2])
-                Main.wallet_coldkey = self.wallet.coldkey.ss58_address
-                File.save_cc()
-        except Exception as e:
-            Hint(Hint.COLOR_RED, Const.LOG_TYPE_LOCAL, Hint.M[3])
-            self.get_cc()
-
-    def prepare(self):
-        file.create_dirs(File.TYPE_MINER)
-
     async def forward(self, synapse: Task) -> Task:
         synapse.dummy_output = {}
         task = synapse.dummy_input
 
-        if task != False and len(task) != 0:
-            Hint(
-                Hint.COLOR_GREEN,
-                Const.LOG_TYPE_VALIDATOR,
-                "Received a campaign task with ID: "
-                + task["product_unique_id"]
-                + " from Validator: "
-                + task["uid"],
-            )
-            miner_has_unique_url = file.unique_link_exists(
+        if not task:
+            Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, "Validator pinging")
+            return synapse
+
+        Hint(
+            Hint.COLOR_GREEN,
+            Const.LOG_TYPE_VALIDATOR,
+            f"Received a campaign task with ID: {task['product_unique_id']} from Validator: {task['uid']}",
+        )
+        miner_has_unique_url = self._file.unique_link_exists(
+            Main.wallet_hotkey,
+            Main.wallet_hotkey,
+            File.TYPE_MINER,
+            task["product_unique_id"],
+        )
+
+        if miner_has_unique_url:
+            response = self._file.get_unique_url(
                 Main.wallet_hotkey,
                 Main.wallet_hotkey,
                 File.TYPE_MINER,
                 task["product_unique_id"],
             )
-
-            if miner_has_unique_url:
-                response = file.getUniqueUrl(
-                    Main.wallet_hotkey,
-                    Main.wallet_hotkey,
-                    File.TYPE_MINER,
-                    task["product_unique_id"],
-                )
-                synapse.dummy_output = response
-                Hint(
-                    Hint.COLOR_GREEN,
-                    Const.LOG_TYPE_VALIDATOR,
-                    "Unique link for campaign ID: "
-                    + task["product_unique_id"]
-                    + " already generated. Sending it to the Validator: "
-                    + task["uid"],
-                )
-            else:
-                file.saveCampaign(Main.wallet_hotkey, File.TYPE_MINER, task)
-                synapse.dummy_output = self.getCampaignUniqueId(
-                    task["product_unique_id"]
-                )
-                Hint(
-                    Hint.COLOR_GREEN,
-                    Const.LOG_TYPE_BITADS,
-                    "Successfully created a unique link for campaign ID: "
-                    + task["product_unique_id"]
-                    + " and forwarded it to the Validator: "
-                    + task["uid"],
-                )
-
-            file.removeCampaign(
-                Main.wallet_hotkey, File.TYPE_MINER, task["product_unique_id"]
+            synapse.dummy_output = response
+            Hint(
+                Hint.COLOR_GREEN,
+                Const.LOG_TYPE_VALIDATOR,
+                "Unique link for campaign ID: "
+                + task["product_unique_id"]
+                + " already generated. Sending it to the Validator: "
+                + task["uid"],
             )
         else:
-            Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, "Validator pinging")
+            self._file.save_campaign(Main.wallet_hotkey, File.TYPE_MINER, task)
+            synapse.dummy_output = self.get_campaign_unique_id(
+                task["product_unique_id"]
+            )
+            Hint(
+                Hint.COLOR_GREEN,
+                Const.LOG_TYPE_BITADS,
+                "Successfully created a unique link for campaign ID: "
+                + task["product_unique_id"]
+                + " and forwarded it to the Validator: "
+                + task["uid"],
+            )
+
+        self._file.remove_campaign(
+            Main.wallet_hotkey, File.TYPE_MINER, task["product_unique_id"]
+        )
 
         return synapse
 
@@ -164,49 +132,14 @@ class Miner(BaseMinerNeuron):
         )
         return prirority
 
-    def process_ping(self):
-        global timeout_ping
-        global v_current
-        need_ping = False
-
-        if not timeout_ping or datetime.now() > timeout_ping:
-            need_ping = True
-            timeout_ping = datetime.now() + timedelta(
-                minutes=Const.VALIDATOR_MINUTES_TIMEOUT_PING
-            )
-
-        if need_ping:
-            tmp_v = request.getV()
-            if v_current is False:
-                v_current = tmp_v
-            elif v_current != tmp_v:
-                command = "git pull origin master"
-                subprocess.Popen(
-                    command,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-
-            Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[3], 2)
-            response = request.ping(Main.wallet_hotkey, Main.wallet_coldkey)
-            if response["result"]:
-                Hint(
-                    Hint.COLOR_GREEN,
-                    Const.LOG_TYPE_BITADS,
-                    Hint.LOG_TEXTS[4],
-                    1,
-                )
-        return need_ping
-
-    def getCampaignUniqueId(self, campaign_id):
-        response = request.getMinerUniqueId(
+    def get_campaign_unique_id(self, campaign_id):
+        response = self._request.get_miner_unique_id(
             campaign_id, Main.wallet_hotkey, Main.wallet_coldkey
         )
-        if response is not False:
+        if response:
             response["product_unique_id"] = campaign_id
             response["hotKey"] = Main.wallet_hotkey
-            file.saveMinerUniqueUrl(
+            self._file.save_miner_unique_url(
                 Main.wallet_hotkey,
                 Main.wallet_hotkey,
                 File.TYPE_MINER,
@@ -223,7 +156,9 @@ if __name__ == "__main__":
         Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_LOCAL, Hint.M[1])
         while True:
             miner.process_ping()
-            time.sleep(20)
-            if miner.should_exit:
+            bt.logging.info("Miner running...", time.time())
+            try:
+                time.sleep(20)
+            except KeyboardInterrupt:
                 bt.logging.warning("Ending miner...")
                 break

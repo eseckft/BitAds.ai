@@ -18,33 +18,22 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-import time
 import hashlib
-import threading
-import torch
+import time
+from datetime import datetime, timedelta
 
 # Bittensor
 import bittensor as bt
+import torch
 
-# Bittensor Validator Template:
-import template
-from template.validator import forward
-
-from template.base.validator import BaseValidatorNeuron
-from helpers.constants.hint import Hint
 from helpers.constants.const import Const
+from helpers.constants.hint import Hint
 from helpers.constants.main import Main
 from helpers.file import File
-from helpers.request import Request
-from datetime import datetime, timedelta
+from template.base.validator import BaseValidatorNeuron
 from template.protocol import Task
-import subprocess
 
-timeout_ping = False
 timeout_process = False
-
-request = Request()
-file = File()
 
 stepSize = 10
 
@@ -61,64 +50,12 @@ wc = False
 
 
 class Validator(BaseValidatorNeuron):
-    def __init__(self, config=None):
-        super(Validator, self).__init__(config=config)
-        self.get_cc()
-        self.prepare()
-
-    def get_cc(self):
-        try:
-            Main.wallet_hotkey = self.wallet.hotkey.ss58_address
-            cc = File.get_cc()
-            if cc is not False:
-                Main.wallet_coldkey = cc
-            else:
-                Hint(Hint.COLOR_CYAN, Const.LOG_TYPE_LOCAL, Hint.M[2])
-                Main.wallet_coldkey = self.wallet.coldkey.ss58_address
-                File.save_cc()
-        except Exception as e:
-            Hint(Hint.COLOR_RED, Const.LOG_TYPE_LOCAL, Hint.M[3])
-            self.get_cc()
-
-    def prepare(self):
-        file.create_dirs(File.TYPE_VALIDATOR)
-
     async def process_ping(self):
-        global timeout_ping
-        global v_current
         global miners
-        need_ping = False
-
-        if not timeout_ping or datetime.now() > timeout_ping:
-            need_ping = True
-            timeout_ping = datetime.now() + timedelta(
-                minutes=Const.VALIDATOR_MINUTES_TIMEOUT_PING
-            )
-
-        if need_ping:
-            tmp_v = request.getV()
-            if v_current is False:
-                v_current = tmp_v
-            elif v_current != tmp_v:
-                command = "git pull origin master"
-                subprocess.Popen(
-                    command,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-
-            Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[3], 2)
-            response = request.ping(Main.wallet_hotkey, Main.wallet_coldkey)
-            if response["result"]:
-                Hint(
-                    Hint.COLOR_GREEN,
-                    Const.LOG_TYPE_BITADS,
-                    Hint.LOG_TEXTS[4],
-                    1,
-                )
-                miners = response["miners"]
-        return need_ping
+        need_ping, response = super().process_ping()
+        if response:
+            miners = response["miners"]
+        return need_ping, response
 
     async def process(self):
         global timeout_process
@@ -140,8 +77,8 @@ class Validator(BaseValidatorNeuron):
             data_campaigns = []
             data_aggregations = []
             Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[5], 2)
-            response = request.getTask(Main.wallet_hotkey, Main.wallet_coldkey)
-            if response["result"]:
+            response = self._request.get_task(Main.wallet_hotkey, Main.wallet_coldkey)
+            if "result" in response:
                 u_max = int(response["Umax"])
                 ctr_max = float(response["CTRmax"])
                 wu = float(response["Wu"])
@@ -150,7 +87,7 @@ class Validator(BaseValidatorNeuron):
                 data_campaigns = response["campaign"]
                 data_aggregations = response["aggregation"]
 
-                if len(data_campaigns) > 0:
+                if data_campaigns:
                     Hint(
                         Hint.COLOR_GREEN,
                         Const.LOG_TYPE_BITADS,
@@ -164,7 +101,7 @@ class Validator(BaseValidatorNeuron):
                         "There are no active campaigns for work.",
                         1,
                     )
-                if len(data_aggregations) > 0:
+                if data_aggregations:
                     Hint(
                         Hint.COLOR_GREEN,
                         Const.LOG_TYPE_BITADS,
@@ -187,9 +124,7 @@ class Validator(BaseValidatorNeuron):
         for campaign in data_campaigns:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[6], 1)
 
-            file.saveCampaign(
-                Main.wallet_hotkey, File.TYPE_VALIDATOR, campaign
-            )
+            self._file.save_campaign(Main.wallet_hotkey, File.TYPE_VALIDATOR, campaign)
 
             Hint.print_campaign_info(campaign)
 
@@ -217,7 +152,7 @@ class Validator(BaseValidatorNeuron):
 
             for response in response_from_miner:
                 has_unique_link = False
-                if response.dummy_output is not None:
+                if response.dummy_output:
                     has_unique_link = True
                     miner_hot_key = response.dummy_output["hotKey"]
                     Hint(
@@ -225,14 +160,14 @@ class Validator(BaseValidatorNeuron):
                         Const.LOG_TYPE_MINER,
                         str(ips[miner_hot_key]) + ". " + Hint.LOG_TEXTS[10],
                     )
-                if has_unique_link is False:
+                if not has_unique_link:
                     pass
 
             data_campaigns.pop(0)
             time.sleep(2)
             # break
 
-    def sendMessage(self, axon, campaign):
+    def send_message(self, axon, campaign):
         pass
 
     async def process_aggregation(self):
@@ -242,9 +177,9 @@ class Validator(BaseValidatorNeuron):
         global wu
         global wc
 
-        minerUids = []
-        minerRatings = []
-        aggregationId = False
+        miner_uids = []
+        miner_ratings = []
+        aggregation_id = None
 
         for aggregation in data_aggregations:
             for uid in range(self.metagraph.n.item()):
@@ -252,7 +187,7 @@ class Validator(BaseValidatorNeuron):
                     continue
                 axon = self.metagraph.axons[uid]
                 if axon.hotkey == aggregation["miner_wallet_address"]:
-                    file.saveMinerUniqueUrlStats(
+                    self._file.save_miner_unique_url_stats(
                         Main.wallet_hotkey,
                         aggregation["product_item_unique_id"],
                         File.TYPE_VALIDATOR,
@@ -277,19 +212,13 @@ class Validator(BaseValidatorNeuron):
                         1,
                     )
 
-                    minerUids.append(uid)
-                    minerRatings.append(rating)
+                    miner_uids.append(uid)
+                    miner_ratings.append(rating)
 
                     Hint(
                         Hint.COLOR_GREEN,
                         Const.LOG_TYPE_VALIDATOR,
-                        "Miner with UID "
-                        + str(uid)
-                        + " for Campaign "
-                        + aggregation["product_unique_id"]
-                        + " he has the score "
-                        + str(rating)
-                        + ".",
+                        f"Miner with UID {uid} for Campaign {aggregation['product_unique_id']} has the score {rating}."
                     )
 
                     save_data = {
@@ -302,7 +231,7 @@ class Validator(BaseValidatorNeuron):
                         "u_max": u_max,
                         "Rating": rating,
                     }
-                    file.saveMinerUniqueUrlScore(
+                    self._file.save_miner_unique_url_score(
                         Main.wallet_hotkey,
                         aggregation["product_unique_id"],
                         aggregation["product_item_unique_id"],
@@ -310,46 +239,40 @@ class Validator(BaseValidatorNeuron):
                         save_data,
                     )
                     break
-            aggregationId = aggregation["id"]
+            aggregation_id = aggregation["id"]
 
-        if aggregationId != False:
-            print("minerUids", minerUids)
-            print("minerRatings", minerRatings)
+        if aggregation_id:
+            print("minerUids", miner_uids)
+            print("minerRatings", miner_ratings)
 
             self.subtensor.set_weights(
                 wallet=self.wallet,
                 netuid=self.config.netuid,
-                uids=minerUids,
-                weights=minerRatings,
+                uids=miner_uids,
+                weights=miner_ratings,
                 wait_for_finalization=False,
                 wait_for_inclusion=False,
-                version_key=int(
-                    hashlib.sha256(aggregationId.encode()).hexdigest(), 16
-                )
+                version_key=int(hashlib.sha256(aggregation_id.encode()).hexdigest(), 16)
                 % (2**64),
             )
 
         data_aggregations = []
-        self.update_scores(
-            torch.FloatTensor(minerRatings).to(self.device), minerUids
-        )
+        self.update_scores(torch.FloatTensor(miner_ratings).to(self.device), miner_uids)
 
-    def rew(query: int, response: int) -> float:
+    def rew(self, query: int, response: int) -> float:
         return 1.0 if response == query * 2 else 0
 
-    async def forward(self):
+    async def forward(self, **kwargs):
         global stepSize
         self.sync()
-        self.moving_averaged_scores = torch.zeros((self.metagraph.n)).to(
-            self.device
-        )
+        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(self.device)
 
         await self.process_ping()
         await self.process()
 
-        if len(data_campaigns) > 0:
+        if data_aggregations:
             await self.process_campaign()
-        elif len(data_aggregations) > 0:
+        elif data_aggregations:
             await self.process_aggregation()
 
 
@@ -359,4 +282,7 @@ if __name__ == "__main__":
         Hint(Hint.COLOR_BLUE, Const.LOG_TYPE_LOCAL, Hint.V[1])
         Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_LOCAL, Hint.V[1])
         while True:
-            time.sleep(5)
+            try:
+                time.sleep(5)
+            except KeyboardInterrupt:
+                bt.logging.warning("Ending validator...")
