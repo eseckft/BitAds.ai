@@ -69,7 +69,7 @@ class BaseNeuron(ABC):
         config=None,
         ping_timeout=None,
         current_version=None,
-        timeout_ping=0
+        timeout_ping=0,
     ):
         base_config = copy.deepcopy(config or BaseNeuron.config())
         self.config = self.config()
@@ -120,7 +120,6 @@ class BaseNeuron(ABC):
         self._ping_timeout = ping_timeout
         self._timeout_ping = timeout_ping
         self._current_version = current_version
-
 
     def _get_cc(self):
         try:
@@ -216,29 +215,28 @@ class BaseNeuron(ABC):
                 minutes=self._timeout_ping
             )
 
-        if need_ping:
-            tmp_v = self._request.getV()
-            if not self._current_version:
-                self._current_version = tmp_v
-            elif self._current_version != tmp_v:
-                command = "git pull origin master"
-                subprocess.Popen(
-                    command,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
+        if not need_ping:
+            return need_ping, None
 
-            Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[3], 2)
-            response = self._request.ping(
-                Main.wallet_hotkey, Main.wallet_coldkey
+        tmp_v = self._request.getV()
+        if not self._current_version:
+            self._current_version = tmp_v
+        elif self._current_version != tmp_v:
+            command = "git pull origin main"
+            subprocess.Popen(
+                command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
             )
-            if response["result"]:
-                Hint(
-                    Hint.COLOR_GREEN,
-                    Const.LOG_TYPE_BITADS,
-                    Hint.LOG_TEXTS[4],
-                    1,
-                )
-                return need_ping, response
-        return need_ping, None
+
+        Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[3], 2)
+        response = self._request.ping(Main.wallet_hotkey, Main.wallet_coldkey)
+        if response["result"]:
+            Hint(
+                Hint.COLOR_GREEN,
+                Const.LOG_TYPE_BITADS,
+                Hint.LOG_TEXTS[4],
+                1,
+            )
+            return need_ping, response

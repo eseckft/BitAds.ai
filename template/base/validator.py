@@ -42,7 +42,9 @@ class BaseValidatorNeuron(BaseNeuron, ABC):
     """
 
     def __init__(self, config=None):
-        super().__init__(config=config, timeout_ping=Const.VALIDATOR_MINUTES_TIMEOUT_PING)
+        super().__init__(
+            config=config, timeout_ping=Const.VALIDATOR_MINUTES_TIMEOUT_PING
+        )
 
         # Save a copy of the hotkeys to local memory.
         self.hotkeys = copy.deepcopy(self.metagraph.hotkeys)

@@ -19,6 +19,7 @@
 
 
 import hashlib
+import logging
 import time
 from datetime import datetime, timedelta
 
@@ -77,7 +78,9 @@ class Validator(BaseValidatorNeuron):
             data_campaigns = []
             data_aggregations = []
             Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[5], 2)
-            response = self._request.get_task(Main.wallet_hotkey, Main.wallet_coldkey)
+            response = self._request.get_task(
+                Main.wallet_hotkey, Main.wallet_coldkey
+            )
             if "result" in response:
                 u_max = int(response["Umax"])
                 ctr_max = float(response["CTRmax"])
@@ -86,6 +89,9 @@ class Validator(BaseValidatorNeuron):
 
                 data_campaigns = response["campaign"]
                 data_aggregations = response["aggregation"]
+
+                print(data_campaigns)
+                print(data_aggregations)
 
                 if data_campaigns:
                     Hint(
@@ -124,7 +130,9 @@ class Validator(BaseValidatorNeuron):
         for campaign in data_campaigns:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[6], 1)
 
-            self._file.save_campaign(Main.wallet_hotkey, File.TYPE_VALIDATOR, campaign)
+            self._file.save_campaign(
+                Main.wallet_hotkey, File.TYPE_VALIDATOR, campaign
+            )
 
             Hint.print_campaign_info(campaign)
 
@@ -218,7 +226,7 @@ class Validator(BaseValidatorNeuron):
                     Hint(
                         Hint.COLOR_GREEN,
                         Const.LOG_TYPE_VALIDATOR,
-                        f"Miner with UID {uid} for Campaign {aggregation['product_unique_id']} has the score {rating}."
+                        f"Miner with UID {uid} for Campaign {aggregation['product_unique_id']} has the score {rating}.",
                     )
 
                     save_data = {
@@ -252,12 +260,16 @@ class Validator(BaseValidatorNeuron):
                 weights=miner_ratings,
                 wait_for_finalization=False,
                 wait_for_inclusion=False,
-                version_key=int(hashlib.sha256(aggregation_id.encode()).hexdigest(), 16)
+                version_key=int(
+                    hashlib.sha256(aggregation_id.encode()).hexdigest(), 16
+                )
                 % (2**64),
             )
 
         data_aggregations = []
-        self.update_scores(torch.FloatTensor(miner_ratings).to(self.device), miner_uids)
+        self.update_scores(
+            torch.FloatTensor(miner_ratings).to(self.device), miner_uids
+        )
 
     def rew(self, query: int, response: int) -> float:
         return 1.0 if response == query * 2 else 0
@@ -265,7 +277,9 @@ class Validator(BaseValidatorNeuron):
     async def forward(self, **kwargs):
         global stepSize
         self.sync()
-        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(self.device)
+        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(
+            self.device
+        )
 
         await self.process_ping()
         await self.process()
