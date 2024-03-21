@@ -1,24 +1,25 @@
+from datetime import timedelta
 from typing import Tuple
 
 
 class Const:
-    API_BITADS_DOMAIN = "https://api.bitads.ai/"
+    API_BITADS_DOMAIN = "https://api.bitads.ai"
+    GITHUB_USER_CONTENT_DOMAIN = "https://raw.githubusercontent.com"
 
-    LOG_TYPE_BITADS = "BITADS"
-    LOG_TYPE_LOCAL = "LOCAL"
-    LOG_TYPE_MINER = "MINER"
-    LOG_TYPE_VALIDATOR = "VALIDATOR"
+    ROOT_DIR = "./bitads_campaigns"
 
     FOLDERS_TO_CHECK: Tuple[str] = (
         "./helpers",
         "./neurons",
     )
+    VALIDATOR = "validator"
+    MINER = "miner"
 
     # TODO: region move_to_config
-    MINER_MINUTES_TIMEOUT_PING = 10
+    MINER_MINUTES_TIMEOUT_PING = timedelta(minutes=10)
 
-    VALIDATOR_MINUTES_TIMEOUT_PING = 10
-    VALIDATOR_MINUTES_PROCESS_CAMPAIGN = 10
+    VALIDATOR_MINUTES_TIMEOUT_PING = timedelta(minutes=10)
+    VALIDATOR_MINUTES_PROCESS_CAMPAIGN = timedelta(minutes=10)
     # endregion
 
     API_ERROR_CODES = {

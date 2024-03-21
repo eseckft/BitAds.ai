@@ -1,9 +1,8 @@
-from typing import Final
-
-
 class BitAdsPaths:
-    SUBNET_PING: Final[str] = "/subnetPing"
-    GET_TASK: Final[str] = "/getTask"
-    GET_GENERATE_MINER_CAMPAIGN_URL: Final[
-        str
-    ] = "/getGenerateMinerCampaignUrl"
+    SUBNET_PING = "/subnetPing"
+    GET_TASK = "/getTask"
+    GENERATE_MINER_CAMPAIGN_URL = "/getGenerateMinerCampaignUrl"
+
+
+class GitHubUserContentPaths:
+    VERSION = "/eseckft/BitAds.ai/master/info/version.txt"

@@ -18,11 +18,12 @@
 # DEALINGS IN THE SOFTWARE.
 
 import typing
+
 import bittensor as bt
 import pydantic
 
+from schemas.bit_ads import GetMinerUniqueIdResponse, Campaign
 
-# TODO(developer): Rewrite with your protocol definition.
 
 # This is the protocol for the dummy miner and validator.
 # It is a simple request-response protocol where the validator sends a request
@@ -79,11 +80,11 @@ class Dummy(bt.Synapse):
 
 
 class Task(bt.Synapse):
-    dummy_input: dict
-    dummy_output: typing.Optional[dict] = None
+    dummy_input: Campaign
+    dummy_output: typing.Optional[GetMinerUniqueIdResponse] = None
 
-    def deserialize(self) -> "Task":
-        return self
+    def deserialize(self) -> typing.Optional[GetMinerUniqueIdResponse]:
+        return self.dummy_output
 
 
 """

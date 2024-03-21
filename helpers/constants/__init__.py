@@ -1,3 +1,2 @@
-from .main import Main
-from .hint import Hint
 from .const import Const
+from .colors import Color, colorize
