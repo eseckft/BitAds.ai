@@ -1,3 +1,4 @@
+import functools
 from enum import StrEnum
 
 
@@ -8,8 +9,14 @@ class Color(StrEnum):
     BLUE = "blue"
     MAGENTA = "magenta"
     CYAN = "cyan"
-    WHITE = "white"
 
 
 def colorize(color: Color, text: str):
     return f"<{color.value}>{text}</{color.value}>"
+
+
+red = functools.partial(colorize, Color.RED)
+green = functools.partial(colorize, Color.GREEN)
+yellow = functools.partial(colorize, Color.YELLOW)
+blue = functools.partial(colorize, Color.BLUE)
+magenta = functools.partial(colorize, Color.MAGENTA)

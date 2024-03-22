@@ -2,14 +2,16 @@ import os
 from typing import Union, Optional
 
 from helpers.constants import Const
-from helpers.constants.colors import colorize, Color
+from helpers.constants.colors import colorize, Color, red, yellow, magenta
 from helpers.logging import logger, LogLevel
 from schemas.bit_ads import Score, GetMinerUniqueIdResponse, Aggregation
 from services.storage.base import BaseStorage
 
 
 class FileStorage(BaseStorage):
-    def __init__(self, neuron_type: str, hotkey: str, root_dir: str = Const.ROOT_DIR):
+    def __init__(
+        self, neuron_type: str, hotkey: str, root_dir: str = Const.ROOT_DIR
+    ):
         self._root_dir = root_dir
         self._hotkey = hotkey
         self._neuron_type = neuron_type
@@ -36,15 +38,15 @@ class FileStorage(BaseStorage):
             if not os.path.exists(path):
                 os.makedirs(path)
                 logger.log(
-                    LogLevel.LOCAL.name,
-                    colorize(Color.MAGENTA, f"Created directory: {path}"),
+                    LogLevel.LOCAL,
+                    magenta(f"Created directory: {path}"),
                 )
 
     def save_campaign(self, task: GetMinerUniqueIdResponse):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/campaign_id/{task.product_unique_id}.json"
         with open(path, "w") as file:
             logger.log(
-                LogLevel.LOCAL.name,
+                LogLevel.LOCAL,
                 colorize(Color.YELLOW, f"Save campaign to: {path}"),
             )
             file.write(task.json(indent=4))
@@ -54,7 +56,7 @@ class FileStorage(BaseStorage):
         if os.path.exists(path):
             os.remove(path)
             logger.log(
-                LogLevel.LOCAL.name,
+                LogLevel.LOCAL,
                 colorize(Color.YELLOW, "Remove campaign file: {path}"),
             )
 
@@ -62,9 +64,8 @@ class FileStorage(BaseStorage):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link/{data.product_unique_id}_{self._hotkey}.json"
         with open(path, "w") as file:
             logger.log(
-                LogLevel.LOCAL.name,
-                colorize(
-                    Color.YELLOW,
+                LogLevel.LOCAL,
+                yellow(
                     f"Save campaign unique url to: {path}",
                 ),
             )
@@ -74,9 +75,8 @@ class FileStorage(BaseStorage):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_stats/{data.product_unique_id}_{data.product_item_unique_id}.json"
         with open(path, "w") as file:
             logger.log(
-                LogLevel.LOCAL.name,
-                colorize(
-                    Color.YELLOW,
+                LogLevel.LOCAL,
+                yellow(
                     f"Save campaign unique url statistics to: {path}",
                 ),
             )
@@ -91,9 +91,8 @@ class FileStorage(BaseStorage):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_score/{product_unique_id}_{product_item_unique_id}.json"
         with open(path, "w") as file:
             logger.log(
-                LogLevel.LOCAL.name,
-                colorize(
-                    Color.YELLOW,
+                LogLevel.LOCAL,
+                yellow(
                     f"Save campaign unique url score to: {path}",
                 ),
             )
@@ -111,11 +110,11 @@ class FileStorage(BaseStorage):
             return GetMinerUniqueIdResponse.parse_file(path)
         except FileNotFoundError:
             logger.log(
-                LogLevel.LOCAL.name,
-                colorize(Color.RED, f"File not found by path: {path}"),
+                LogLevel.LOCAL,
+                red(f"File not found by path: {path}"),
             )
         except:
             logger.log(
-                LogLevel.LOCAL.name,
-                colorize(Color.RED, f"File broken by path: {path}"),
+                LogLevel.LOCAL,
+                red(f"File broken by path: {path}"),
             )

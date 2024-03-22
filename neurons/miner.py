@@ -27,6 +27,7 @@ import template
 from clients.base import BitAdsClient
 from helpers import dependencies
 from helpers.constants import colorize, Color, Const
+from helpers.constants.colors import green
 from helpers.logging import logger, LogLevel
 from services.storage.base import BaseStorage
 
@@ -68,15 +69,14 @@ class Miner(BaseMinerNeuron):
 
         if not task:  # TODO: Not sure this is called
             logger.log(
-                LogLevel.BITADS.name,
-                colorize(Color.GREEN, "Validator pinging"),
+                LogLevel.BITADS,
+                green("Validator pinging"),
             )
             return synapse
 
         logger.log(
-            LogLevel.VALIDATOR.name,
-            colorize(
-                Color.GREEN,
+            LogLevel.VALIDATOR,
+            green(
                 f"Received a campaign task with ID: {task.product_unique_id} from Validator: {task.uid}",
             ),
         )
@@ -89,9 +89,8 @@ class Miner(BaseMinerNeuron):
             )
             synapse.dummy_output = response
             logger.log(
-                LogLevel.VALIDATOR.name,
-                colorize(
-                    Color.GREEN,
+                LogLevel.VALIDATOR,
+                green(
                     f"Unique link for campaign ID: {task.product_unique_id} already generated. "
                     f"Sending it to the Validator: {task.uid}",
                 ),
@@ -102,9 +101,8 @@ class Miner(BaseMinerNeuron):
                 task.product_unique_id
             )
             logger.log(
-                LogLevel.BITADS.name,
-                colorize(
-                    Color.GREEN,
+                LogLevel.BITADS,
+                green(
                     f"Successfully created a unique link for campaign ID: {task.product_unique_id} "
                     f"and forwarded it to the Validator: {task.product_unique_id}",
                 ),
@@ -235,7 +233,7 @@ if __name__ == "__main__":
         )
         for color in (Color.BLUE, Color.YELLOW):
             logger.log(
-                LogLevel.LOCAL.name,
+                LogLevel.LOCAL,
                 colorize(color, f"{miner.neuron_type.title()} running..."),
             )
         while True:

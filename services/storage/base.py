@@ -1,7 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Union, Optional
 
-from schemas.bit_ads import GetMinerUniqueIdResponse, Score, Campaign, Aggregation
+from schemas.bit_ads import (
+    GetMinerUniqueIdResponse,
+    Score,
+    Campaign,
+    Aggregation,
+)
 
 
 class BaseStorage(ABC):

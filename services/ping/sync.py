@@ -4,6 +4,7 @@ from typing import Optional
 
 from clients.base import BitAdsClient, VersionClient
 from helpers.constants import colorize, Color
+from helpers.constants.colors import green
 from helpers.logging import logger, LogLevel
 from schemas.bit_ads import PingResponse
 from services.ping.base import PingService
@@ -45,7 +46,7 @@ class SyncPingService(PingService):
             )
 
         logger.log(
-            LogLevel.BITADS.name,
+            LogLevel.BITADS,
             "Initiating ping to the server to update the activity timestamp.",
         )
         response = self._bitads_client.subnet_ping()
@@ -53,9 +54,7 @@ class SyncPingService(PingService):
             return
 
         logger.log(
-            LogLevel.BITADS.name,
-            colorize(
-                Color.GREEN, "--> Ping successful. Activity timestamp updated."
-            ),
+            LogLevel.BITADS,
+            green("--> Ping successful. Activity timestamp updated."),
         )
         return response

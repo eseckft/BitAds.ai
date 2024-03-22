@@ -29,7 +29,7 @@ import torch
 
 from clients.base import BitAdsClient, VersionClient
 from helpers import dependencies
-from helpers.constants.colors import colorize, Color
+from helpers.constants.colors import green, yellow, colorize, Color
 from helpers.constants.const import Const
 from helpers.logging import logger, LogLevel, log_campaign_info
 from schemas.bit_ads import (
@@ -87,7 +87,7 @@ class Validator(BaseValidatorNeuron):
             return
 
         logger.log(
-            LogLevel.BITADS.name,
+            LogLevel.BITADS,
             "<-- I'm making a request to the server to get a campaign allocation task for miners.",
         )
         response = self._bitads_client.get_task()
@@ -96,31 +96,28 @@ class Validator(BaseValidatorNeuron):
 
         if response.campaign:
             logger.log(
-                LogLevel.BITADS.name,
-                colorize(
-                    Color.GREEN,
+                LogLevel.BITADS,
+                green(
                     f"--> Received campaigns for distribution among miners: {len(response.campaign)}",
                 ),
             )
         else:
             logger.log(
-                LogLevel.BITADS.name,
-                colorize(Color.YELLOW, "--> There are no active campaigns for work."),
+                LogLevel.BITADS,
+                yellow("--> There are no active campaigns for work."),
             )
 
         if response.aggregation:
             logger.log(
-                LogLevel.BITADS.name,
-                colorize(
-                    Color.GREEN,
+                LogLevel.BITADS,
+                green(
                     f"Received tasks for assessing miners: {len(response.aggregation)}",
                 ),
             )
         else:
             logger.log(
-                LogLevel.BITADS.name,
-                colorize(
-                    Color.YELLOW,
+                LogLevel.BITADS,
+                yellow(
                     "--> There are no statistical data to establish the miners' rating.",
                 ),
             )
@@ -130,9 +127,8 @@ class Validator(BaseValidatorNeuron):
     async def process_campaign(self, data_campaigns: List[Campaign]):
         for campaign in data_campaigns:
             logger.log(
-                LogLevel.BITADS.name,
-                colorize(
-                    Color.GREEN,
+                LogLevel.BITADS,
+                green(
                     "--> Received a task to distribute the campaign to miners.",
                 ),
             )
@@ -169,9 +165,8 @@ class Validator(BaseValidatorNeuron):
 
                 output: GetMinerUniqueIdResponse = response.dummy_output
                 logger.log(
-                    LogLevel.MINER.name,
-                    colorize(
-                        Color.GREEN,
+                    LogLevel.MINER,
+                    green(
                         f"{ips[output.hot_key]}. The miner submitted his unique link to the campaign.",
                     ),
                 )
@@ -197,7 +192,8 @@ class Validator(BaseValidatorNeuron):
                     ctr = 0.0
                 else:
                     ctr = (
-                        aggregation.count_through_rate_click / aggregation.visits_unique
+                        aggregation.count_through_rate_click
+                        / aggregation.visits_unique
                     )
                 u_norm = aggregation.visits_unique / task.u_max
                 ctr_norm = ctr / task.ctr_max
@@ -205,9 +201,8 @@ class Validator(BaseValidatorNeuron):
                 rating = min(rating, 1)
 
                 logger.log(
-                    LogLevel.BITADS.name,
-                    colorize(
-                        Color.GREEN,
+                    LogLevel.BITADS,
+                    green(
                         "--> Received a task to evaluate the miner.",
                     ),
                 )
@@ -216,9 +211,8 @@ class Validator(BaseValidatorNeuron):
                 self._miner_ratings.append(rating)
 
                 logger.log(
-                    LogLevel.VALIDATOR.name,
-                    colorize(
-                        Color.GREEN,
+                    LogLevel.VALIDATOR,
+                    green(
                         f"Miner with UID {uid} for Campaign {aggregation.product_unique_id} has the score {rating}.",
                     ),
                 )
@@ -253,8 +247,8 @@ class Validator(BaseValidatorNeuron):
     def set_weights(self):
         if not self._aggregation_id:
             return
-        logger.log(LogLevel.BITADS.name, self._miner_uids)
-        logger.log(LogLevel.BITADS.name, self._miner_ratings)
+        logger.log(LogLevel.BITADS, self._miner_uids)
+        logger.log(LogLevel.BITADS, self._miner_ratings)
         self.subtensor.set_weights(
             wallet=self.wallet,
             netuid=self.config.netuid,
@@ -270,7 +264,9 @@ class Validator(BaseValidatorNeuron):
         )
 
     async def forward(self, synapse: bt.Synapse = None):
-        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(self.device)
+        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(
+            self.device
+        )
 
         ping_response = self._ping_service.process_ping()
         if ping_response and ping_response.miners:
@@ -284,7 +280,9 @@ class Validator(BaseValidatorNeuron):
         if task_response.campaign:
             await self.process_campaign(task_response.campaign)
         if task_response.aggregation:
-            await self.process_aggregation(task_response.aggregation, task_response)
+            await self.process_aggregation(
+                task_response.aggregation, task_response
+            )
 
 
 # The main function parses the configuration and runs the validator.
@@ -297,7 +295,7 @@ if __name__ == "__main__":
     ) as validator:
         for color in (Color.BLUE, Color.YELLOW):
             logger.log(
-                LogLevel.LOCAL.name,
+                LogLevel.LOCAL,
                 colorize(
                     color,
                     f"{validator.neuron_type.title()} running...",
