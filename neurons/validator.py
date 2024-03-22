@@ -149,6 +149,7 @@ class Validator(BaseValidatorNeuron):
 
     async def process_campaign(self):
         global data_campaigns
+        global miners
 
         for campaign in data_campaigns:
             Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[6], 1)
