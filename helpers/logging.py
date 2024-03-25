@@ -3,10 +3,9 @@ from typing import List, Any
 
 import requests
 from bittensor.btlogging import logger
-from pygments.styles.dracula import cyan
 
 from helpers.constants import Const
-from helpers.constants.colors import colorize, Color, red
+from helpers.constants.colors import colorize, Color, red, cyan
 from schemas.bit_ads import Campaign
 
 
