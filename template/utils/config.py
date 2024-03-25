@@ -21,7 +21,6 @@ import torch
 import argparse
 import bittensor as bt
 from loguru import logger
-import sys
 
 
 def check_config(cls, config: "bt.Config"):
@@ -61,27 +60,14 @@ def add_args(cls, parser):
     """
     Adds relevant arguments to the parser for operation.
     """
-    # Netuid Arg: The netuid of the subnet to connect to.
+
     parser.add_argument("--netuid", type=int, help="Subnet netuid", default=1)
-
-    command_line = ' '.join(sys.argv[0:])
-    if "neurons/miner.py" in command_line:
-        neuron_type = "miner"
-    else:
-        neuron_type = "validator"
-
-    parser.add_argument(
-        "--neuron.name",
-        type=str,
-        help="Trials for this neuron go in neuron.root / (wallet_cold - wallet_hot) / neuron.name. ",
-        default=neuron_type,
-    )
 
     parser.add_argument(
         "--neuron.device",
         type=str,
         help="Device to run on.",
-        default="cpu",
+        default="cuda" if torch.cuda.is_available() else "cpu",
     )
 
     parser.add_argument(
@@ -89,6 +75,13 @@ def add_args(cls, parser):
         type=int,
         help="The default epoch length (how often we set weights, measured in 12 second blocks).",
         default=100,
+    )
+
+    parser.add_argument(
+        "--mock",
+        action="store_true",
+        help="Mock neuron and all network components.",
+        default=False,
     )
 
     parser.add_argument(
@@ -105,66 +98,142 @@ def add_args(cls, parser):
         default=False,
     )
 
-    if neuron_type == "validator":
-        parser.add_argument(
-            "--neuron.num_concurrent_forwards",
-            type=int,
-            help="The number of concurrent forwards running at any time.",
-            default=1,
-        )
+    parser.add_argument(
+        "--wandb.off",
+        action="store_true",
+        help="Turn off wandb.",
+        default=False,
+    )
 
-        parser.add_argument(
-            "--neuron.sample_size",
-            type=int,
-            help="The number of miners to query in a single step.",
-            default=10,
-        )
+    parser.add_argument(
+        "--wandb.offline",
+        action="store_true",
+        help="Runs wandb in offline mode.",
+        default=False,
+    )
 
-        parser.add_argument(
-            "--neuron.disable_set_weights",
-            action="store_true",
-            help="Disables setting weights.",
-            default=True,
-        )
+    parser.add_argument(
+        "--wandb.notes",
+        type=str,
+        help="Notes to add to the wandb run.",
+        default="",
+    )
 
-        parser.add_argument(
-            "--neuron.moving_average_alpha",
-            type=float,
-            help="Moving average alpha parameter, how much to add of the new observation.",
-            default=0.05,
-        )
 
-        parser.add_argument(
-            "--neuron.axon_off",
-            "--axon_off",
-            action="store_true",
-            # Note: the validator needs to serve an Axon with their IP or they may
-            #   be blacklisted by the firewall of serving peers on the network.
-            help="Set this flag to not attempt to serve an Axon.",
-            default=False,
-        )
+def add_miner_args(cls, parser):
+    """Add miner specific arguments to the parser."""
 
-        parser.add_argument(
-            "--neuron.vpermit_tao_limit",
-            type=int,
-            help="The maximum number of TAO allowed to query a validator with a vpermit.",
-            default=4096,
-        )
+    parser.add_argument(
+        "--neuron.name",
+        type=str,
+        help="Trials for this neuron go in neuron.root / (wallet_cold - wallet_hot) / neuron.name. ",
+        default="miner",
+    )
 
-    else:
-        parser.add_argument(
-            "--blacklist.force_validator_permit",
-            action="store_true",
-            help="If set, we will force incoming requests to have a permit.",
-            default=False,
-        )
+    parser.add_argument(
+        "--blacklist.force_validator_permit",
+        action="store_true",
+        help="If set, we will force incoming requests to have a permit.",
+        default=False,
+    )
 
-        parser.add_argument(
-            "--blacklist.allow_non_registered",
-            action="store_true",
-            help="If set, miners will accept queries from non registered entities. (Dangerous!)",
-            default=False,
-        )
+    parser.add_argument(
+        "--blacklist.allow_non_registered",
+        action="store_true",
+        help="If set, miners will accept queries from non registered entities. (Dangerous!)",
+        default=False,
+    )
+
+    parser.add_argument(
+        "--wandb.project_name",
+        type=str,
+        default="template-miners",
+        help="Wandb project to log to.",
+    )
+
+    parser.add_argument(
+        "--wandb.entity",
+        type=str,
+        default="opentensor-dev",
+        help="Wandb entity to log to.",
+    )
+
+
+def add_validator_args(cls, parser):
+    """Add validator specific arguments to the parser."""
+
+    parser.add_argument(
+        "--neuron.name",
+        type=str,
+        help="Trials for this neuron go in neuron.root / (wallet_cold - wallet_hot) / neuron.name. ",
+        default="validator",
+    )
+
+    parser.add_argument(
+        "--neuron.timeout",
+        type=float,
+        help="The timeout for each forward call in seconds.",
+        default=10,
+    )
+
+    parser.add_argument(
+        "--neuron.num_concurrent_forwards",
+        type=int,
+        help="The number of concurrent forwards running at any time.",
+        default=1,
+    )
+
+    parser.add_argument(
+        "--neuron.sample_size",
+        type=int,
+        help="The number of miners to query in a single step.",
+        default=50,
+    )
+
+    parser.add_argument(
+        "--neuron.disable_set_weights",
+        action="store_true",
+        help="Disables setting weights.",
+        default=False,
+    )
+
+    parser.add_argument(
+        "--neuron.moving_average_alpha",
+        type=float,
+        help="Moving average alpha parameter, how much to add of the new observation.",
+        default=0.1,
+    )
+
+    parser.add_argument(
+        "--neuron.axon_off",
+        "--axon_off",
+        action="store_true",
+        # Note: the validator needs to serve an Axon with their IP or they may
+        #   be blacklisted by the firewall of serving peers on the network.
+        help="Set this flag to not attempt to serve an Axon.",
+        default=False,
+    )
+
+    parser.add_argument(
+        "--neuron.vpermit_tao_limit",
+        type=int,
+        help="The maximum number of TAO allowed to query a validator with a vpermit.",
+        default=4096,
+    )
+
+    parser.add_argument(
+        "--wandb.project_name",
+        type=str,
+        help="The name of the project where you are sending the new run.",
+        default="template-validators",
+    )
+
+    parser.add_argument(
+        "--wandb.entity",
+        type=str,
+        help="The name of the project where you are sending the new run.",
+        default="opentensor-dev",
+    )
 
 
 def config(cls):
@@ -172,12 +241,6 @@ def config(cls):
     Returns the configuration object specific to this miner or validator after adding relevant arguments.
     """
     parser = argparse.ArgumentParser()
-
-    parser.add_argument("--logging.debug",default=True)
-    parser.add_argument("--logging.trace",default=True)
-    # parser.add_argument("--logging.record_log",default=True)
-    # bt.logging.error = lambda *args, **kwargs: None
-
     bt.wallet.add_args(parser)
     bt.subtensor.add_args(parser)
     bt.logging.add_args(parser)

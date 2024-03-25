@@ -18,145 +18,124 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-import time
 import hashlib
-import threading
-import torch
+import time
+from datetime import datetime, timedelta
+from typing import Callable, List, Optional
+
 # Bittensor
 import bittensor as bt
+import torch
 
-# Bittensor Validator Template:
-import template
-from template.validator import forward
-
-from template.base.validator import BaseValidatorNeuron
-from helpers.constants.hint import Hint
+from clients.base import BitAdsClient, VersionClient
+from helpers import dependencies
+from helpers.constants.colors import green, yellow, colorize, Color
 from helpers.constants.const import Const
-from helpers.constants.main import Main
-from helpers.file import File
-from helpers.request import Request
-from datetime import datetime, timedelta
+from helpers.logging import logger, LogLevel, log_campaign_info
+from schemas.bit_ads import (
+    Score,
+    Campaign,
+    TaskResponse,
+    GetMinerUniqueIdResponse,
+    Aggregation,
+)
+from services.ping.base import PingService
+from services.storage.base import BaseStorage
+from template.base.validator import BaseValidatorNeuron
 from template.protocol import Task
-import subprocess
 
-timeout_ping = False
-timeout_process = False
-
-request = Request()
-file = File()
-
-stepSize = 10
-
-data_campaigns = []
-data_aggregations = []
-
-v_current = False
-miners = []
-
-u_max = False
-ctr_max = False
-wu = False
-wc = False
 
 class Validator(BaseValidatorNeuron):
+    neuron_type = "validator"  # for backward compatibility with "File"
 
-    def __init__(self, config=None):
-        super(Validator, self).__init__(config=config)
-        self.get_cc()
-        self.prepare()
+    def __init__(
+        self,
+        bitads_client_factory: Callable[[bt.wallet], BitAdsClient],
+        version_client_factory: Callable[[], VersionClient],
+        ping_service_factory: Callable[
+            [BitAdsClient, VersionClient, timedelta], PingService
+        ],
+        storage_factory: Callable[[str, bt.wallet], BaseStorage],
+        config=None,
+        miner_uids=None,
+        miner_ratings=None,
+        process_timeout=Const.VALIDATOR_MINUTES_PROCESS_CAMPAIGN,
+    ):
+        super().__init__(config)
+        self._bitads_client = bitads_client_factory(self.wallet)
+        self._ping_service = ping_service_factory(
+            self._bitads_client,
+            version_client_factory(),
+            Const.VALIDATOR_MINUTES_TIMEOUT_PING,
+        )
+        self._storage = storage_factory(self.neuron_type, self.wallet)
+        self._process_timeout = process_timeout
+        self._aggregation_id = None
+        self._timeout_process = None
+        self._miner_uids = miner_uids or []
+        self._miner_ratings = miner_ratings or []
+        self._miners = set()
 
-    def get_cc(self):
-        try:
-            Main.wallet_hotkey = self.wallet.hotkey.ss58_address
-            cc = File.get_cc()
-            if cc is not False:
-                Main.wallet_coldkey = cc
-            else:
-                Hint(Hint.COLOR_CYAN, Const.LOG_TYPE_LOCAL, Hint.M[2])
-                Main.wallet_coldkey = self.wallet.coldkey.ss58_address
-                File.save_cc()
-        except Exception as e:
-            Hint(Hint.COLOR_RED, Const.LOG_TYPE_LOCAL, Hint.M[3])
-            self.get_cc()
-
-    def prepare(self):
-        file.create_dirs(File.TYPE_VALIDATOR)
-
-    async def process_ping(self):
-        global timeout_ping
-        global v_current
-        global miners
-        need_ping = False
-
-        if not timeout_ping or datetime.now() > timeout_ping:
-            need_ping = True
-            timeout_ping = datetime.now() + timedelta(minutes=Const.VALIDATOR_MINUTES_TIMEOUT_PING)
-
-        if need_ping:
-            tmp_v = request.getV()
-            if v_current is False:
-                v_current = tmp_v
-            elif v_current != tmp_v:
-                command = "git pull origin master"
-                subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-            Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[3], 2)
-            response = request.ping(Main.wallet_hotkey, Main.wallet_coldkey)
-            if response['result']:
-                Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[4], 1)
-                miners = response['miners']
-        return need_ping
-
-    async def process(self):
-        global timeout_process
-        global data_campaigns
-        global data_aggregations
-        global u_max
-        global ctr_max
-        global wu
-        global wc
+    async def process(self) -> Optional[TaskResponse]:
         need_process_campaign = False
 
-        if not timeout_process or datetime.now() > timeout_process:
+        if not self._timeout_process or datetime.now() > self._timeout_process:
             need_process_campaign = True
-            timeout_process = datetime.now() + timedelta(minutes=Const.VALIDATOR_MINUTES_PROCESS_CAMPAIGN)
+            self._timeout_process = datetime.now() + self._process_timeout
 
-        if need_process_campaign:
-            data_campaigns = []
-            data_aggregations = []
-            Hint(Hint.COLOR_WHITE, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[5], 2)
-            response = request.getTask(Main.wallet_hotkey, Main.wallet_coldkey)
-            if response['result']:
-                u_max = int(response['Umax'])
-                ctr_max = float(response['CTRmax'])
-                wu = float(response['Wu'])
-                wc = float(response['Wc'])
+        if not need_process_campaign:
+            return
 
-                data_campaigns = response['campaign']
-                data_aggregations = response['aggregation']
+        logger.log(
+            LogLevel.BITADS,
+            "<-- I'm making a request to the server to get a campaign allocation task for miners.",
+        )
+        response = self._bitads_client.get_task()
+        if not response or not response.result:
+            return
 
-                if len(data_campaigns) > 0:
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[8] + str(len(data_campaigns)), 1)
-                else:
-                    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_BITADS, "There are no active campaigns for work.", 1)
-                if len(data_aggregations) > 0:
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[9] + str(len(data_aggregations)), 1)
-                else:
-                    Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_BITADS, "There are no statistical data to establish the miners' rating.", 1)
+        if response.campaign:
+            logger.log(
+                LogLevel.BITADS,
+                green(
+                    f"--> Received campaigns for distribution among miners: {len(response.campaign)}",
+                ),
+            )
+        else:
+            logger.log(
+                LogLevel.BITADS,
+                yellow("--> There are no active campaigns for work."),
+            )
 
+        if response.aggregation:
+            logger.log(
+                LogLevel.BITADS,
+                green(
+                    f"Received tasks for assessing miners: {len(response.aggregation)}",
+                ),
+            )
+        else:
+            logger.log(
+                LogLevel.BITADS,
+                yellow(
+                    "--> There are no statistical data to establish the miners' rating.",
+                ),
+            )
 
-        return need_process_campaign
+        return response
 
-    async def process_campaign(self):
-        global data_campaigns
-        global miners
-
+    async def process_campaign(self, data_campaigns: List[Campaign]):
         for campaign in data_campaigns:
-            Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[6], 1)
+            logger.log(
+                LogLevel.BITADS,
+                green(
+                    "--> Received a task to distribute the campaign to miners.",
+                ),
+            )
 
-            file.saveCampaign(Main.wallet_hotkey, File.TYPE_VALIDATOR, campaign)
+            self._storage.save_campaign(campaign)
 
-            Hint.print_campaign_info(campaign)
+            log_campaign_info(campaign)
 
             axons = []
             ips = {}
@@ -168,114 +147,163 @@ class Validator(BaseValidatorNeuron):
                 axon = self.metagraph.axons[uid]
                 ips[axon.hotkey] = f"{axon.ip}:{axon.port}"
 
-                if axon.hotkey in miners:
+                if axon.hotkey in self._miners:
                     axons.append(axon)
 
-            campaign['uid'] = Main.wallet_hotkey
+            campaign.uid = self.wallet.get_hotkey().ss58_address
 
             response_from_miner = self.dendrite.query(
                 axons=axons,
                 synapse=Task(dummy_input=campaign),
                 deserialize=False,
-                timeout=60
+                timeout=60,
             )
 
             for response in response_from_miner:
-                has_unique_link = False
-                if response.dummy_output is not None:
-                    has_unique_link = True
-                    miner_hot_key = response.dummy_output['hotKey']
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_MINER, str(ips[miner_hot_key]) + ". " + Hint.LOG_TEXTS[10])
-                if has_unique_link is False:
-                    pass
+                if not response.dummy_output:
+                    continue
 
-            data_campaigns.pop(0)
+                output: GetMinerUniqueIdResponse = response.dummy_output
+                logger.log(
+                    LogLevel.MINER,
+                    green(
+                        f"{ips[output.hot_key]}. The miner submitted his unique link to the campaign.",
+                    ),
+                )
+
             time.sleep(2)
-            # break
 
-    def sendMessage(self, axon, campaign):
-        pass
-
-    async def process_aggregation(self):
-        global data_aggregations
-        global u_max
-        global ctr_max
-        global wu
-        global wc
-
-        minerUids = []
-        minerRatings = []
-        aggregationId = False
+    async def process_aggregation(
+        self, data_aggregations: List[Aggregation], task: TaskResponse
+    ):
+        self._miner_uids = []
+        self._miner_ratings = []
+        self._aggregation_id = None
 
         for aggregation in data_aggregations:
             for uid in range(self.metagraph.n.item()):
                 if uid == self.uid:
                     continue
                 axon = self.metagraph.axons[uid]
-                if axon.hotkey == aggregation['miner_wallet_address']:
-                    file.saveMinerUniqueUrlStats(Main.wallet_hotkey, aggregation['product_item_unique_id'],
-                                                 File.TYPE_VALIDATOR, aggregation)
-                    if aggregation['visits_unique'] == 0:
-                        ctr = 0
-                    else:
-                        ctr = (aggregation['count_through_rate_click'] / aggregation['visits_unique'])
-                    u_norm = aggregation['visits_unique'] / u_max
-                    ctr_norm = ctr / ctr_max
-                    rating = round((wu * u_norm + wc * ctr_norm), 5)
-                    rating = min(rating, 1)
+                if axon.hotkey != aggregation.miner_wallet_address:
+                    continue
+                self._storage.save_miner_unique_url_stats(aggregation)
+                if aggregation.visits_unique == 0:
+                    ctr = 0.0
+                else:
+                    ctr = (
+                        aggregation.count_through_rate_click
+                        / aggregation.visits_unique
+                    )
+                u_norm = aggregation.visits_unique / task.u_max
+                ctr_norm = ctr / task.ctr_max
+                rating = round((task.u_max * u_norm + task.wc * ctr_norm), 5)
+                rating = min(rating, 1)
 
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_BITADS, Hint.LOG_TEXTS[7], 1)
+                logger.log(
+                    LogLevel.BITADS,
+                    green(
+                        "--> Received a task to evaluate the miner.",
+                    ),
+                )
 
-                    minerUids.append(uid)
-                    minerRatings.append(rating)
+                self._miner_uids.append(uid)
+                self._miner_ratings.append(rating)
 
-                    Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_VALIDATOR, "Miner with UID " + str(uid) + " for Campaign " + aggregation['product_unique_id'] + " he has the score " + str(rating) + ".")
+                logger.log(
+                    LogLevel.VALIDATOR,
+                    green(
+                        f"Miner with UID {uid} for Campaign {aggregation.product_unique_id} has the score {rating}.",
+                    ),
+                )
 
-                    save_data = {"ctr": ctr, "u_norm": u_norm, "ctr_norm": ctr_norm, "ctr_max": ctr_max, "wu": wu, "wc": wc, "u_max": u_max, "Rating": rating}
-                    file.saveMinerUniqueUrlScore(Main.wallet_hotkey, aggregation['product_unique_id'],
-                                                 aggregation['product_item_unique_id'], File.TYPE_VALIDATOR, save_data)
-                    break
-            aggregationId = aggregation['id']
+                score = Score(
+                    ctr=ctr,
+                    u_norm=u_norm,
+                    ctr_norm=ctr_norm,
+                    ctr_max=task.ctr_max,
+                    wu=task.wu,
+                    wc=task.wc,
+                    u_max=task.u_max,
+                    rating=rating,
+                )
+                self._storage.save_miner_unique_url_score(
+                    aggregation.product_unique_id,
+                    aggregation.product_item_unique_id,
+                    score,
+                )
+                break  # FIXME: creates miner ratings with one miner?
 
-        if aggregationId != False:
+            # FIXME: We are process multiple aggregations, but settings weights only for last?
+            self._aggregation_id = aggregation.id
 
-            print('minerUids', minerUids)
-            print('minerRatings', minerRatings)
+        self.set_weights()
 
-            self.subtensor.set_weights(
-                wallet=self.wallet,
-                netuid=self.config.netuid,
-                uids=minerUids,
-                weights=minerRatings,
-                wait_for_finalization=False,
-                wait_for_inclusion=False,
-                version_key=int(hashlib.sha256(aggregationId.encode()).hexdigest(), 16) % (2 ** 64),
+        self.update_scores(
+            torch.FloatTensor(self._miner_ratings).to(self.device),
+            self._miner_uids,
+        )
+
+    def set_weights(self):
+        if not self._aggregation_id:
+            return
+        logger.log(LogLevel.BITADS, self._miner_uids)
+        logger.log(LogLevel.BITADS, self._miner_ratings)
+        self.subtensor.set_weights(
+            wallet=self.wallet,
+            netuid=self.config.netuid,
+            uids=self._miner_uids,
+            weights=self._miner_ratings,
+            wait_for_finalization=False,
+            wait_for_inclusion=False,
+            version_key=int(
+                hashlib.sha256(self._aggregation_id.encode()).hexdigest(),
+                16,
             )
+            % (2**64),
+        )
 
-        data_aggregations = []
-        self.update_scores(torch.FloatTensor(minerRatings).to(self.device), minerUids)
+    async def forward(self, synapse: bt.Synapse = None):
+        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(
+            self.device
+        )
 
-    def rew(query: int, response: int) -> float:
-        return 1.0 if response == query * 2 else 0
+        ping_response = self._ping_service.process_ping()
+        if ping_response and ping_response.miners:
+            self._miners = ping_response.miners
 
-    async def forward(self):
-        global stepSize
-        self.sync()
-        self.moving_averaged_scores = torch.zeros((self.metagraph.n)).to(self.device)
+        task_response = await self.process()
 
-        await self.process_ping()
-        await self.process()
+        if not task_response:
+            return
 
-        if len(data_campaigns) > 0:
-            await self.process_campaign()
-        elif len(data_aggregations) > 0:
-            await self.process_aggregation()
+        if task_response.campaign:
+            await self.process_campaign(task_response.campaign)
+        if task_response.aggregation:
+            await self.process_aggregation(
+                task_response.aggregation, task_response
+            )
 
 
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
-    with Validator() as validator:
-        Hint(Hint.COLOR_BLUE, Const.LOG_TYPE_LOCAL, Hint.V[1])
-        Hint(Hint.COLOR_YELLOW, Const.LOG_TYPE_LOCAL, Hint.V[1])
+    with Validator(
+        dependencies.create_bitads_client,
+        dependencies.create_version_client,
+        dependencies.create_ping_service,
+        dependencies.create_storage,
+    ) as validator:
+        for color in (Color.BLUE, Color.YELLOW):
+            logger.log(
+                LogLevel.LOCAL,
+                colorize(
+                    color,
+                    f"{validator.neuron_type.title()} running...",
+                ),
+            )
         while True:
-            time.sleep(5)
+            try:
+                time.sleep(5)
+            except KeyboardInterrupt:
+                bt.logging.warning("Ending validator...")
+                break

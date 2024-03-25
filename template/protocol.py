@@ -17,11 +17,13 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-from typing import Optional, List, Dict
+import typing
+
 import bittensor as bt
 import pydantic
 
-# TODO(developer): Rewrite with your protocol definition.
+from schemas.bit_ads import GetMinerUniqueIdResponse, Campaign
+
 
 # This is the protocol for the dummy miner and validator.
 # It is a simple request-response protocol where the validator sends a request
@@ -56,7 +58,7 @@ class Dummy(bt.Synapse):
     dummy_input: int
 
     # Optional request output, filled by recieving axon.
-    dummy_output: Optional[int] = None
+    dummy_output: typing.Optional[int] = None
 
     def deserialize(self) -> int:
         """
@@ -77,39 +79,48 @@ class Dummy(bt.Synapse):
         return self.dummy_output
 
 
-
 class Task(bt.Synapse):
+    dummy_input: Campaign
+    dummy_output: typing.Optional[GetMinerUniqueIdResponse] = None
 
-    dummy_input: dict
-    dummy_output: Optional[dict] = None
+    def deserialize(self) -> typing.Optional[GetMinerUniqueIdResponse]:
+        return self.dummy_output
 
-    def deserialize(self) -> "Task":
-        return self
 
 """
 Represents a software version with major, minor, and patch components.
 """
-class Version (pydantic.BaseModel):
-    major_version: Optional[int] = None
-    minor_version: Optional[int] = None
-    patch_version: Optional[int] = None
 
-class MapSynapse ( bt.Synapse ):
-    version: Optional[Version] = None
+
+class Version(pydantic.BaseModel):
+    major_version: typing.Optional[int] = None
+    minor_version: typing.Optional[int] = None
+    patch_version: typing.Optional[int] = None
+
+
+class MapSynapse(bt.Synapse):
+    version: typing.Optional[Version] = None
+
 
 """
 A specialized Synapse representing the status of a miner, 
 including its availability and memory resources.
 """
-class MinerStatus( MapSynapse  ):
-    free_memory: Optional[int] = None
-    available: Optional[bool] = None
 
-class SpeedTest( MapSynapse  ):
-    result: Optional[Dict] = None
+
+class MinerStatus(MapSynapse):
+    free_memory: typing.Optional[int] = None
+    available: typing.Optional[bool] = None
+
+
+class SpeedTest(MapSynapse):
+    result: typing.Optional[typing.Dict] = None
+
 
 """
 Defines the status of a validator, particularly whether it is available for processing requests.
 """
-class ValidatorStatus( pydantic.BaseModel ):
-    available: Optional[bool] = None
+
+
+class ValidatorStatus(pydantic.BaseModel):
+    available: typing.Optional[bool] = None

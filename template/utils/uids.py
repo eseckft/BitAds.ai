@@ -5,7 +5,9 @@ from typing import List
 
 
 def check_uid_availability(
-    metagraph: "bt.metagraph.Metagraph", uid: int, vpermit_tao_limit: int
+    metagraph: "bt.metagraph.Metagraph",
+    uid: int,
+    vpermit_tao_limit: int,
 ) -> bool:
     """Check if uid is available. The UID should be available if it is serving and has less than vpermit_tao_limit stake
     Args:
@@ -51,7 +53,8 @@ def get_random_uids(
             avail_uids.append(uid)
             if uid_is_not_excluded:
                 candidate_uids.append(uid)
-
+    # If k is larger than the number of available uids, set k to the number of available uids.
+    k = min(k, len(avail_uids))
     # Check if candidate_uids contain enough for querying, if not grab all avaliable uids
     available_uids = candidate_uids
     if len(candidate_uids) < k:

@@ -19,13 +19,13 @@ import time
 import torch
 import asyncio
 import threading
+import argparse
 import traceback
 
 import bittensor as bt
 
 from template.base.neuron import BaseNeuron
-from helpers.constants.hint import Hint
-from helpers.constants import Const
+from template.utils.config import add_miner_args
 
 
 class BaseMinerNeuron(BaseNeuron):
@@ -33,36 +33,37 @@ class BaseMinerNeuron(BaseNeuron):
     Base class for Bittensor miners.
     """
 
+    neuron_type: str = "MinerNeuron"
+
+    @classmethod
+    def add_args(cls, parser: argparse.ArgumentParser):
+        super().add_args(parser)
+        add_miner_args(cls, parser)
+
     def __init__(self, config=None):
         super().__init__(config=config)
 
         # Warn if allowing incoming requests from anyone.
-        # if not self.config.blacklist.force_validator_permit:
-        #     bt.logging.warning(
-        #         "You are allowing non-validators to send requests to your miner. This is a security risk."
-        #     )
-        # if self.config.blacklist.allow_non_registered:
-        #     bt.logging.warning(
-        #         "You are allowing non-registered entities to send requests to your miner. This is a security risk."
-        #     )
+        if not self.config.blacklist.force_validator_permit:
+            bt.logging.warning(
+                "You are allowing non-validators to send requests to your miner. This is a security risk."
+            )
+        if self.config.blacklist.allow_non_registered:
+            bt.logging.warning(
+                "You are allowing non-registered entities to send requests to your miner. This is a security risk."
+            )
 
         # The axon handles request processing, allowing validators to send this miner requests.
         self.axon = bt.axon(wallet=self.wallet, config=self.config)
 
         # Attach determiners which functions are called when servicing a request.
         bt.logging.info(f"Attaching forward function to miner axon.")
-
-        Hint(Hint.COLOR_GREEN, Const.LOG_TYPE_LOCAL, "Attaching forward function to miner axon.")
-
         self.axon.attach(
             forward_fn=self.forward,
             blacklist_fn=self.blacklist,
             priority_fn=self.priority,
-        ).attach(
-            forward_fn = self.forward_status,
-        ).attach(
-            forward_fn = self.forward_speed,
         )
+        bt.logging.info(f"Axon created: {self.axon}")
 
         # Instantiate runners
         self.should_exit: bool = False
@@ -112,8 +113,8 @@ class BaseMinerNeuron(BaseNeuron):
         try:
             while not self.should_exit:
                 while (
-                        self.block - self.metagraph.last_update[self.uid]
-                        < self.config.neuron.epoch_length
+                    self.block - self.metagraph.last_update[self.uid]
+                    < self.config.neuron.epoch_length
                 ):
                     # Wait before checking again.
                     time.sleep(1)
@@ -183,41 +184,9 @@ class BaseMinerNeuron(BaseNeuron):
         """
         self.stop_run_thread()
 
-    def set_weights(self):
-        """
-        Self-assigns a weight of 1 to the current miner (identified by its UID) and
-        a weight of 0 to all other peers in the network. The weights determine the trust level the miner assigns to other nodes on the network.
-
-        Raises:
-            Exception: If there's an error while setting weights, the exception is logged for diagnosis.
-        """
-        # try:
-        #     # --- query the chain for the most current number of peers on the network
-        #     chain_weights = torch.zeros(
-        #         self.subtensor.subnetwork_n(netuid=self.metagraph.netuid)
-        #     )
-        #     chain_weights[self.uid] = 1
-        #
-        #     # --- Set weights.
-        #     self.subtensor.set_weights(
-        #         wallet=self.wallet,
-        #         netuid=self.metagraph.netuid,
-        #         uids=torch.arange(0, len(chain_weights)),
-        #         weights=chain_weights.to("cpu"),
-        #         wait_for_inclusion=False,
-        #         version_key=self.spec_version,
-        #     )
-        #
-        # except Exception as e:
-        #     bt.logging.error(
-        #         f"Failed to set weights on chain with exception: {e}"
-        #     )
-
-        # bt.logging.info(f"Set weights: {chain_weights}")
-
     def resync_metagraph(self):
         """Resyncs the metagraph and updates the hotkeys and moving averages based on the new metagraph."""
-        # bt.logging.info("resync_metagraph()")
+        bt.logging.debug("resync_metagraph()")
 
         # Sync the metagraph.
         self.metagraph.sync(subtensor=self.subtensor)
