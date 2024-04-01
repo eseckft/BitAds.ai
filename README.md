@@ -1,7 +1,7 @@
 # BitAds - Decentralized Advertising on Bittensor
 
 **Revolutionizing Online Advertising with Decentralization. Discover how BitAds leverages the Bittensor Network to offer cost-effective, high-quality advertising through a unique incentive mechanism for miners and validators.**
-![alt text](bitads.png)
+![alt text](docs/bitads.png)
 
 
 :no_entry_sign:**The Problem:**
@@ -40,7 +40,7 @@ Miners generate unique links for campaigns to promote across the internet. They 
 **2. Incentive Mechanism:**
 Miners are incentivized with TAO tokens, not based on the client's payment offer, but on the organic traffic they attract. This system ensures cost-effective advertising for clients while rewarding miners substantially for their efforts.
 <br>
-![alt text](bitads_diagram.png)
+![alt text](docs/bitads_diagram.png)
 
 # Integration with Bittensor
 
@@ -48,6 +48,20 @@ BitAds leverages Bittensor’s decentralized network to distribute advertising t
 Initially, BitAds will focus on promoting the Bittensor project itself, demonstrating the network's marketing capabilities and incentivizing participation. <br><br>
 Taking into consideration the potential emission of the subnet, this will potentially serve as the most powerful marketing engine for the Bittensor project. <br><br>
 By harnessing the collaborative efforts of the network's participants, BitAds aims to significantly enhance the visibility and adoption of Bittensor, establishing a robust foundation for the future growth of both BitAds and Bittensor.
+
+# The First Incentivized Campaign
+![alt text](docs/bittensor_campaign.png)<br>
+The first campaign ["Join the Bittensor Revolution where AI meets the Decentralization"](https://x.bitads.ai/lty9sdtvcg55s/) on the BitAds Network will be BittensorWiki, a platform where you can find everything you need to know about the Bittensor Network. <br>
+In fact, this campaign will serve as a powerful marketing tool for the Bittensor Network, as miners will be incentivized to generate organic traffic for the BittensorWiki campaign. <br>
+https://bittensorwiki.com
+
+# FirstAds.ai - The First Web App
+<p align="center">
+  <img src="docs/firstads.png" alt="Description of Image" width="50%" />
+</p>
+
+The first application developed on the BitAds subnet is FirstAds. This platform enables users to create and promote their campaigns, incentivizing BitAds miners to generate organic traffic for these campaigns at a minimal cost. <br>
+https://firstads.ai
 
 # Advantages of BitAds.ai
 
