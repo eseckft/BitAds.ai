@@ -1,6 +1,8 @@
 # BitAds - Decentralized Advertising on Bittensor
 
 **Revolutionizing Online Advertising with Decentralization. Discover how BitAds leverages the Bittensor Network to offer cost-effective, high-quality advertising through a unique incentive mechanism for miners and validators.**
+![alt text](bitads.png)
+
 
 :no_entry_sign:**The Problem:**
 
@@ -37,6 +39,8 @@ Miners generate unique links for campaigns to promote across the internet. They 
 
 **2. Incentive Mechanism:**
 Miners are incentivized with TAO tokens, not based on the client's payment offer, but on the organic traffic they attract. This system ensures cost-effective advertising for clients while rewarding miners substantially for their efforts.
+<br>
+![alt text](bitads_diagram.png)
 
 # Integration with Bittensor
 
