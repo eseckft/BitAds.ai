@@ -1,4 +1,4 @@
-# BitAds - Decentralized Advertising on the Bittensor Network
+# BitAds - Decentralized Advertising on Bittensor
 
 **Revolutionizing Online Advertising with Decentralization. Discover how BitAds leverages the Bittensor Network to offer cost-effective, high-quality advertising through a unique incentive mechanism for miners and validators.**
 
