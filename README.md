@@ -170,7 +170,7 @@ Detailed instructions on how to create a wallet can be found in the official doc
 
 Please ensure that you follow the steps outlined in the documentation carefully to set up your wallet correctly.
 
-# Registration in Subnetwork \<ID\>
+# Registration in Subnetwork
 
 To fully utilize the functionalities provided by this repository, it is necessary to register within Subnetwork **120 (TESTNET)**. 
 
