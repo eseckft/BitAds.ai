@@ -1,3 +1,23 @@
+# BitAds - Decentralized Advertising on the Bittensor Network
+
+The Problem:
+
+The current advertising landscape, particularly as shaped by the web2 paradigm, presents significant challenges not only for the users who are subjected to ads but also for the companies that invest heavily in advertising. At the heart of these challenges are the highly centralized tech organizations that dominate and control the industry, such as Google AdSense, Facebook Audience Network, and Apple Advertising. This centralized control results in a significant power imbalance, lack of transparency, and high costs. 
+
+The Solution:
+
+The BitAds network emerges as a revolutionary solution, harnessing the power of blockchain technology to foster a decentralized and incentivised advertising environment. By reimagining the foundational principles of advertising transactions, BitAds seeks to rectify the issues of transparency, fraud, inefficiency, and the high costs associated with conventional advertising methods.
+
+1st Campaign:
+
+The first campaign on the BitAds Network will be BittensorWiki, a platform where you can find everything you need to know about the Bittensor Network. In fact, this campaign will serve as a powerful marketing tool for the Bittensor Network, as miners will be incentivized to generate organic traffic for the BittensorWiki campaign.
+https://bittensorwiki.com
+
+1st Web App:
+
+The first application developed on the BitAds subnet is FirstAds. This platform enables users to create and promote their campaigns, incentivizing BitAds miners to generate organic traffic for these campaigns at a minimal cost. 
+https://firstads.ai
+
 # Usage of Scripts
 
 Please note that the usage of scripts within this repository is restricted to registered users of bitads.ai. 
