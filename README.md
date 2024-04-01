@@ -110,6 +110,32 @@ The formula caps the Miner Score at 1, ensuring scores remain within a 0 to 1 ra
 
 Both the maximum expected values (Umax, CTRmax) and the weights (Wu, Wc) are configurable through the admin panel of BitAds. <br> This flexibility allows you to recalibrate the scoring model based on evolving campaign goals, performance benchmarks, or engagement strategies.
 
+# Roadmap
+
+1. **Template and Design Expansion** <br>
+Add more templates, colors, and layouts to BitAds landing pages.
+
+2. **Device Targeting** <br>
+Implement device targeting feature to specify desired traffic source.
+
+3. **Performance Analytics** <br>
+Implement daily performance analytics for validators to enhance campaign monitoring.
+
+4. **Geo-Location** <br>
+Implement geo-location filtering to enable validators and clients to specify desired traffic origins in BitAds.
+
+5. **Campaign Information Bot** <br>
+Launch an interactive discord/telegram bot to provide miners with immediate access to campaign information and notifications.
+
+6. **Traffic Source Analysis** <br>
+Implement traffic source analysis to precisely track visitor origins.
+
+7. **Domain Selection Expansion** <br>
+Expand landing page domains to enable validators and clients to select from a wider range of options.
+
+8. **Conversion Tracking** <br>
+Integrate conversion tracking in order to measure conversion rates on client websites.
+
 # Usage of Scripts
 
 Please note that the usage of scripts within this repository is restricted to registered users of [BitAds.ai](https://BitAds.ai)
