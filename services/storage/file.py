@@ -123,7 +123,7 @@ class FileStorage(BaseStorage):
     @staticmethod
     def get_cold_key(hotkey):
         try:
-            with open(f"./tmp/{hotkey}.txt", 'r') as file:
+            with open(f"./tmp/{hotkey}.txt", "r") as file:
                 return json.load(file)
         except FileNotFoundError:
             return False
@@ -132,5 +132,5 @@ class FileStorage(BaseStorage):
     def save_cold_key(hotkey, cold_key):
         path = f"./tmp/{hotkey}.txt"
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'w') as file:
+        with open(path, "w") as file:
             json.dump(cold_key, file, indent=4)

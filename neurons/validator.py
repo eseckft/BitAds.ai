@@ -26,12 +26,13 @@ from typing import Callable, List, Optional
 # Bittensor
 import bittensor as bt
 import torch
+from websocket import WebSocketConnectionClosedException
 
 from clients.base import BitAdsClient, VersionClient
 from helpers import dependencies
 from helpers.constants.colors import green, yellow, colorize, Color
 from helpers.constants.const import Const
-from helpers.logging import logger, LogLevel, log_campaign_info
+from helpers.logging import logger, LogLevel, log_campaign_info, log_task
 from schemas.bit_ads import (
     Score,
     Campaign,
@@ -76,22 +77,6 @@ class Validator(BaseValidatorNeuron):
         self._miner_ratings = miner_ratings or []
         self._miners = set()
 
-        ping_response = self._ping_service.process_ping()
-        if ping_response and ping_response.miners:
-            self._miners = ping_response.miners
-
-        task_response = self.process()
-
-        if not task_response:
-            return
-
-        if task_response.campaign:
-            self.process_campaign(task_response.campaign)
-        if task_response.aggregation:
-            self.process_aggregation(
-                task_response.aggregation, task_response
-            )
-
     def process(self) -> Optional[TaskResponse]:
         need_process_campaign = False
 
@@ -110,33 +95,7 @@ class Validator(BaseValidatorNeuron):
         if not response or not response.result:
             return
 
-        if response.campaign:
-            logger.log(
-                LogLevel.BITADS,
-                green(
-                    f"--> Received campaigns for distribution among miners: {len(response.campaign)}",
-                ),
-            )
-        else:
-            logger.log(
-                LogLevel.BITADS,
-                yellow("--> There are no active campaigns for work."),
-            )
-
-        if response.aggregation:
-            logger.log(
-                LogLevel.BITADS,
-                green(
-                    f"Received tasks for assessing miners: {len(response.aggregation)}",
-                ),
-            )
-        else:
-            logger.log(
-                LogLevel.BITADS,
-                yellow(
-                    "--> There are no statistical data to establish the miners' rating.",
-                ),
-            )
+        log_task(response)
 
         return response
 
@@ -263,19 +222,27 @@ class Validator(BaseValidatorNeuron):
             return
         logger.log(LogLevel.BITADS, self._miner_uids)
         logger.log(LogLevel.BITADS, self._miner_ratings)
-        self.subtensor.set_weights(
-            wallet=self.wallet,
-            netuid=self.config.netuid,
-            uids=self._miner_uids,
-            weights=self._miner_ratings,
-            wait_for_finalization=False,
-            wait_for_inclusion=False,
-            version_key=int(
-                hashlib.sha256(self._aggregation_id.encode()).hexdigest(),
-                16,
+        try:
+            self.subtensor.set_weights(
+                wallet=self.wallet,
+                netuid=self.config.netuid,
+                uids=self._miner_uids,
+                weights=self._miner_ratings,
+                wait_for_finalization=False,
+                wait_for_inclusion=False,
+                version_key=int(
+                    hashlib.sha256(self._aggregation_id.encode()).hexdigest(),
+                    16,
+                )
+                % (2**64),
             )
-            % (2**64),
-        )
+        except WebSocketConnectionClosedException:
+            logger.warning(
+                "The websocket connection is lost, we are restoring it..."
+            )
+            self.subtensor.connect_websocket()
+        except Exception as ex:
+            logger.error(f"Set weights error: {ex}")
 
     def should_set_weights(self) -> bool:
         """
@@ -287,6 +254,21 @@ class Validator(BaseValidatorNeuron):
         self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(
             self.device
         )
+
+    def process_ping(self):
+        ping_response = self._ping_service.process_ping()
+        if ping_response and ping_response.miners:
+            self._miners = ping_response.miners
+
+        task_response = self.process()
+
+        if not task_response:
+            return
+
+        if task_response.campaign:
+            self.process_campaign(task_response.campaign)
+        if task_response.aggregation:
+            self.process_aggregation(task_response.aggregation, task_response)
 
 
 # The main function parses the configuration and runs the validator.
@@ -306,6 +288,7 @@ if __name__ == "__main__":
         dependencies.create_storage,
     ) as validator:
         while True:
+            validator.process_ping()
             try:
                 time.sleep(5)
             except KeyboardInterrupt:

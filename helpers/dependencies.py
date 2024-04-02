@@ -21,11 +21,13 @@ def create_bitads_client(
     temp_hot_key = _wallet.get_hotkey().ss58_address
     temp_cold_key = FileStorage.get_cold_key(temp_hot_key)
 
-    while temp_cold_key is False:
-        if temp_cold_key is False:
+    while not temp_cold_key:
+        if not temp_cold_key:
             logger.log(
                 LogLevel.LOCAL,
-                red("Please note that you will be required to enter your password only once to verify the ownership of your coldkey. This is a necessary step to ensure secure access and to enable full interaction with the BitAds API. Your password is not stored and will not be requested again for future sessions."),
+                red(
+                    "Please note that you will be required to enter your password only once to verify the ownership of your coldkey. This is a necessary step to ensure secure access and to enable full interaction with the BitAds API. Your password is not stored and will not be requested again for future sessions."
+                ),
             )
             temp_cold_key = _wallet.coldkey.ss58_address
             FileStorage.save_cold_key(temp_hot_key, temp_cold_key)
