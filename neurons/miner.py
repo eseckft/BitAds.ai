@@ -223,6 +223,11 @@ class Miner(BaseMinerNeuron):
 
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
+    for color in (Color.BLUE, Color.YELLOW):
+        logger.log(
+            LogLevel.LOCAL,
+            colorize(color, f"{Const.MINER} running..."),
+        )
     with Miner(
         dependencies.create_bitads_client, dependencies.create_storage
     ) as miner:
@@ -231,11 +236,6 @@ if __name__ == "__main__":
             dependencies.create_version_client(),
             Const.MINER_MINUTES_TIMEOUT_PING,
         )
-        for color in (Color.BLUE, Color.YELLOW):
-            logger.log(
-                LogLevel.LOCAL,
-                colorize(color, f"{miner.neuron_type.title()} running..."),
-            )
         while True:
             ping_service.process_ping()
             try:

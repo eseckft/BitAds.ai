@@ -16,10 +16,10 @@ class Const:
     MINER = "miner"
 
     # TODO: region move_to_config
-    MINER_MINUTES_TIMEOUT_PING = timedelta(minutes=10)
+    MINER_MINUTES_TIMEOUT_PING = timedelta(minutes=30)
 
-    VALIDATOR_MINUTES_TIMEOUT_PING = timedelta(minutes=10)
-    VALIDATOR_MINUTES_PROCESS_CAMPAIGN = timedelta(minutes=10)
+    VALIDATOR_MINUTES_TIMEOUT_PING = timedelta(minutes=30)
+    VALIDATOR_MINUTES_PROCESS_CAMPAIGN = timedelta(minutes=30)
     # endregion
 
     API_ERROR_CODES = {

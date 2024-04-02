@@ -72,4 +72,4 @@ class Score(pydantic.BaseModel):
     wu: float
     wc: float
     u_max: float
-    rating: float = Field(alias="Rating")
+    rating: float

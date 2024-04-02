@@ -3,11 +3,10 @@ from typing import List, Any
 
 import requests
 from bittensor.btlogging import logger
-from pygments.styles.dracula import cyan
 
 from helpers.constants import Const
-from helpers.constants.colors import colorize, Color, red
-from schemas.bit_ads import Campaign
+from helpers.constants.colors import red, cyan, green, yellow
+from schemas.bit_ads import Campaign, TaskResponse
 
 
 class _LogLevel(IntEnum):
@@ -83,5 +82,35 @@ def log_errors(errors: List[Any] = None):
                 Const.API_ERROR_CODES.get(
                     error, "Unknown code error {}".format(error)
                 ),
+            ),
+        )
+
+
+def log_task(task: TaskResponse):
+    if task.campaign:
+        logger.log(
+            LogLevel.BITADS,
+            green(
+                f"--> Received campaigns for distribution among miners: {len(task.campaign)}",
+            ),
+        )
+    else:
+        logger.log(
+            LogLevel.BITADS,
+            yellow("--> There are no active campaigns for work."),
+        )
+
+    if task.aggregation:
+        logger.log(
+            LogLevel.BITADS,
+            green(
+                f"Received tasks for assessing miners: {len(task.aggregation)}",
+            ),
+        )
+    else:
+        logger.log(
+            LogLevel.BITADS,
+            yellow(
+                "--> There are no statistical data to establish the miners' rating.",
             ),
         )
