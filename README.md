@@ -68,7 +68,11 @@ The incentive mechanism encourages miners to drive high-quality organic traffic 
 Miners are motivated to outperform each other in attracting the best traffic to clients' websites, in order to generate more rewards. This competition enhances the effectiveness of advertising campaigns, ensuring that clients will receive optimal visibility and engagement.
 
 # Income Sources for Validators
-:white_check_mark:**Validators can monetize their participation in BitAds through various avenues, including promoting their own products, engaging in affiliate marketing, developing applications using the BitAds API, and offering API access to others.**
+:white_check_mark:**Validators can monetize their participation in BitAds.ai Subnet through various avenues, including:** <br>
+- promoting their own products <br>
+- engaging in affiliate marketing (for example - Amazon Affiliate Program, ClickBank) <br>
+- developing applications using the BitAds.ai API <br>
+- offering paid API access to others
 
 # Scoring Mechanism
 
@@ -117,6 +121,23 @@ MINER SCORE = (0.51) + (0.50.333) = 0.5 + 0.1665 = 0.6665
 The formula caps the Miner Score at 1, ensuring scores remain within a 0 to 1 range. If the calculated score exceeds 1, it's adjusted to 1, maintaining a standardized scoring scale.
 
 Both the maximum expected values (Umax, CTRmax) and the weights (Wu, Wc) are configurable through the admin panel of BitAds. <br> This flexibility allows you to recalibrate the scoring model based on evolving campaign goals, performance benchmarks, or engagement strategies.
+
+# Subnet Security 
+
+**BitAds campaigns have multiple levels of protection against fraudulent activity such as bot or script-driven fake activity. In particular, verification for human authenticity occurs through:**
+- AWS WAF [(Well-Architected Framework) ](https://aws.amazon.com/waf/)
+- CAPTCHA
+
+All incoming requests are forwarded to AWS WAF for inspection by the web ACL. <br>
+
+AWS WAF is a web security service that helps protect web applications from common web threats such as SQL injections, cross-site scripting (XSS), and cross-site request forgery (CSRF). <br>
+
+Human Verification Check is an additional layer of protection in AWS WAF, designed to help distinguish humans from bots. It is useful for preventing automated attacks such as DDoS attacks and spam. 
+In BitAds.ai architecture it is one of the levels of protection against traffic manipulation. <br>
+
+Each time the BidAds.ai API is accessed, validators' and miners' scripts transmit their Bittensor wallet keys for verification of their presence in the registered users' database. BidAds also checks the status of each user (whether they are active or blocked), as well as the compatibility of validators' and miners' script code versions with the current version provided by BitAds.ai developers. This, on the one hand, requires users to constantly update their scripts and prevents unauthorized interference with them. <br>
+
+Additionally, every 30 minutes, there is an update of the lists of allowed participants in the process. Miners receive a list of validators, and validators receive a list of miners with whom they can communicate. This way, the system is protected from external intrusion.
 
 # Roadmap
 
@@ -184,6 +205,10 @@ btcli subnet register --netuid 120 --wallet.name <name> --wallet.hotkey <name>
 
 To execute the commands at the root of the project, you can follow these steps:
 
+- Git clone the repository:
+```basg 
+git clone https://github.com/eseckft/BitAds.ai.git
+```
 - Install the project in editable mode using pip:
 ```basg 
 python3 -m pip install -e .
