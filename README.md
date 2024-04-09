@@ -102,7 +102,7 @@ These weights reflect the relative importance of Unique visits and CTR in calcul
 The Miner Score is computed by applying the weights to the normalized values of unique visits and CTR, as follows:
 
 ```bash
-MINER SCORE = (Wu ⋅ Unorm) + (Wc ⋅ CTRnorm)
+MINER SCORE = (Wu * Unorm) + (Wc * CTRnorm)
 ```
 
 Given the example of a miner with 1000 unique visitors and a CTR of 5% (0.05), and with the normalization constants provided (Umax = 1000, CTRmax = 0.15), the calculations would be:
@@ -113,7 +113,7 @@ CTRnorm = 0.05 / 0.15 = 0.333
 
 Thus, the Miner Score would be:
 ```bash
-MINER SCORE = (0.51) + (0.50.333) = 0.5 + 0.1665 = 0.6665
+MINER SCORE = (0.5 * 1) + (0.50 * 0.333) = 0.5 + 0.1665 = 0.6665
 ```
 
 **Conditions and Adjustability:**
