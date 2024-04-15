@@ -2,11 +2,15 @@ from enum import IntEnum
 from typing import List, Any
 
 import requests
-from bittensor.btlogging import logger
+from bittensor import logging
 
 from helpers.constants import Const
 from helpers.constants.colors import red, cyan, green, yellow
 from schemas.bit_ads import Campaign, TaskResponse
+
+
+logger = logging
+logging.set_trace()
 
 
 class _LogLevel(IntEnum):
@@ -16,6 +20,12 @@ class _LogLevel(IntEnum):
     VALIDATOR = 24
 
 
+# class LogLevel:
+#     BITADS = 21
+#     LOCAL = 22
+#     MINER = 23
+#     VALIDATOR = 24
+
 class LogLevel:
     BITADS = "BITADS"
     LOCAL = "LOCAL"
@@ -23,37 +33,40 @@ class LogLevel:
     VALIDATOR = "VALIDATOR"
 
 
-@lambda _: _()  # IIFE function call
-def _configure_logger():
-    for level in _LogLevel:
-        logger.level(level.name, level.value)
+# @lambda _: _()  # IIFE function call
+# def _configure_logger():
+#     for level in _LogLevel:
+#         logging.addLevelName(level.value, level.name)
+    #     pass
+        # logging.addLevelName(level.value, level.name)
+        # logger.setLevel(level)
 
 
 def log_campaign_info(campaign: Campaign):
-    logger.log(LogLevel.BITADS, "")
-    logger.log(
+    logger.info(LogLevel.BITADS, "")
+    logger.info(
         LogLevel.BITADS,
         cyan("    --------------------------"),
     )
-    logger.log(LogLevel.BITADS, "")
-    logger.log(
+    logger.info(LogLevel.BITADS, "")
+    logger.info(
         LogLevel.BITADS,
         cyan(
             f"    Campaign unique id: {campaign.product_unique_id}",
         ),
     )
-    logger.log(
+    logger.info(
         LogLevel.BITADS,
         cyan(
             f"    Campaign title: {campaign.product_title}",
         ),
     )
-    logger.log(LogLevel.BITADS, "")
-    logger.log(
+    logger.info(LogLevel.BITADS, "")
+    logger.info(
         LogLevel.BITADS,
         cyan("    --------------------------"),
     )
-    logger.log(
+    logger.info(
         LogLevel.BITADS,
         "Preparation for distribution of the campaign to miners.",
     )
@@ -68,7 +81,7 @@ def log_error(ex: Exception):
         requests.exceptions.RequestException: "OOps: Something Else.",
         ValueError: "Invalid JSON received.",
     }.get(type(ex), "Unknown exception")
-    logger.log(LogLevel.BITADS, red(error_message))
+    logger.info(LogLevel.BITADS, red(error_message))
 
 
 def log_errors(errors: List[Any] = None):
@@ -76,7 +89,7 @@ def log_errors(errors: List[Any] = None):
     for error in errors:
         if error == 200:
             continue
-        logger.log(
+        logger.info(
             LogLevel.BITADS,
             red(
                 Const.API_ERROR_CODES.get(
@@ -88,27 +101,27 @@ def log_errors(errors: List[Any] = None):
 
 def log_task(task: TaskResponse):
     if task.campaign:
-        logger.log(
+        logger.info(
             LogLevel.BITADS,
             green(
                 f"--> Received campaigns for distribution among miners: {len(task.campaign)}",
             ),
         )
     else:
-        logger.log(
+        logger.info(
             LogLevel.BITADS,
             yellow("--> There are no active campaigns for work."),
         )
 
     if task.aggregation:
-        logger.log(
+        logger.info(
             LogLevel.BITADS,
             green(
                 f"Received tasks for assessing miners: {len(task.aggregation)}",
             ),
         )
     else:
-        logger.log(
+        logger.info(
             LogLevel.BITADS,
             yellow(
                 "--> There are no statistical data to establish the miners' rating.",

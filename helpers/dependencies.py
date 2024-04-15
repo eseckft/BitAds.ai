@@ -6,12 +6,11 @@ from clients.base import BitAdsClient, VersionClient
 from clients.bit_ads import SyncBitAdsClient
 from clients.user_content import GitHubUserContentVersionClient
 from helpers.constants import Const
-from helpers.logging import LogLevel
+from helpers.logging import LogLevel, logger
 from services.ping.base import PingService
 from services.ping.sync import SyncPingService
 from services.storage.base import BaseStorage
 from services.storage.file import FileStorage
-from bittensor.btlogging import logger
 from helpers.constants.colors import red
 
 
@@ -23,7 +22,7 @@ def create_bitads_client(
 
     while not temp_cold_key:
         if not temp_cold_key:
-            logger.log(
+            logger.info(
                 LogLevel.LOCAL,
                 red(
                     "Please note that you will be required to enter your password only once to verify the ownership of your coldkey. This is a necessary step to ensure secure access and to enable full interaction with the BitAds API. Your password is not stored and will not be requested again for future sessions."

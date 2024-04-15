@@ -30,7 +30,7 @@ from websocket import WebSocketConnectionClosedException
 
 from clients.base import BitAdsClient, VersionClient
 from helpers import dependencies
-from helpers.constants.colors import green, yellow, colorize, Color
+from helpers.constants.colors import green, colorize, Color
 from helpers.constants.const import Const
 from helpers.logging import logger, LogLevel, log_campaign_info, log_task
 from schemas.bit_ads import (
@@ -87,7 +87,7 @@ class Validator(BaseValidatorNeuron):
         if not need_process_campaign:
             return
 
-        logger.log(
+        logger.info(
             LogLevel.BITADS,
             "<-- I'm making a request to the server to get a campaign allocation task for miners.",
         )
@@ -101,7 +101,7 @@ class Validator(BaseValidatorNeuron):
 
     def process_campaign(self, data_campaigns: List[Campaign]):
         for campaign in data_campaigns:
-            logger.log(
+            logger.info(
                 LogLevel.BITADS,
                 green(
                     "--> Received a task to distribute the campaign to miners.",
@@ -139,7 +139,7 @@ class Validator(BaseValidatorNeuron):
                     continue
 
                 output: GetMinerUniqueIdResponse = response.dummy_output
-                logger.log(
+                logger.info(
                     LogLevel.MINER,
                     green(
                         f"{ips[output.hot_key]}. The miner submitted his unique link to the campaign.",
@@ -168,15 +168,14 @@ class Validator(BaseValidatorNeuron):
                     ctr = 0.0
                 else:
                     ctr = (
-                        aggregation.count_through_rate_click
-                        / aggregation.visits_unique
+                        aggregation.count_through_rate_click / aggregation.visits_unique
                     )
                 u_norm = aggregation.visits_unique / task.u_max
                 ctr_norm = ctr / task.ctr_max
                 rating = round((task.u_max * u_norm + task.wc * ctr_norm), 5)
                 rating = min(rating, 1)
 
-                logger.log(
+                logger.info(
                     LogLevel.BITADS,
                     green(
                         "--> Received a task to evaluate the miner.",
@@ -186,7 +185,7 @@ class Validator(BaseValidatorNeuron):
                 self._miner_uids.append(uid)
                 self._miner_ratings.append(rating)
 
-                logger.log(
+                logger.info(
                     LogLevel.VALIDATOR,
                     green(
                         f"Miner with UID {uid} for Campaign {aggregation.product_unique_id} has the score {rating}.",
@@ -220,8 +219,8 @@ class Validator(BaseValidatorNeuron):
     def set_weights(self):
         if not self._aggregation_id:
             return
-        logger.log(LogLevel.BITADS, self._miner_uids)
-        logger.log(LogLevel.BITADS, self._miner_ratings)
+        logger.info(LogLevel.BITADS, self._miner_uids)
+        logger.info(LogLevel.BITADS, self._miner_ratings)
         try:
             self.subtensor.set_weights(
                 wallet=self.wallet,
@@ -237,9 +236,7 @@ class Validator(BaseValidatorNeuron):
                 % (2**64),
             )
         except WebSocketConnectionClosedException:
-            logger.warning(
-                "The websocket connection is lost, we are restoring it..."
-            )
+            logger.warning("The websocket connection is lost, we are restoring it...")
             self.subtensor.connect_websocket()
         except Exception as ex:
             logger.error(f"Set weights error: {ex}")
@@ -251,9 +248,7 @@ class Validator(BaseValidatorNeuron):
         return False
 
     async def forward(self, synapse: bt.Synapse = None):
-        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(
-            self.device
-        )
+        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(self.device)
 
     def process_ping(self):
         ping_response = self._ping_service.process_ping()
@@ -274,7 +269,7 @@ class Validator(BaseValidatorNeuron):
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
     for color in (Color.BLUE, Color.YELLOW):
-        logger.log(
+        logger.info(
             LogLevel.LOCAL,
             colorize(
                 color,

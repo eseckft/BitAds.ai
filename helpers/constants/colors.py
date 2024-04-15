@@ -11,8 +11,9 @@ class Color(StrEnum):
     CYAN = "cyan"
 
 
+# TODO: Fix colorize after bittensor update
 def colorize(color: Color, text: str):
-    return f"<{color.value}>{text}</{color.value}>"
+    return f"{text}"
 
 
 red = functools.partial(colorize, Color.RED)

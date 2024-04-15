@@ -68,13 +68,13 @@ class Miner(BaseMinerNeuron):
         task = synapse.dummy_input
 
         if not task:  # TODO: Not sure this is called
-            logger.log(
+            logger.info(
                 LogLevel.BITADS,
                 green("Validator pinging"),
             )
             return synapse
 
-        logger.log(
+        logger.info(
             LogLevel.VALIDATOR,
             green(
                 f"Received a campaign task with ID: {task.product_unique_id} from Validator: {task.uid}",
@@ -88,7 +88,7 @@ class Miner(BaseMinerNeuron):
                 task.product_unique_id,
             )
             synapse.dummy_output = response
-            logger.log(
+            logger.info(
                 LogLevel.VALIDATOR,
                 green(
                     f"Unique link for campaign ID: {task.product_unique_id} already generated. "
@@ -100,7 +100,7 @@ class Miner(BaseMinerNeuron):
             synapse.dummy_output = self.get_campaign_unique_id(
                 task.product_unique_id
             )
-            logger.log(
+            logger.info(
                 LogLevel.BITADS,
                 green(
                     f"Successfully created a unique link for campaign ID: {task.product_unique_id} "
@@ -224,7 +224,7 @@ class Miner(BaseMinerNeuron):
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
     for color in (Color.BLUE, Color.YELLOW):
-        logger.log(
+        logger.info(
             LogLevel.LOCAL,
             colorize(color, f"{Const.MINER} running..."),
         )
