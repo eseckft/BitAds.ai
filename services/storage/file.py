@@ -38,7 +38,7 @@ class FileStorage(BaseStorage):
         for path in directories:
             if not os.path.exists(path):
                 os.makedirs(path)
-                logger.log(
+                logger.info(
                     LogLevel.LOCAL,
                     magenta(f"Created directory: {path}"),
                 )
@@ -46,7 +46,7 @@ class FileStorage(BaseStorage):
     def save_campaign(self, task: GetMinerUniqueIdResponse):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/campaign_id/{task.product_unique_id}.json"
         with open(path, "w") as file:
-            logger.log(
+            logger.info(
                 LogLevel.LOCAL,
                 colorize(Color.YELLOW, f"Save campaign to: {path}"),
             )
@@ -56,7 +56,7 @@ class FileStorage(BaseStorage):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/campaign_id/{campaign_id}_{self._hotkey}.json"
         if os.path.exists(path):
             os.remove(path)
-            logger.log(
+            logger.info(
                 LogLevel.LOCAL,
                 colorize(Color.YELLOW, "Remove campaign file: {path}"),
             )
@@ -64,7 +64,7 @@ class FileStorage(BaseStorage):
     def save_miner_unique_url(self, data: GetMinerUniqueIdResponse):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link/{data.product_unique_id}_{self._hotkey}.json"
         with open(path, "w") as file:
-            logger.log(
+            logger.info(
                 LogLevel.LOCAL,
                 yellow(
                     f"Save campaign unique url to: {path}",
@@ -75,7 +75,7 @@ class FileStorage(BaseStorage):
     def save_miner_unique_url_stats(self, data: Aggregation):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_stats/{data.product_unique_id}_{data.product_item_unique_id}.json"
         with open(path, "w") as file:
-            logger.log(
+            logger.info(
                 LogLevel.LOCAL,
                 yellow(
                     f"Save campaign unique url statistics to: {path}",
@@ -91,7 +91,7 @@ class FileStorage(BaseStorage):
     ):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_score/{product_unique_id}_{product_item_unique_id}.json"
         with open(path, "w") as file:
-            logger.log(
+            logger.info(
                 LogLevel.LOCAL,
                 yellow(
                     f"Save campaign unique url score to: {path}",
@@ -110,12 +110,12 @@ class FileStorage(BaseStorage):
         try:
             return GetMinerUniqueIdResponse.parse_file(path)
         except FileNotFoundError:
-            logger.log(
+            logger.info(
                 LogLevel.LOCAL,
                 red(f"File not found by path: {path}"),
             )
         except:
-            logger.log(
+            logger.info(
                 LogLevel.LOCAL,
                 red(f"File broken by path: {path}"),
             )

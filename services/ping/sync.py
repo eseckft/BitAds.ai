@@ -45,7 +45,7 @@ class SyncPingService(PingService):
                 stderr=subprocess.PIPE,
             )
 
-        logger.log(
+        logger.info(
             LogLevel.BITADS,
             "Initiating ping to the server to update the activity timestamp.",
         )
@@ -53,7 +53,7 @@ class SyncPingService(PingService):
         if not response.result:
             return
 
-        logger.log(
+        logger.info(
             LogLevel.BITADS,
             green("--> Ping successful. Activity timestamp updated."),
         )
