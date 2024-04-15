@@ -205,10 +205,10 @@ If you encounter any issues during the installation process, refer to the troubl
 To execute the commands at the root of the project, you can follow these steps:
 
 ```basg 
-git clone https://github.com/eseckft/BitAds.ai.git && \
-cd BitAds.ai && \
-python3 -m pip install -e . && \
-python3 setup.py install_lib && \
+git clone https://github.com/eseckft/BitAds.ai.git
+cd BitAds.ai
+python3 -m pip install -e .
+python3 setup.py install_lib
 python3 setup.py build
 ```
 
