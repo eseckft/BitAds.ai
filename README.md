@@ -184,9 +184,9 @@ btcli subnet register --netuid 16 --wallet.name <name> --wallet.hotkey <name>
 
 Please note that the usage of scripts within this repository is restricted to registered users of [BitAds.ai](https://BitAds.ai)
 
-To utilize any scripts provided here, you must first sign up and authenticate yourself on the [BitAds.ai](https://BitAds.ai) platform. Once registered, you will be granted access to the necessary resources and functionalities.
+To utilize any scripts provided here, you must first sign up and authenticate yourself on the [BitAds.ai](https://BitAds.ai) platform. Once registered, you will be granted access to the necessary resources and functionalities. 
 
-**As part of our validation protocol, each Validator must send 0.0001 TAO from their coldkey to verify their identity. This process is necessary to confirm their status as a validator and to grant them access to the API.**
+**The validators will be manually approved after we receive written confirmation on Discord about their registration.**
 
 For any inquiries regarding script usage or registration, please refer to the official documentation on [BitAds.ai](https://BitAds.ai) or contact our support team.
 
@@ -200,7 +200,9 @@ Please make sure to follow the installation steps carefully to ensure that Bitte
 
 If you encounter any issues during the installation process, refer to the troubleshooting section in the Bittensor documentation or reach out to our support team for assistance.
 
-**Prerequisites: Ensure that you have Python 3.12 or a later version installed on your system.**
+**Prerequisites:**
+- Ensure that you have Python 3.12 or a later version installed on your system.**
+- Run your local Subtensor
 
 ```basg 
 git clone https://github.com/eseckft/BitAds.ai.git
@@ -213,11 +215,11 @@ python3 setup.py build
 **After registration, you can start the miner script using the following command:**
 
 ```bash
-python neurons/miner.py --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
+python neurons/miner.py --netuid 16 --subtensor.network finney/local --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
 ```
 
 **And for running the validator script, use:**
 
 ```bash
-python neurons/validator.py --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
+python neurons/validator.py --netuid 16 --subtensor.network finney/local --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
 ```
