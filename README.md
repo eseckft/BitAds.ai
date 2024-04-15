@@ -165,11 +165,28 @@ Expand landing page domains to enable validators and clients to select from a wi
 8. **Conversion Tracking** <br>
 Integrate conversion tracking in order to measure conversion rates on client websites.
 
+# Creating a Wallet
+
+Before proceeding, you'll need to create a wallet. A wallet is required for managing your digital assets and interacting with the functionalities provided by this repository.
+
+Detailed instructions on how to create a wallet can be found in the official documentation [here](https://docs.bittensor.com/getting-started/wallets).
+
+Please ensure that you follow the steps outlined in the documentation carefully to set up your wallet correctly.
+
+# Registration in Subnetwork
+
+To fully utilize the functionalities provided by this repository, it is necessary to register within the BitAds.ai Subnetwork (UID 16). 
+```bash
+btcli subnet register --netuid 16 --wallet.name <name> --wallet.hotkey <name>
+```
+
 # Usage of Scripts
 
 Please note that the usage of scripts within this repository is restricted to registered users of [BitAds.ai](https://BitAds.ai)
 
 To utilize any scripts provided here, you must first sign up and authenticate yourself on the [BitAds.ai](https://BitAds.ai) platform. Once registered, you will be granted access to the necessary resources and functionalities.
+
+**As part of our validation protocol, each Validator must send 0.0001 TAO from their coldkey to verify their identity. This process is necessary to confirm their status as a validator and to grant them access to the API.**
 
 For any inquiries regarding script usage or registration, please refer to the official documentation on [BitAds.ai](https://BitAds.ai) or contact our support team.
 
@@ -183,53 +200,26 @@ Please make sure to follow the installation steps carefully to ensure that Bitte
 
 If you encounter any issues during the installation process, refer to the troubleshooting section in the Bittensor documentation or reach out to our support team for assistance.
 
-# Creating a Wallet
-
-Before proceeding, you'll need to create a wallet. A wallet is required for managing your digital assets and interacting with the functionalities provided by this repository.
-
-Detailed instructions on how to create a wallet can be found in the official documentation [here](https://docs.bittensor.com/getting-started/wallets).
-
-Please ensure that you follow the steps outlined in the documentation carefully to set up your wallet correctly.
-
-# Registration in Subnetwork
-
-To fully utilize the functionalities provided by this repository, it is necessary to register within Subnetwork **120 (TESTNET)**. 
-
-Registration in Subnetwork **120** allows you to access specific features and resources tailored to your needs.
-
-```bash
-btcli subnet register --netuid 120 --wallet.name <name> --wallet.hotkey <name>
-```
-
-# Running Scripts
+**Prerequisites: Ensure that you have Python 3.12 or a later version installed on your system.**
 
 To execute the commands at the root of the project, you can follow these steps:
 
-- Git clone the repository:
 ```basg 
-git clone https://github.com/eseckft/BitAds.ai.git
-```
-- Install the project in editable mode using pip:
-```basg 
-python3 -m pip install -e .
-```
-- Install the project's library:
-```basg 
-python3 setup.py install_lib
-```
-- Build the project:
-```basg 
+git clone https://github.com/eseckft/BitAds.ai.git && \
+cd BitAds.ai && \
+python3 -m pip install -e . && \
+python3 setup.py install_lib && \
 python3 setup.py build
 ```
 
-After registration, you can start the miner script using the following command:
+**After registration, you can start the miner script using the following command:**
 
 ```bash
-python neurons/miner.py --netuid <id> --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
+python neurons/miner.py --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
 ```
 
-And for running the validator script, use:
+**And for running the validator script, use:**
 
 ```bash
-python neurons/validator.py --netuid <id> --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
+python neurons/validator.py --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
 ```
