@@ -201,7 +201,7 @@ Please make sure to follow the installation steps carefully to ensure that Bitte
 If you encounter any issues during the installation process, refer to the troubleshooting section in the Bittensor documentation or reach out to our support team for assistance.
 
 **Prerequisites:**
-- Ensure that you have Python 3.12 or a later version installed on your system.**
+- Ensure that you have Python 3.12 or a later version installed on your system.
 - Run your local Subtensor
 
 ```basg 
