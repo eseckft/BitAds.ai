@@ -2,7 +2,6 @@
 # Copyright © 2023 Yuma Rao
 # TODO(developer): Set your name
 # Copyright © 2023 <your name>
-
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -23,6 +22,7 @@ import bittensor as bt
 import pydantic
 
 from schemas.bit_ads import GetMinerUniqueIdResponse, Campaign
+import base64
 
 
 # This is the protocol for the dummy miner and validator.
@@ -85,6 +85,15 @@ class Task(bt.Synapse):
 
     def deserialize(self) -> typing.Optional[GetMinerUniqueIdResponse]:
         return self.dummy_output
+
+    def to_headers(self) -> dict:
+        result = super().to_headers()
+        result["bt_header_input_obj_dummy_input"] = base64.b64encode(
+            self.dummy_input.json().encode()
+        ).decode(
+            "utf-8"
+        )
+        return result
 
 
 """
