@@ -35,5 +35,10 @@ else
     echo "Process is not currently managed by PM2."
 fi
 
+python3 -m pip install -r requirements.txt
+python3 -m pip install -e .
+python3 setup.py install_lib
+python3 setup.py build
+
 pm2 start --name mining_server_$wallet_hotkey neurons/miner.py --interpreter python3 -- $@
 
