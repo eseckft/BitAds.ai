@@ -38,6 +38,7 @@ class SyncPingService(PingService):
             "Initiating ping to the server to update the activity timestamp.",
         )
         response = self._bitads_client.subnet_ping()
+        print('response', response)
         if not response.result:
             return
 
