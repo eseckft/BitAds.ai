@@ -214,6 +214,20 @@ python3 setup.py build
 
 **After registration, you can start the miner script using the following command:**
 
+# With autoupdates
+
+```bash
+pm2 start run_miner_auto_update.py --interpreter python3 -- --netuid 16 --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
+```
+
+**And for running the validator script, use:**
+
+```bash
+pm2 start run_validator_auto_update.py --interpreter python3 -- --netuid 16 --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
+```
+
+# Without auto updates
+
 ```bash
 python neurons/miner.py --netuid 16 --subtensor.network finney/local --wallet.name <name> --wallet.hotkey <name> --logging.debug
 ```
