@@ -33,18 +33,6 @@ class SyncPingService(PingService):
         if not need_ping:
             return None
 
-        tmp_v = self._version_client.get_version()
-        if not self._current_version:
-            self._current_version = tmp_v
-        elif self._current_version != tmp_v:
-            command = "git pull origin main"
-            subprocess.Popen(
-                command,
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-
         logger.info(
             LogLevel.BITADS,
             "Initiating ping to the server to update the activity timestamp.",
