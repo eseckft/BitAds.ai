@@ -34,7 +34,7 @@ def run_auto_updater():
 
                 print("Running the autoupdate steps...")
                 # Trigger shell script. Make sure this file path starts from root
-                os.system("./start_miners.sh")
+                os.system(f"./start_miners.sh {args}")
                 time.sleep(20)
 
                 print("Finished running the autoupdate steps! Ready to go 😎")
