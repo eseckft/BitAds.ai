@@ -1,34 +1,27 @@
 import os
 import subprocess
 import time
+import sys
 
 
-def get_remote_commit_if_needed():
-    local_commit = get_local_commit()
-    remote_commit = get_remote_commit()
-    return remote_commit if local_commit != remote_commit else None
+def should_update_local(local_commit, remote_commit):
+    return local_commit != remote_commit
 
 
-def get_local_commit():
-    local_commit = subprocess.getoutput("git rev-parse HEAD")
-    return local_commit
+args = " ".join(sys.argv[1:])
 
-
-def get_remote_commit():
-    current_branch = subprocess.getoutput("git rev-parse --abbrev-ref HEAD")
-    remote_commit = subprocess.getoutput(f"git rev-parse github/{current_branch}")
-    return remote_commit
-
-
-os.system("./start_miners.sh")
+os.system(f"./start_miners.sh {args}")
 time.sleep(10)
 
 
 def run_auto_updater():
     while True:
-        os.system("git fetch github")
+        current_branch = subprocess.getoutput("git rev-parse --abbrev-ref HEAD")
+        local_commit = subprocess.getoutput("git rev-parse HEAD")
+        os.system("git fetch")
+        remote_commit = subprocess.getoutput(f"git rev-parse origin/{current_branch}")
 
-        if remote_commit := get_remote_commit_if_needed():
+        if should_update_local(local_commit, remote_commit):
             print("Local repo is not up-to-date. Updating...")
             reset_cmd = "git reset --hard " + remote_commit
             process = subprocess.Popen(reset_cmd.split(), stdout=subprocess.PIPE)
@@ -41,7 +34,7 @@ def run_auto_updater():
 
                 print("Running the autoupdate steps...")
                 # Trigger shell script. Make sure this file path starts from root
-                # os.system("./autoupdate_miner_steps.sh")
+                os.system("./start_miners.sh")
                 time.sleep(20)
 
                 print("Finished running the autoupdate steps! Ready to go 😎")
