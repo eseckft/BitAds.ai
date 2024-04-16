@@ -21,6 +21,7 @@ class BaseHTTPClient(ABC):
         self, method: str, endpoint: str, **kwargs
     ) -> Dict[str, Any]:
         try:
+            print('requests', method, self._base_url + endpoint, self._headers, kwargs)
             response = requests.request(
                 method,
                 self._base_url + endpoint,
