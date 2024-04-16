@@ -28,6 +28,7 @@ class BaseHTTPClient(ABC):
                 headers=self._headers,
                 params=kwargs,
             )
+            print('response', response)
             body = response.json()
             logger.debug(f"Response from {endpoint}: {body}")
             log_errors(body.get("errors"))
