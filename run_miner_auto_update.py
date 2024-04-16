@@ -39,8 +39,8 @@ def run_auto_updater():
 
                 print("Finished running the autoupdate steps! Ready to go 😎")
 
-        else:
-            print("Repo is up-to-date.")
+        #else:
+            #print("Repo is up-to-date.")
 
         time.sleep(60)
 

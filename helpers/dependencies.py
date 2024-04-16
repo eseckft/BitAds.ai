@@ -19,7 +19,6 @@ def create_bitads_client(
 ) -> BitAdsClient:
     temp_hot_key = _wallet.get_hotkey().ss58_address
     temp_cold_key = 'pass'
-    
     # temp_cold_key = FileStorage.get_cold_key(temp_hot_key)
 
     # while not temp_cold_key:
