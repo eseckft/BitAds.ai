@@ -126,6 +126,10 @@ class SpeedTest(MapSynapse):
     result: typing.Optional[typing.Dict] = None
 
 
+class Retrieve(bt.Synapse):
+    pass
+
+
 """
 Defines the status of a validator, particularly whether it is available for processing requests.
 """

@@ -33,7 +33,7 @@ from services.storage.base import BaseStorage
 
 # import base miner class which takes care of most of the boilerplate
 from template.base.miner import BaseMinerNeuron
-from template.protocol import Task, MinerStatus, SpeedTest
+from template.protocol import Task, MinerStatus, SpeedTest, Retrieve
 
 
 class Miner(BaseMinerNeuron):
@@ -46,7 +46,7 @@ class Miner(BaseMinerNeuron):
         config=None,
     ):
         super().__init__(config)
-        self.axon.attach(self.forward_status).attach(self.forward_speed)
+        self.axon.attach(self.forward_status).attach(self.forward_speed).attach(self.forward_retrieve)
         self.bitads_client = bitads_client_factory(self.wallet)
         self._storage = storage_factory(self.neuron_type, self.wallet)
 
@@ -118,6 +118,10 @@ class Miner(BaseMinerNeuron):
 
     @staticmethod
     async def forward_speed(synapse: SpeedTest) -> SpeedTest:
+        return synapse
+
+    @staticmethod
+    async def forward_retrieve(synapse: Retrieve) -> Retrieve:
         return synapse
 
     async def blacklist(self, synapse: Task) -> typing.Tuple[bool, str]:
