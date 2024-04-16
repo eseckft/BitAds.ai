@@ -20,7 +20,7 @@ class BaseHTTPClient(ABC):
     def _make_request(
         self, method: str, endpoint: str, **kwargs
     ) -> Dict[str, Any]:
-        try:
+        #try:
             print('requests', method, self._base_url + endpoint, self._headers, kwargs)
             response = requests.request(
                 method,
@@ -33,8 +33,8 @@ class BaseHTTPClient(ABC):
             logger.debug(f"Response from {endpoint}: {body}")
             log_errors(body.get("errors"))
             return body
-        except Exception as ex:
-            log_error(ex)
+        #except Exception as ex:
+        #    log_error(ex)
 
 
 class BaseAsyncHTTPClient(ABC):
