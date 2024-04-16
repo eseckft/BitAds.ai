@@ -60,7 +60,8 @@ class SyncBitAdsClient(BitAdsClient, BaseHTTPClient):
     ) -> Optional[GetMinerUniqueIdResponse]:
         body = self._make_request(
             "GET",
-            paths.BitAdsPaths.GENERATE_MINER_CAMPAIGN_URL,
-            id=campaign_id,
+            paths.BitAdsPaths.GENERATE_MINER_CAMPAIGN_URL.format(
+                id=campaign_id
+            ),
         )
         return GetMinerUniqueIdResponse.parse_obj(body) if body else None
