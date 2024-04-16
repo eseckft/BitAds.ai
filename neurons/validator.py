@@ -236,7 +236,9 @@ class Validator(BaseValidatorNeuron):
                 % (2**64),
             )
         except WebSocketConnectionClosedException:
-            logger.warning("The websocket connection is lost, we are restoring it...")
+            logger.warning(
+                "The websocket connection is lost, we are restoring it..."
+            )
             self.subtensor.connect_websocket()
         except Exception as ex:
             logger.error(f"Set weights error: {ex}")
@@ -248,7 +250,9 @@ class Validator(BaseValidatorNeuron):
         return False
 
     async def forward(self, synapse: bt.Synapse = None):
-        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(self.device)
+        self.moving_averaged_scores = torch.zeros(self.metagraph.n).to(
+            self.device
+        )
 
     def process_ping(self):
         ping_response = self._ping_service.process_ping()

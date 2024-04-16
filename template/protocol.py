@@ -130,6 +130,10 @@ class Retrieve(bt.Synapse):
     pass
 
 
+class TextToSpeech(bt.Synapse):
+    pass
+
+
 """
 Defines the status of a validator, particularly whether it is available for processing requests.
 """
