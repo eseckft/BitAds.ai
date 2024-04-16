@@ -39,6 +39,8 @@ from template.protocol import (
     SpeedTest,
     Retrieve,
     TextToSpeech,
+    VoiceClone,
+    MusicGeneration,
 )
 
 
@@ -54,7 +56,9 @@ class Miner(BaseMinerNeuron):
         super().__init__(config)
         self.axon.attach(self.forward_status).attach(
             self.forward_speed
-        ).attach(self.forward_retrieve).attach(self.forward_text_to_speech)
+        ).attach(self.forward_retrieve).attach(
+            self.forward_text_to_speech
+        ).attach()
         self.bitads_client = bitads_client_factory(self.wallet)
         self._storage = storage_factory(self.neuron_type, self.wallet)
 
@@ -134,6 +138,16 @@ class Miner(BaseMinerNeuron):
 
     @staticmethod
     async def forward_text_to_speech(synapse: TextToSpeech) -> TextToSpeech:
+        return synapse
+
+    @staticmethod
+    async def forward_voice_clone(synapse: VoiceClone) -> VoiceClone:
+        return synapse
+
+    @staticmethod
+    async def forward_music_generation(
+        synapse: MusicGeneration,
+    ) -> MusicGeneration:
         return synapse
 
     async def blacklist(self, synapse: Task) -> typing.Tuple[bool, str]:

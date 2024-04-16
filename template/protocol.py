@@ -16,13 +16,13 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+import base64
 import typing
 
 import bittensor as bt
 import pydantic
 
 from schemas.bit_ads import GetMinerUniqueIdResponse, Campaign
-import base64
 
 
 # This is the protocol for the dummy miner and validator.
@@ -90,9 +90,7 @@ class Task(bt.Synapse):
         result = super().to_headers()
         result["bt_header_input_obj_dummy_input"] = base64.b64encode(
             self.dummy_input.json().encode()
-        ).decode(
-            "utf-8"
-        )
+        ).decode("utf-8")
         return result
 
 
@@ -131,6 +129,14 @@ class Retrieve(bt.Synapse):
 
 
 class TextToSpeech(bt.Synapse):
+    pass
+
+
+class MusicGeneration(bt.Synapse):
+    pass
+
+
+class VoiceClone(bt.Synapse):
     pass
 
 
