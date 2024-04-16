@@ -20,21 +20,19 @@ class BaseHTTPClient(ABC):
     def _make_request(
         self, method: str, endpoint: str, **kwargs
     ) -> Dict[str, Any]:
-        #try:
-            print('requests', method, self._base_url + endpoint, self._headers, kwargs)
+        try:
             response = requests.request(
                 method,
                 self._base_url + endpoint,
                 headers=self._headers,
                 params=kwargs,
             )
-            print('response', response)
             body = response.json()
             logger.debug(f"Response from {endpoint}: {body}")
             log_errors(body.get("errors"))
             return body
-        #except Exception as ex:
-        #    log_error(ex)
+        except Exception as ex:
+            log_error(ex)
 
 
 class BaseAsyncHTTPClient(ABC):
