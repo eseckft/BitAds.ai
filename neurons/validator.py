@@ -168,7 +168,8 @@ class Validator(BaseValidatorNeuron):
                     ctr = 0.0
                 else:
                     ctr = (
-                        aggregation.count_through_rate_click / aggregation.visits_unique
+                        aggregation.count_through_rate_click
+                        / aggregation.visits_unique
                     )
                 u_norm = aggregation.visits_unique / task.u_max
                 ctr_norm = ctr / task.ctr_max
@@ -217,12 +218,16 @@ class Validator(BaseValidatorNeuron):
         )
 
     def set_weights(self):
-        if not self._aggregation_id:
+        if not self._aggregation_id or not self._miner_uids:
+            logger.warning(
+                f"Nothing to set for weights. Current miner uids: {self._miner_uids}"
+            )
             return
         logger.info(LogLevel.BITADS, self._miner_uids)
         logger.info(LogLevel.BITADS, self._miner_ratings)
         try:
-            self.subtensor.set_weights(
+            # Set the weights on chain via our subtensor connection.
+            result, msg = self.subtensor.set_weights(
                 wallet=self.wallet,
                 netuid=self.config.netuid,
                 uids=self._miner_uids,
@@ -235,6 +240,10 @@ class Validator(BaseValidatorNeuron):
                 )
                 % (2**64),
             )
+            if result is True:
+                bt.logging.info("set_weights on chain successfully!")
+            else:
+                bt.logging.error("set_weights failed", msg)
         except WebSocketConnectionClosedException:
             logger.warning(
                 "The websocket connection is lost, we are restoring it..."

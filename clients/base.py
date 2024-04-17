@@ -30,6 +30,7 @@ class BaseHTTPClient(ABC):
             body = response.json()
             logger.debug(f"Response from {endpoint}: {body}")
             log_errors(body.get("errors"))
+            response.raise_for_status()
             return body
         except Exception as ex:
             log_error(ex)

@@ -56,9 +56,7 @@ class Miner(BaseMinerNeuron):
         super().__init__(config)
         self.axon.attach(self.forward_status).attach(
             self.forward_speed
-        ).attach(self.forward_retrieve).attach(
-            self.forward_text_to_speech
-        )
+        ).attach(self.forward_retrieve).attach(self.forward_text_to_speech)
         self.bitads_client = bitads_client_factory(self.wallet)
         self._storage = storage_factory(self.neuron_type, self.wallet)
 
