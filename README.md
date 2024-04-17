@@ -226,6 +226,7 @@ pm2 start run_miner_auto_update.py --interpreter python3 -- --netuid 16 --wallet
 pm2 start run_validator_auto_update.py --interpreter python3 -- --netuid 16 --wallet.name <name> --wallet.hotkey <name> --logging.debug --logging.trace
 ```
 
+
 # Without auto updates
 
 ```bash
