@@ -92,6 +92,7 @@ class Miner(BaseMinerNeuron):
                 f"Received a campaign task with ID: {task.product_unique_id} from Validator: {task.uid}",
             ),
         )
+        logger.info(f"Receive campaign {task}")
 
         if self._storage.unique_link_exists(
             task.product_unique_id,
@@ -112,6 +113,7 @@ class Miner(BaseMinerNeuron):
             synapse.dummy_output = self.get_campaign_unique_id(
                 task.product_unique_id
             )
+            logger.info(f"Result campaign generated {synapse.dummy_output}")
             logger.info(
                 LogLevel.BITADS,
                 green(
