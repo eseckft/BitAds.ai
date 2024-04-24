@@ -307,7 +307,7 @@ if __name__ == "__main__":
         while True:
             validator.process_ping()
             try:
-                time.sleep(5)
+                time.sleep(20)
             except KeyboardInterrupt:
                 bt.logging.warning("Ending validator...")
                 break
