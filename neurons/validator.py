@@ -216,10 +216,10 @@ class Validator(BaseValidatorNeuron):
                 )
                 break
 
-        self.set_weights()
-
         self._miner_uids = list(self._miner_uids.values())
         self._miner_ratings = list(self._miner_ratings.values())
+
+        self.set_weights()
 
         self.update_scores(
             torch.FloatTensor(self._miner_ratings).to(self.device),
