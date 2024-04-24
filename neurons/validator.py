@@ -151,9 +151,15 @@ class Validator(BaseValidatorNeuron):
     def process_aggregation(
         self, data_aggregations: List[Aggregation], task: TaskResponse
     ):
-        self._miner_uids = []
-        self._miner_ratings = []
+        self._miner_uids = {}
+        self._miner_ratings = {}
         self._aggregation_id = None
+
+        for uid in range(self.metagraph.n.item()):
+            axon = self.metagraph.axons[uid]
+            if axon.hotkey in self._miners:
+                self._miner_uids[uid] = uid
+                self._miner_ratings[uid] = 0.0
 
         for aggregation in data_aggregations:
             self._aggregation_id = aggregation.id
@@ -183,8 +189,8 @@ class Validator(BaseValidatorNeuron):
                     ),
                 )
 
-                self._miner_uids.append(uid)
-                self._miner_ratings.append(rating)
+                #self._miner_uids.append(uid)
+                self._miner_ratings[uid] = rating
 
                 logger.info(
                     LogLevel.VALIDATOR,
@@ -211,6 +217,9 @@ class Validator(BaseValidatorNeuron):
                 break
 
         self.set_weights()
+
+        self._miner_uids = list(self._miner_uids.values())
+        self._miner_ratings = list(self._miner_ratings.values())
 
         self.update_scores(
             torch.FloatTensor(self._miner_ratings).to(self.device),
