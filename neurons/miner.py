@@ -28,7 +28,7 @@ from clients.base import BitAdsClient
 from helpers import dependencies
 from helpers.constants import colorize, Color, Const
 from helpers.constants.colors import green
-from helpers.logging import logger, LogLevel
+from helpers.logging import LogLevel
 from services.storage.base import BaseStorage
 
 # import base miner class which takes care of most of the boilerplate
@@ -78,15 +78,15 @@ class Miner(BaseMinerNeuron):
         task = synapse.dummy_input
 
         if not task:  # TODO: Not sure this is called
-            logger.info(
-                LogLevel.BITADS,
-                green("Validator pinging"),
+            bt.logging.info(
+                prefix=LogLevel.BITADS,
+                msg=green("Validator pinging"),
             )
             return synapse
 
-        logger.info(
-            LogLevel.VALIDATOR,
-            green(
+        bt.logging.info(
+            prefix=LogLevel.VALIDATOR,
+            msg=green(
                 f"Received a campaign task with ID: {task.product_unique_id} from Validator: {task.uid}",
             ),
         )
@@ -98,9 +98,9 @@ class Miner(BaseMinerNeuron):
                 task.product_unique_id,
             )
             synapse.dummy_output = response
-            logger.info(
-                LogLevel.VALIDATOR,
-                green(
+            bt.logging.info(
+                prefix=LogLevel.VALIDATOR,
+                msg=green(
                     f"Unique link for campaign ID: {task.product_unique_id} already generated. "
                     f"Sending it to the Validator: {task.uid}",
                 ),
@@ -110,9 +110,9 @@ class Miner(BaseMinerNeuron):
             synapse.dummy_output = self.get_campaign_unique_id(
                 task.product_unique_id
             )
-            logger.info(
-                LogLevel.BITADS,
-                green(
+            bt.logging.info(
+                prefix=LogLevel.BITADS,
+                msg=green(
                     f"Successfully created a unique link for campaign ID: {task.product_unique_id} "
                     f"and forwarded it to the Validator: {task.product_unique_id}",
                 ),
@@ -183,7 +183,7 @@ class Miner(BaseMinerNeuron):
             and synapse.dendrite.hotkey not in self.metagraph.hotkeys
         ):
             # Ignore requests from un-registered entities.
-            logger.trace(
+            bt.logging.trace(
                 f"Blacklisting un-registered hotkey {synapse.dendrite.hotkey}"
             )
             return True, "Unrecognized hotkey"
@@ -191,12 +191,12 @@ class Miner(BaseMinerNeuron):
         if self.config.blacklist.force_validator_permit:
             # If the config is set to force validator permit, then we should only allow requests from validators.
             if not self.metagraph.validator_permit[uid]:
-                logger.warning(
+                bt.logging.warning(
                     f"Blacklisting a request from non-validator hotkey {synapse.dendrite.hotkey}"
                 )
                 return True, "Non-validator hotkey"
 
-        logger.trace(
+        bt.logging.trace(
             f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
         )
         return False, "Hotkey recognized!"
@@ -227,7 +227,7 @@ class Miner(BaseMinerNeuron):
         prirority = float(
             self.metagraph.S[caller_uid]
         )  # Return the stake as the priority.
-        logger.trace(
+        bt.logging.trace(
             f"Prioritizing {synapse.dendrite.hotkey} with value: ",
             prirority,
         )
@@ -252,9 +252,9 @@ class Miner(BaseMinerNeuron):
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
     for color in (Color.BLUE, Color.YELLOW):
-        logger.info(
-            LogLevel.LOCAL,
-            colorize(color, f"{Const.MINER} running..."),
+        bt.logging.info(
+            prefix=LogLevel.LOCAL,
+            msg=colorize(color, f"{Const.MINER} running..."),
         )
     with Miner(
         dependencies.create_bitads_client, dependencies.create_storage
@@ -269,5 +269,5 @@ if __name__ == "__main__":
             try:
                 time.sleep(20)
             except KeyboardInterrupt:
-                logger.warning("Ending miner...")
+                bt.logging.warning("Ending miner...")
                 break

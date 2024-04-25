@@ -1,19 +1,21 @@
 import functools
-from enum import StrEnum
+from enum import Enum
+
+from colorama import Style
+from colorama.ansi import Fore
 
 
-class Color(StrEnum):
-    RED = "red"
-    GREEN = "green"
-    YELLOW = "yellow"
-    BLUE = "blue"
-    MAGENTA = "magenta"
-    CYAN = "cyan"
+class Color(Enum):
+    RED = Fore.RED
+    GREEN = Fore.GREEN
+    YELLOW = Fore.YELLOW
+    BLUE = Fore.BLUE
+    MAGENTA = Fore.MAGENTA
+    CYAN = Fore.CYAN
 
 
-# TODO: Fix colorize after bittensor update
 def colorize(color: Color, text: str):
-    return f"{text}"
+    return f"{color.value}{text}{Style.RESET_ALL}"
 
 
 red = functools.partial(colorize, Color.RED)

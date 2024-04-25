@@ -1,12 +1,14 @@
+import json
 import os
 from typing import Union, Optional
 
+import bittensor as bt
+
 from helpers.constants import Const
 from helpers.constants.colors import colorize, Color, red, yellow, magenta
-from helpers.logging import logger, LogLevel
+from helpers.logging import LogLevel
 from schemas.bit_ads import Score, GetMinerUniqueIdResponse, Aggregation
 from services.storage.base import BaseStorage
-import json
 
 
 class FileStorage(BaseStorage):
@@ -38,17 +40,17 @@ class FileStorage(BaseStorage):
         for path in directories:
             if not os.path.exists(path):
                 os.makedirs(path)
-                logger.info(
-                    LogLevel.LOCAL,
-                    magenta(f"Created directory: {path}"),
+                bt.logging.info(
+                    prefix=LogLevel.LOCAL,
+                    msg=magenta(f"Created directory: {path}"),
                 )
 
     def save_campaign(self, task: GetMinerUniqueIdResponse):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/campaign_id/{task.product_unique_id}.json"
         with open(path, "w") as file:
-            logger.info(
-                LogLevel.LOCAL,
-                colorize(Color.YELLOW, f"Save campaign to: {path}"),
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=colorize(Color.YELLOW, f"Save campaign to: {path}"),
             )
             file.write(task.json(indent=4))
 
@@ -56,17 +58,17 @@ class FileStorage(BaseStorage):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/campaign_id/{campaign_id}_{self._hotkey}.json"
         if os.path.exists(path):
             os.remove(path)
-            logger.info(
-                LogLevel.LOCAL,
-                colorize(Color.YELLOW, "Remove campaign file: {path}"),
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=colorize(Color.YELLOW, "Remove campaign file: {path}"),
             )
 
     def save_miner_unique_url(self, data: GetMinerUniqueIdResponse):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link/{data.product_unique_id}_{self._hotkey}.json"
         with open(path, "w") as file:
-            logger.info(
-                LogLevel.LOCAL,
-                yellow(
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=yellow(
                     f"Save campaign unique url to: {path}",
                 ),
             )
@@ -75,9 +77,9 @@ class FileStorage(BaseStorage):
     def save_miner_unique_url_stats(self, data: Aggregation):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_stats/{data.product_unique_id}_{data.product_item_unique_id}.json"
         with open(path, "w") as file:
-            logger.info(
-                LogLevel.LOCAL,
-                yellow(
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=yellow(
                     f"Save campaign unique url statistics to: {path}",
                 ),
             )
@@ -91,9 +93,9 @@ class FileStorage(BaseStorage):
     ):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_score/{product_unique_id}_{product_item_unique_id}.json"
         with open(path, "w") as file:
-            logger.info(
-                LogLevel.LOCAL,
-                yellow(
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=yellow(
                     f"Save campaign unique url score to: {path}",
                 ),
             )
@@ -110,14 +112,14 @@ class FileStorage(BaseStorage):
         try:
             return GetMinerUniqueIdResponse.parse_file(path)
         except FileNotFoundError:
-            logger.info(
-                LogLevel.LOCAL,
-                red(f"File not found by path: {path}"),
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=red(f"File not found by path: {path}"),
             )
         except:
-            logger.info(
-                LogLevel.LOCAL,
-                red(f"File broken by path: {path}"),
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=red(f"File broken by path: {path}"),
             )
 
     @staticmethod

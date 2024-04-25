@@ -4,7 +4,9 @@ from typing import Optional, Any, Dict, Union
 import aiohttp
 import requests
 
-from helpers.logging import log_errors, log_error, logger
+import bittensor as bt
+
+from helpers.logging import log_errors, log_error
 from schemas.bit_ads import (
     PingResponse,
     GetMinerUniqueIdResponse,
@@ -28,7 +30,7 @@ class BaseHTTPClient(ABC):
                 params=kwargs,
             )
             body = response.json()
-            logger.debug(f"Response from {endpoint}: {body}")
+            bt.logging.debug(f"Response from {endpoint}: {body}")
             log_errors(body.get("errors"))
             response.raise_for_status()
             return body

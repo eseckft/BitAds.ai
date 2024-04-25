@@ -8,7 +8,6 @@ from clients.base import (
 )
 from helpers import md5_utils
 from helpers.constants import paths, Const
-from helpers.logging import logger
 from schemas.bit_ads import (
     PingResponse,
     GetMinerUniqueIdResponse,
@@ -41,13 +40,6 @@ class AsyncAsyncBitAdsClientAsync(AsyncBitAdsClient, BaseAsyncHTTPClient):
 
 class SyncBitAdsClient(BitAdsClient, BaseHTTPClient):
     def subnet_ping(self) -> Optional[PingResponse]:
-        files_hash = md5_utils.calculate_md5_for_files_in_folders(
-            Const.FOLDERS_TO_CHECK
-        )
-        logger.info(
-            f"Request hash example: {files_hash}",
-        )
-
         body = self._make_request("GET", paths.BitAdsPaths.SUBNET_PING)
         return PingResponse.parse_obj(body) if body else None
 

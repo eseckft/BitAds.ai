@@ -32,7 +32,7 @@ from clients.base import BitAdsClient, VersionClient
 from helpers import dependencies
 from helpers.constants.colors import green, colorize, Color
 from helpers.constants.const import Const
-from helpers.logging import logger, LogLevel, log_campaign_info, log_task
+from helpers.logging import LogLevel, log_campaign_info, log_task
 from schemas.bit_ads import (
     Score,
     Campaign,
@@ -87,9 +87,9 @@ class Validator(BaseValidatorNeuron):
         if not need_process_campaign:
             return
 
-        logger.info(
-            LogLevel.BITADS,
-            "<-- I'm making a request to the server to get a campaign allocation task for miners.",
+        bt.logging.info(
+            prefix=LogLevel.BITADS,
+            msg="<-- I'm making a request to the server to get a campaign allocation task for miners.",
         )
         response = self._bitads_client.get_task()
         if not response or not response.result:
@@ -101,9 +101,9 @@ class Validator(BaseValidatorNeuron):
 
     def process_campaign(self, data_campaigns: List[Campaign]):
         for campaign in data_campaigns:
-            logger.info(
-                LogLevel.BITADS,
-                green(
+            bt.logging.info(
+                prefix=LogLevel.BITADS,
+                msg=green(
                     "--> Received a task to distribute the campaign to miners.",
                 ),
             )
@@ -139,9 +139,9 @@ class Validator(BaseValidatorNeuron):
                     continue
 
                 output: GetMinerUniqueIdResponse = response.dummy_output
-                logger.info(
-                    LogLevel.MINER,
-                    green(
+                bt.logging.info(
+                    prefix=LogLevel.MINER,
+                    msg=green(
                         f"{ips[output.hot_key]}. The miner submitted his unique link to the campaign.",
                     ),
                 )
@@ -182,19 +182,19 @@ class Validator(BaseValidatorNeuron):
                 rating = round((task.u_max * u_norm + task.wc * ctr_norm), 5)
                 rating = min(rating, 1)
 
-                logger.info(
-                    LogLevel.BITADS,
-                    green(
+                bt.logging.info(
+                    prefix=LogLevel.BITADS,
+                    msg=green(
                         "--> Received a task to evaluate the miner.",
                     ),
                 )
 
-                #self._miner_uids.append(uid)
+                # self._miner_uids.append(uid)
                 self._miner_ratings[uid] = rating
 
-                logger.info(
-                    LogLevel.VALIDATOR,
-                    green(
+                bt.logging.info(
+                    prefix=LogLevel.VALIDATOR,
+                    msg=green(
                         f"Miner with UID {uid} for Campaign {aggregation.product_unique_id} has the score {rating}.",
                     ),
                 )
@@ -228,12 +228,12 @@ class Validator(BaseValidatorNeuron):
 
     def set_weights(self):
         if not self._aggregation_id or not self._miner_uids:
-            logger.warning(
+            bt.logging.warning(
                 f"Nothing to set for weights. Current miner uids: {self._miner_uids}"
             )
             return
-        logger.info(LogLevel.BITADS, self._miner_uids)
-        logger.info(LogLevel.BITADS, self._miner_ratings)
+        bt.logging.info(prefix=LogLevel.BITADS, msg=self._miner_uids)
+        bt.logging.info(prefix=LogLevel.BITADS, msg=self._miner_ratings)
         try:
             # Set the weights on chain via our subtensor connection.
             result, msg = self.subtensor.set_weights(
@@ -254,12 +254,12 @@ class Validator(BaseValidatorNeuron):
             else:
                 bt.logging.error("set_weights failed", msg)
         except WebSocketConnectionClosedException:
-            logger.warning(
+            bt.logging.warning(
                 "The websocket connection is lost, we are restoring it..."
             )
             self.subtensor.connect_websocket()
         except Exception as ex:
-            logger.error(f"Set weights error: {ex}")
+            bt.logging.error(f"Set weights error: {ex}")
 
     def should_set_weights(self) -> bool:
         """
@@ -291,9 +291,9 @@ class Validator(BaseValidatorNeuron):
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
     for color in (Color.BLUE, Color.YELLOW):
-        logger.info(
-            LogLevel.LOCAL,
-            colorize(
+        bt.logging.info(
+            prefix=LogLevel.LOCAL,
+            msg=colorize(
                 color,
                 f"{Const.VALIDATOR} running...",
             ),
