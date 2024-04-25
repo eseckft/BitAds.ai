@@ -24,7 +24,9 @@ class Const:
 
     API_ERROR_CODES = {
         100: "Internal Server Error.",
-        101: "User Not Found.",
+        101: "You must register your account as a Miner or "
+        "Validator on the BitAds website to mine or validate on Subnet 16. "
+        "Visit https://bitads.ai and register.",
         102: "User Status Not Active.",
         103: "Not Active Campaign.",
         104: "Not Query Parameters.",
