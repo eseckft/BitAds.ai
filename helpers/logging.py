@@ -80,7 +80,7 @@ def log_error(ex: Exception):
         requests.exceptions.RequestException: "OOps: Something Else.",
         ValueError: "Invalid JSON received.",
     }.get(type(ex), "Unknown exception")
-    bt.logging.info(prefix=LogLevel.BITADS, msg=red(error_message))
+    bt.logging.error(prefix=LogLevel.BITADS, msg=red(error_message))
 
 
 def log_errors(errors: List[Any] = None):
