@@ -116,7 +116,7 @@ def log_task(task: TaskResponse):
         bt.logging.info(
             prefix=LogLevel.BITADS,
             msg=green(
-                f"Received tasks for assessing miners: {len(task.aggregation)}",
+                f"Received tasks for assessing miners",
             ),
         )
     else:

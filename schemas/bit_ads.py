@@ -1,4 +1,4 @@
-from typing import List, Any, Optional, Union, Set
+from typing import List, Any, Optional, Union, Set, Dict
 
 import pydantic
 from pydantic import Field
@@ -53,6 +53,7 @@ class TaskResponse(BaseResponse):
     wc: float = Field(alias="Wc")
     campaign: List[Campaign]
     aggregation: List[Aggregation]
+    new: Dict[str, Dict[str, Dict[str, int]]]
 
 
 class GetMinerUniqueIdResponse(BaseResponse):

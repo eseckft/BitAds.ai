@@ -92,6 +92,7 @@ class Validator(BaseValidatorNeuron):
             msg="<-- I'm making a request to the server to get a campaign allocation task for miners.",
         )
         response = self._bitads_client.get_task()
+
         if not response or not response.result:
             return
 
@@ -151,80 +152,171 @@ class Validator(BaseValidatorNeuron):
     def process_aggregation(
         self, data_aggregations: List[Aggregation], task: TaskResponse
     ):
-        self._miner_uids = {}
-        self._miner_ratings = {}
-        self._aggregation_id = None
+        if task.new:
+            # new
+            self._miner_uids = {}
+            self._miner_ratings = {}
+            self._aggregation_id = None
 
-        for uid in range(self.metagraph.n.item()):
-            axon = self.metagraph.axons[uid]
-            if axon.hotkey in self._miners:
-                self._miner_uids[uid] = uid
-                self._miner_ratings[uid] = 0.0
-
-        for aggregation in data_aggregations:
-            self._aggregation_id = aggregation.id
             for uid in range(self.metagraph.n.item()):
-                if uid == self.uid:
-                    continue
                 axon = self.metagraph.axons[uid]
-                if axon.hotkey != aggregation.miner_wallet_address:
-                    continue
-                self._storage.save_miner_unique_url_stats(aggregation)
-                if aggregation.visits_unique == 0:
-                    ctr = 0.0
-                else:
-                    ctr = (
-                        aggregation.count_through_rate_click
-                        / aggregation.visits_unique
-                    )
-                u_norm = aggregation.visits_unique / task.u_max
-                ctr_norm = ctr / task.ctr_max
-                rating = round((task.u_max * u_norm + task.wc * ctr_norm), 5)
-                rating = min(rating, 1)
+                if axon.hotkey in self._miners:
+                    self._miner_uids[uid] = uid
+                    self._miner_ratings[uid] = 0.0
 
+            campaign_count = len(task.new)
+
+            for aggregation in task.new:
+                for miner_wallet in task.new[aggregation]:
+                    for uid in range(self.metagraph.n.item()):
+                        if uid == self.uid:
+                            continue
+                        axon = self.metagraph.axons[uid]
+                        if axon.hotkey != miner_wallet:
+                         continue
+
+                        if task.new[aggregation][miner_wallet]['visits_unique'] == 0:
+                            ctr = 0.0
+                        else:
+                            ctr = (
+                                    task.new[aggregation][miner_wallet]['count_through_rate_click']
+                                    / task.new[aggregation][miner_wallet]['visits_unique']
+                            )
+                        if ctr > 0.2:
+                            ctr = 0
+                        u_norm = task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['umax']
+                        ctr_norm = ctr / task.ctr_max
+                        rating = round((task.new[aggregation][miner_wallet]['umax'] * u_norm + task.wc * ctr_norm), 5)
+                        rating = min(rating, 1)
+
+                        task.new[aggregation][miner_wallet]['rating'] = rating
+
+                        if uid not in self._miner_ratings:
+                            self._miner_ratings[uid] = 0
+
+                        self._miner_ratings[uid] = self._miner_ratings[uid] + rating
+
+                        score = Score(
+                            ctr=ctr,
+                            u_norm=u_norm,
+                            ctr_norm=ctr_norm,
+                            ctr_max=task.ctr_max,
+                            wu=task.wu,
+                            wc=task.wc,
+                            u_max=task.u_max,
+                            rating=rating,
+                        )
+                        self._storage.save_miner_unique_url_score(
+                            aggregation,
+                            miner_wallet,
+                            score,
+                        )
+
+            for mnr in self._miner_ratings:
                 bt.logging.info(
                     prefix=LogLevel.BITADS,
                     msg=green(
                         "--> Received a task to evaluate the miner.",
                     ),
                 )
-
-                # self._miner_uids.append(uid)
-                self._miner_ratings[uid] = rating
+                self._miner_ratings[mnr] = round(min(self._miner_ratings[mnr] / campaign_count, 1), 5)
 
                 bt.logging.info(
                     prefix=LogLevel.VALIDATOR,
                     msg=green(
-                        f"Miner with UID {uid} for Campaign {aggregation.product_unique_id} has the score {rating}.",
+                        f"Miner with UID {mnr} has the score {self._miner_ratings[mnr]}.",
                     ),
                 )
 
-                score = Score(
-                    ctr=ctr,
-                    u_norm=u_norm,
-                    ctr_norm=ctr_norm,
-                    ctr_max=task.ctr_max,
-                    wu=task.wu,
-                    wc=task.wc,
-                    u_max=task.u_max,
-                    rating=rating,
-                )
-                self._storage.save_miner_unique_url_score(
-                    aggregation.product_unique_id,
-                    aggregation.product_item_unique_id,
-                    score,
-                )
-                break
+            self._miner_uids = list(self._miner_uids.values())
+            self._miner_ratings = list(self._miner_ratings.values())
 
-        self._miner_uids = list(self._miner_uids.values())
-        self._miner_ratings = list(self._miner_ratings.values())
+            print('uids', self._miner_uids)
+            print('score', self._miner_ratings)
 
-        self.set_weights()
+            self.set_weights()
 
-        self.update_scores(
-            torch.FloatTensor(self._miner_ratings).to(self.device),
-            self._miner_uids,
-        )
+            self.update_scores(
+                torch.FloatTensor(self._miner_ratings).to(self.device),
+                self._miner_uids,
+            )
+        else:
+            # old
+
+            self._miner_uids = {}
+            self._miner_ratings = {}
+            self._aggregation_id = None
+
+            for uid in range(self.metagraph.n.item()):
+                axon = self.metagraph.axons[uid]
+                if axon.hotkey in self._miners:
+                    self._miner_uids[uid] = uid
+                    self._miner_ratings[uid] = 0.0
+
+            for aggregation in data_aggregations:
+                self._aggregation_id = aggregation.id
+                for uid in range(self.metagraph.n.item()):
+                    if uid == self.uid:
+                        continue
+                    axon = self.metagraph.axons[uid]
+                    if axon.hotkey != aggregation.miner_wallet_address:
+                        continue
+                    self._storage.save_miner_unique_url_stats(aggregation)
+                    if aggregation.visits_unique == 0:
+                        ctr = 0.0
+                    else:
+                        ctr = (
+                            aggregation.count_through_rate_click
+                            / aggregation.visits_unique
+                        )
+                    u_norm = aggregation.visits_unique / task.u_max
+                    ctr_norm = ctr / task.ctr_max
+                    rating = round((task.u_max * u_norm + task.wc * ctr_norm), 5)
+                    rating = min(rating, 1)
+
+                    bt.logging.info(
+                        prefix=LogLevel.BITADS,
+                        msg=green(
+                            "--> Received a task to evaluate the miner.",
+                        ),
+                    )
+
+                    # self._miner_uids.append(uid)
+                    self._miner_ratings[uid] = rating
+
+                    bt.logging.info(
+                        prefix=LogLevel.VALIDATOR,
+                        msg=green(
+                            f"Miner with UID {uid} for Campaign {aggregation.product_unique_id} has the score {rating}.",
+                        ),
+                    )
+
+                    score = Score(
+                        ctr=ctr,
+                        u_norm=u_norm,
+                        ctr_norm=ctr_norm,
+                        ctr_max=task.ctr_max,
+                        wu=task.wu,
+                        wc=task.wc,
+                        u_max=task.u_max,
+                        rating=rating,
+                    )
+                    self._storage.save_miner_unique_url_score(
+                        aggregation.product_unique_id,
+                        aggregation.product_item_unique_id,
+                        score,
+                    )
+                    break
+
+            self._miner_uids = list(self._miner_uids.values())
+            self._miner_ratings = list(self._miner_ratings.values())
+
+            self.set_weights()
+
+            self.update_scores(
+                torch.FloatTensor(self._miner_ratings).to(self.device),
+                self._miner_uids,
+            )
 
     def set_weights(self):
         if not self._aggregation_id or not self._miner_uids:
@@ -278,13 +370,12 @@ class Validator(BaseValidatorNeuron):
             self._miners = ping_response.miners
 
         task_response = self.process()
-
         if not task_response:
             return
 
         if task_response.campaign:
             self.process_campaign(task_response.campaign)
-        if task_response.aggregation:
+        if task_response.aggregation or task_response.new:
             self.process_aggregation(task_response.aggregation, task_response)
 
 
