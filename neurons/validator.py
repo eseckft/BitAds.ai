@@ -186,7 +186,7 @@ class Validator(BaseValidatorNeuron):
                             ctr = 0
                         u_norm = task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['umax']
                         ctr_norm = ctr / task.ctr_max
-                        rating = round((task.new[aggregation][miner_wallet]['umax'] * u_norm + task.wc * ctr_norm), 5)
+                        rating = round((task.wu * u_norm + task.wc * ctr_norm), 5)
                         rating = min(rating, 1)
 
                         task.new[aggregation][miner_wallet]['rating'] = rating
