@@ -119,7 +119,6 @@ class Miner(BaseMinerNeuron):
             )
 
         self._storage.remove_campaign(task.product_unique_id)
-
         return synapse
 
     @staticmethod
