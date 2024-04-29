@@ -53,7 +53,7 @@ class TaskResponse(BaseResponse):
     wc: float = Field(alias="Wc")
     campaign: List[Campaign]
     aggregation: List[Aggregation]
-    new: Dict[str, Dict[str, Dict[str, int]]]
+    new: Any
 
 
 class GetMinerUniqueIdResponse(BaseResponse):
