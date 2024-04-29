@@ -231,6 +231,7 @@ class Validator(BaseValidatorNeuron):
             self._miner_uids = list(self._miner_uids.values())
             self._miner_ratings = list(self._miner_ratings.values())
 
+
             print('uids', self._miner_uids)
             print('score', self._miner_ratings)
 
