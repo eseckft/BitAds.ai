@@ -39,7 +39,7 @@ def create_bitads_client(
         base_url,
         hot_key=temp_hot_key,
         cold_key=temp_cold_key,
-        v="2.0.1"
+        v="2.0.2"
     )
 
 
