@@ -167,6 +167,7 @@ class Validator(BaseValidatorNeuron):
             campaign_count = len(task.new)
 
             for aggregation in task.new:
+                self._aggregation_id = aggregation
                 for miner_wallet in task.new[aggregation]:
                     for uid in range(self.metagraph.n.item()):
                         if uid == self.uid:
