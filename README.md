@@ -89,6 +89,11 @@ Expressed as a decimal, this metric captures the efficiency of the campaign in e
 **Maximum Expected Values (Umax and CTRmax)** <br>
 These thresholds are set to normalize the unique visits and CTR, ensuring they're scaled to a value between 0 and 1. This normalization facilitates a fair comparison between miners, accounting for varying scales of performance.  Let's say Umax is set to 1000, and CTRmax is 0.15.
 
+**Total number of visits for the period (V)** <br>
+
+**Artificial traffic (AT)** <br>
+Several metrics are taken into account to calculate the number of artificial visits over a period.
+
 Normalization is performed as follows:
 ```bash
 Unorm = U / Umax
@@ -102,7 +107,7 @@ These weights reflect the relative importance of Unique visits and CTR in calcul
 The Miner Score is computed by applying the weights to the normalized values of unique visits and CTR, as follows:
 
 ```bash
-MINER SCORE = (Wu * Unorm) + (Wc * CTRnorm)
+MINER SCORE = (( Wu * Unorm ) + ( Wc * CTRnorm )) * ( 1 - AT / V )
 ```
 
 Given the example of a miner with 1000 unique visitors and a CTR of 5% (0.05), and with the normalization constants provided (Umax = 1000, CTRmax = 0.15), the calculations would be:

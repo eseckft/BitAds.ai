@@ -185,9 +185,18 @@ class Validator(BaseValidatorNeuron):
                             )
                         if ctr > 0.2:
                             ctr = 0
+                        at = 1
+                        if task.new[aggregation][miner_wallet]['at']:
+                            if task.new[aggregation][miner_wallet]['visits_unique'] != 0:
+                                at = task.new[aggregation][miner_wallet]['at'] / task.new[aggregation][miner_wallet]['visits']
+                            else:
+                                at = 0
+                            at = min(at, 1)
+                        if at != 1 and at != 0:
+                            at = min(1 - at, 1)
                         u_norm = task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['umax']
                         ctr_norm = ctr / task.ctr_max
-                        rating = round((task.wu * u_norm + task.wc * ctr_norm), 5)
+                        rating = round((task.wu * u_norm + task.wc * ctr_norm) * at, 5)
                         rating = min(rating, 1)
 
                         task.new[aggregation][miner_wallet]['rating'] = rating
