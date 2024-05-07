@@ -188,7 +188,10 @@ class Validator(BaseValidatorNeuron):
                         at = 1
                         if task.new[aggregation][miner_wallet]['at']:
                             if task.new[aggregation][miner_wallet]['visits_unique'] != 0:
-                                at = task.new[aggregation][miner_wallet]['at'] / task.new[aggregation][miner_wallet]['visits']
+                                if task.new[aggregation][miner_wallet]['at'] == task.new[aggregation][miner_wallet]['visits']:
+                                    at = 0
+                                else:
+                                    at = task.new[aggregation][miner_wallet]['at'] / task.new[aggregation][miner_wallet]['visits']
                             else:
                                 at = 0
                             at = min(at, 1)
