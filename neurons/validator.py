@@ -166,6 +166,9 @@ class Validator(BaseValidatorNeuron):
 
             campaign_count = len(task.new)
 
+            Wats = 0.5
+            Wuvps = 0.5
+
             for aggregation in task.new:
                 self._aggregation_id = aggregation
                 for miner_wallet in task.new[aggregation]:
@@ -197,9 +200,13 @@ class Validator(BaseValidatorNeuron):
                             at = min(at, 1)
                         if at != 1 and at != 0:
                             at = min(1 - at, 1)
+
+                        ats = Wats * at
+                        uvps = Wuvps * (task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['visits'])
+                        ati = ats + uvps
                         u_norm = task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['umax']
                         ctr_norm = ctr / task.ctr_max
-                        rating = round((task.wu * u_norm + task.wc * ctr_norm) * at, 5)
+                        rating = round(((task.wu * u_norm) + (task.wc * ctr_norm)) * ati, 5)
                         rating = min(rating, 1)
 
                         task.new[aggregation][miner_wallet]['rating'] = rating
