@@ -166,8 +166,8 @@ class Validator(BaseValidatorNeuron):
 
             campaign_count = len(task.new)
 
-            Wats = 0.5
-            Wuvps = 0.5
+            Wats = task.wats
+            Wuvps = task.wuvps
 
             for aggregation in task.new:
                 self._aggregation_id = aggregation

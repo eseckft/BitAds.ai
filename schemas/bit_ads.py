@@ -51,6 +51,8 @@ class TaskResponse(BaseResponse):
     ctr_max: float = Field(alias="CTRmax")
     wu: float = Field(alias="Wu")
     wc: float = Field(alias="Wc")
+    wats: float = Field(alias="Wats")
+    wuvps: float = Field(alias="Wuvps")
     campaign: List[Campaign]
     aggregation: List[Aggregation]
     new: Any
