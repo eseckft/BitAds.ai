@@ -167,7 +167,7 @@ The score will be calculated:
 ```bash
 Unorm = 1000/1000 = 1
 CTRnorm = 0.05/0.15 = 0.33
-AT = 100 + 200 + 300 = 600
+AT = 600
 OTS = (1 - (600/1000) = 1 - 0.6 = 0.4
 UVPS = 1000 / 10000 = 0.1
 
