@@ -117,7 +117,7 @@ Wuvps (weights unique visits percentage score) = 0.5
 **8. Organic traffic score (OTS)** <br>
 This parameter will calculate the percentage of organic traffic, by excluding the artificial traffic from the unique visits.
 ```bash
-OTS = (1 - (AT / UV))
+OTS = 1 - (AT / UV)
 ```
 **9. Artificial traffic (AT)** <br>
 This parameter will count all the artificial traffic, based on multiple metrics that takes into account the user's behavior. 
@@ -125,7 +125,7 @@ This parameter will count all the artificial traffic, based on multiple metrics 
 **10. Unique visits percentage score (UVPS)** <br>
 This parameter will calculate the percentage of unique visits.
 ```bash
-UVPS = (UV / TV) 
+UVPS = UV / TV
 ```
 
 **All the values needed for Score Calculation:** <br>
@@ -138,6 +138,7 @@ CTRnorm = CTR / CTRmax
 Wuv - Weight for Unique Visitors = 0.5
 Wctr - Weight for CTR = 0.5
 ATI - Artificial traffic indicator = ATI = (Wots * OTS) + (Wuvps * UVPS)
+AT - Artifical traffic
 OTS - Organic traffic score = (1- (AT / V))
 UVPS - Unique visits percentage = (UV / TV)
 Wots - Weight for organic traffic score = 0.5
