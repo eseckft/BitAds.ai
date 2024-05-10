@@ -1,19 +1,19 @@
-import copy
-import time
-import asyncio
 import argparse
+import asyncio
+import copy
 import threading
+import time
 import traceback
 from abc import ABC, abstractmethod
 from functools import partial
-from starlette.types import Send
+from typing import Dict, Tuple
 
 import bittensor as bt
+from starlette.types import Send
 from transformers import GPT2Tokenizer
-from typing import List, Dict, Tuple, Union, Callable, Awaitable
 
-from protocol import StreamPrompting
 from config import get_config, check_config
+from protocol import StreamPrompting
 
 
 class StreamMiner(ABC):

@@ -1,10 +1,9 @@
-import time
-
 import asyncio
 import random
-import bittensor as bt
-
+import time
 from typing import List
+
+import bittensor as bt
 
 
 class MockSubtensor(bt.MockSubtensor):

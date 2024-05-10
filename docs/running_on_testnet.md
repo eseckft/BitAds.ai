@@ -1,14 +1,17 @@
 # Running Subnet on Testnet
 
-This tutorial shows how to use the Bittensor testnet to create a subnet and run your incentive mechanism on it. 
+This tutorial shows how to use the Bittensor testnet to create a subnet and run your incentive mechanism on it.
 
-**IMPORTANT:** We strongly recommend that you first run [Running Subnet Locally](running_on_staging.md) before running on the testnet. Incentive mechanisms running on the testnet are open to anyone, and although these mechanisms on testnet do not emit real TAO, they cost you test TAO which you must create. 
+**IMPORTANT:** We strongly recommend that you first run [Running Subnet Locally](running_on_staging.md) before running
+on the testnet. Incentive mechanisms running on the testnet are open to anyone, and although these mechanisms on testnet
+do not emit real TAO, they cost you test TAO which you must create.
 
 **DANGER**
+
 - Do not expose your private keys.
 - Only use your testnet wallet.
 - Do not reuse the password of your mainnet wallet.
-- Make sure your incentive mechanism is resistant to abuse. 
+- Make sure your incentive mechanism is resistant to abuse.
 
 ## Prerequisites
 
@@ -40,15 +43,18 @@ Install the bittensor-subnet-template package:
 python -m pip install -e . 
 ```
 
-## 2. Create wallets 
+## 2. Create wallets
 
 Create wallets for subnet owner, subnet validator and for subnet miner.
-  
-This step creates local coldkey and hotkey pairs for your three identities: subnet owner, subnet validator and subnet miner. 
 
-The owner will create and control the subnet. The owner must have at least 100 testnet TAO before the owner can run next steps. 
+This step creates local coldkey and hotkey pairs for your three identities: subnet owner, subnet validator and subnet
+miner.
 
-The validator and miner will be registered to the subnet created by the owner. This ensures that the validator and miner can run the respective validator and miner scripts.
+The owner will create and control the subnet. The owner must have at least 100 testnet TAO before the owner can run next
+steps.
+
+The validator and miner will be registered to the subnet created by the owner. This ensures that the validator and miner
+can run the respective validator and miner scripts.
 
 Create a coldkey for your owner wallet:
 
@@ -82,9 +88,11 @@ btcli wallet new_hotkey --wallet.name validator --wallet.hotkey default
 
 ## 3. Get the price of subnet creation
 
-Creating subnets on the testnet is competitive. The cost is determined by the rate at which new subnets are being registered onto the chain. 
+Creating subnets on the testnet is competitive. The cost is determined by the rate at which new subnets are being
+registered onto the chain.
 
-By default you must have at least 100 testnet TAO in your owner wallet to create a subnet. However, the exact amount will fluctuate based on demand. The below command shows how to get the current price of creating a subnet.
+By default you must have at least 100 testnet TAO in your owner wallet to create a subnet. However, the exact amount
+will fluctuate based on demand. The below command shows how to get the current price of creating a subnet.
 
 ```bash
 btcli subnet lock_cost --subtensor.network test
@@ -97,14 +105,16 @@ The above command will show:
 ```
 
 ## 4. (Optional) Get faucet tokens
-   
-Faucet is disabled on the testnet. Hence, if you don't have sufficient faucet tokens, ask the [Bittensor Discord community](https://discord.com/channels/799672011265015819/830068283314929684) for faucet tokens.
+
+Faucet is disabled on the testnet. Hence, if you don't have sufficient faucet tokens, ask
+the [Bittensor Discord community](https://discord.com/channels/799672011265015819/830068283314929684) for faucet tokens.
 
 ## 5. Purchase a slot
 
-Using the test TAO from the previous step you can register your subnet on the testnet. This will create a new subnet on the testnet and give you the owner permissions to it. 
+Using the test TAO from the previous step you can register your subnet on the testnet. This will create a new subnet on
+the testnet and give you the owner permissions to it.
 
-The below command shows how to purchase a slot. 
+The below command shows how to purchase a slot.
 
 **NOTE**: Slots cost TAO to lock. You will get this TAO back when the subnet is deregistered.
 
@@ -124,7 +134,8 @@ Enter the owner wallet name which gives permissions to the coldkey:
 
 ## 6. Register keys
 
-This step registers your subnet validator and subnet miner keys to the subnet, giving them the **first two slots** on the subnet.
+This step registers your subnet validator and subnet miner keys to the subnet, giving them the **first two slots** on
+the subnet.
 
 Register your miner key to the subnet:
 
@@ -221,7 +232,6 @@ You will see the below terminal output:
 ```bash
 >> 2023-08-08 16:58:11.223 |       INFO       | Running validator for subnet: 1 on network: ws://127.0.0.1:9946 with config: ...
 ```
-
 
 ## 9. Get emissions flowing
 

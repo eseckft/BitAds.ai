@@ -17,9 +17,10 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import torch
 import random
+
 import bittensor as bt
+import torch
 
 
 async def ping_uids(dendrite, metagraph, uids, timeout=3):

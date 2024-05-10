@@ -1,13 +1,12 @@
-import torch
 import random
-import bittensor as bt
 from typing import List
+
+import bittensor as bt
+import torch
 
 
 def check_uid_availability(
-    metagraph: "bt.metagraph.Metagraph",
-    uid: int,
-    vpermit_tao_limit: int,
+    metagraph: "bt.metagraph.Metagraph", uid: int, vpermit_tao_limit: int
 ) -> bool:
     """Check if uid is available. The UID should be available if it is serving and has less than vpermit_tao_limit stake
     Args:
