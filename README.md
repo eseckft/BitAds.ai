@@ -186,8 +186,9 @@ Conditions:
 # Subnet Security 
 
 **BitAds campaigns have multiple levels of protection against fraudulent activity such as bot or script-driven fake activity. In particular, verification for human authenticity occurs through:**
-- AWS WAF [(Well-Architected Framework) ](https://aws.amazon.com/waf/)
+- AWS WAF [(Web Application Firewall) ](https://aws.amazon.com/waf/)
 - CAPTCHA
+- Visitor "Fingerprint"
 
 All incoming requests are forwarded to AWS WAF for inspection by the web ACL. <br>
 
