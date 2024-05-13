@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 
-from common import dependencies
+from common.validator import dependencies
 from common.validator.schemas import TrackingDataSchema
 from common.validator.services.track_data.base import TrackingDataService
 

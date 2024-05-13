@@ -23,7 +23,8 @@ import time
 # Bittensor
 import bittensor as bt
 
-from common import dependencies
+from common.validator import dependencies
+
 # Bittensor Validator Template:
 from neurons.protocol import Ping
 
