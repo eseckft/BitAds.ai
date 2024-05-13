@@ -1,12 +1,12 @@
+from abc import ABC, abstractmethod
 from typing import Callable
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from common.db.repositories.visitors import SQLAlchemyVisitorRepository
 from common.db.unit_of_work.base import UnitOfWork
 
 
-class SQLAlchemyUnitOfWork(UnitOfWork):
+class SQLAlchemyUnitOfWork(UnitOfWork, ABC):
     def __init__(self, sessionmaker: Callable[[], AsyncSession]):
         self.sessionmaker = sessionmaker
 
@@ -18,8 +18,12 @@ class SQLAlchemyUnitOfWork(UnitOfWork):
 
     async def __aenter__(self):
         self._session = self.sessionmaker()
-        self.visitors = SQLAlchemyVisitorRepository(self._session)
+        self._init_repos()
         return self
+
+    @abstractmethod
+    def _init_repos(self):
+        pass
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:

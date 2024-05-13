@@ -3,10 +3,10 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from common.db.entities import Visitor
 from common.db.repositories.alchemy import BaseSQLAlchemyRepository
 from common.db.repositories.base import VisitorRepository
-from common.schemas.visitor import VisitorSchema
+from common.miner.db.entities.active import Visitor
+from common.miner.schemas import VisitorSchema
 
 
 class SQLAlchemyVisitorRepository(VisitorRepository, BaseSQLAlchemyRepository):

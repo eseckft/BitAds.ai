@@ -23,6 +23,7 @@ import time
 # Bittensor
 import bittensor as bt
 
+from common import dependencies
 # Bittensor Validator Template:
 from neurons.protocol import Ping
 
@@ -76,7 +77,8 @@ class CoreValidator(BaseValidatorNeuron):
 
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
-    with CoreValidator() as validator:
+    bt.logging.on()
+    with dependencies.get_core_validator() as validator:
         while True:
             bt.logging.info("Validator running...", time.time())
             time.sleep(5)

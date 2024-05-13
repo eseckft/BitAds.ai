@@ -4,7 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from common.schemas.visitor import VisitorSchema
+from common.validator.schemas import TrackingDataSchema
+from common.miner.schemas import VisitorSchema
 
 Model = TypeVar("Model", bound=BaseModel)
 ID = TypeVar("ID")
@@ -27,4 +28,14 @@ class VisitorRepository(ABC):
 
     @abstractmethod
     async def get_visitor(self, id_: UUID) -> Optional[VisitorSchema]:
+        pass
+
+
+class TrackingDataRepository(ABC):
+    @abstractmethod
+    async def add_data(self, data: TrackingDataSchema):
+        pass
+
+    @abstractmethod
+    async def get_data(self, id_: UUID) -> Optional[TrackingDataSchema]:
         pass

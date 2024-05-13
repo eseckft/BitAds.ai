@@ -1,7 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import RedirectResponse
 
-from common.schemas.visitor import VisitorSchema
+from common.miner import dependencies
+from common.miner.schemas import VisitorSchema
+from common.miner.services.visitors.base import VisitorService
 
 app = FastAPI()
 
@@ -13,8 +15,11 @@ async def anti_ddos_middleware(request: Request, call_next):
 
 
 @app.get("/")
-async def fetch_request_data_and_redirect(request: Request):
-    # TODO(developer): remove miner ID from request and save data
+async def fetch_request_data_and_redirect(
+    request: Request,
+    visitor_service: VisitorService = Depends(dependencies.get_visitor_service),
+):
+    # TODO(developer): remove miner ID from request and use correct redirect
     modified_headers = request.headers.mutablecopy()
     visitor = VisitorSchema(
         referrer=request.headers.get("referer", "1"),
@@ -24,6 +29,5 @@ async def fetch_request_data_and_redirect(request: Request):
         user_agent=request.headers.get("user-agent"),
         additional_headers=dict(request.headers),
     )
-    return RedirectResponse(
-        url="https://example.com", headers=modified_headers
-    )
+    await visitor_service.add_visitor(visitor)
+    return RedirectResponse(url="https://example.com", headers=modified_headers)

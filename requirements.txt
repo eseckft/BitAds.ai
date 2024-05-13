@@ -1,4 +1,5 @@
 bittensor
 torch
 sqlalchemy[asyncio]
+aiosqlite
 alembic

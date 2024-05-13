@@ -1,11 +1,7 @@
 from abc import ABC, abstractmethod
 
-from common.db.repositories.base import VisitorRepository
-
 
 class UnitOfWork(ABC):
-    visitors: VisitorRepository
-
     @abstractmethod
     def __aenter__(self):
         pass

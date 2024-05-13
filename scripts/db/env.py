@@ -5,8 +5,9 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from common.miner.db.entities import MinerActiveBase, MinerHistoryBase
+from common.validator.db.entities import ValidatorActiveBase, ValidatorHistoryBase
 
-from common.db.entities import Base
 
 USE_TWOPHASE = False
 
@@ -36,7 +37,12 @@ db_names = config.get_main_option("databases", "")
 #       'engine1':mymodel.metadata1,
 #       'engine2':mymodel.metadata2
 # }
-target_metadata = {"engine1": Base.metadata, "engine2": Base.metadata}
+target_metadata = {
+    "miner_active_engine": MinerActiveBase.metadata,
+    "validator_active_engine": ValidatorActiveBase.metadata,
+    "miner_history_engine": MinerHistoryBase.metadata,
+    "validator_history_engine": ValidatorHistoryBase.metadata
+}
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
