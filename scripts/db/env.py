@@ -1,16 +1,18 @@
 import logging
+import os
 import re
 from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+
+from common.db.entities import Base as MainBase
 from common.miner.db.entities import MinerActiveBase, MinerHistoryBase
 from common.validator.db.entities import (
     ValidatorActiveBase,
     ValidatorHistoryBase,
 )
-
 
 USE_TWOPHASE = False
 
@@ -45,7 +47,12 @@ target_metadata = {
     "validator_active_engine": ValidatorActiveBase.metadata,
     "miner_history_engine": MinerHistoryBase.metadata,
     "validator_history_engine": ValidatorHistoryBase.metadata,
+    "main_engine": MainBase.metadata,
 }
+
+SUBTENSOR_NETWORK = os.environ.get("SUBTENSOR_NETWORK", "finney")
+for engine in target_metadata.keys():
+    config.set_section_option(engine, "subtensor.network", SUBTENSOR_NETWORK)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

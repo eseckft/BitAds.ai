@@ -1,5 +1,7 @@
-bittensor
-torch
-sqlalchemy[asyncio]
-aiosqlite
-alembic
+geoip2==4.8.0
+bittensor==7.3.1
+sqlalchemy==2.0.30
+alembic==1.13.1
+loguru==0.7.2
+torch==2.2.2
+bitads-security==0.1.3
