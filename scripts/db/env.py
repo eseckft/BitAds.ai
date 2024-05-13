@@ -6,7 +6,10 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from common.miner.db.entities import MinerActiveBase, MinerHistoryBase
-from common.validator.db.entities import ValidatorActiveBase, ValidatorHistoryBase
+from common.validator.db.entities import (
+    ValidatorActiveBase,
+    ValidatorHistoryBase,
+)
 
 
 USE_TWOPHASE = False
@@ -41,7 +44,7 @@ target_metadata = {
     "miner_active_engine": MinerActiveBase.metadata,
     "validator_active_engine": ValidatorActiveBase.metadata,
     "miner_history_engine": MinerHistoryBase.metadata,
-    "validator_history_engine": ValidatorHistoryBase.metadata
+    "validator_history_engine": ValidatorHistoryBase.metadata,
 }
 
 # other values from the config, defined by the needs of env.py,

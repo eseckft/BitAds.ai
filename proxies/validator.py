@@ -1,6 +1,8 @@
+import uvicorn
 from fastapi import FastAPI, Depends
 
 from common.validator import dependencies
+from common.validator.environ import Environ
 from common.validator.schemas import TrackingDataSchema
 from common.validator.services.track_data.base import TrackingDataService
 
@@ -15,3 +17,7 @@ async def collect_visit_information(
     ),
 ) -> None:
     await tracking_data_service.add_data(tracking_data)
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, port=Environ.PROXY_PORT)

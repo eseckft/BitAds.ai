@@ -9,7 +9,9 @@ from common.validator.schemas import TrackingDataSchema
 from common.validator.db.entities.active import TrackingData
 
 
-class SQLAlchemyTrackingDataRepository(TrackingDataRepository, BaseSQLAlchemyRepository):
+class SQLAlchemyTrackingDataRepository(
+    TrackingDataRepository, BaseSQLAlchemyRepository
+):
     def __init__(self, session: AsyncSession):
         super().__init__(session, TrackingData, TrackingDataSchema)
 

@@ -5,6 +5,8 @@ from common.validator.db.repositories.tracking_data import (
 from common.validator.db.unit_of_work.base import ValidatorActiveUnitOfWork
 
 
-class ValidatorActiveUnitOfWorkImpl(ValidatorActiveUnitOfWork, SQLAlchemyUnitOfWork):
+class ValidatorActiveUnitOfWorkImpl(
+    ValidatorActiveUnitOfWork, SQLAlchemyUnitOfWork
+):
     def _init_repos(self):
         self.tracking_data = SQLAlchemyTrackingDataRepository(self._session)

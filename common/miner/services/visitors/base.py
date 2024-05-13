@@ -10,7 +10,6 @@ class VisitorService(ABC):
     async def add_visitor(self, visitor: VisitorSchema) -> None:
         pass
 
-
     @abstractmethod
     async def get_visitor(self, id_: UUID) -> Optional[VisitorSchema]:
         pass
