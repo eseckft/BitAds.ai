@@ -234,6 +234,19 @@ Implement traffic source analysis to precisely track visitor origins.
 9. **Domain Selection Expansion** <br>
 Expand landing page domains to enable validators and clients to select from a wider range of options.
 
+# How to Mine TAO on Subnet 16
+1. Create a Bittensor wallet (coldkey & hotkey).
+2. Register your hotkey to the Subnet 16.
+3. Register an account to https://bitads.ai using the correct coldkey/hotkey pair of your Miner.
+4. Hardware requirements:
+- VPS with Ubuntu v.20 or higher
+- Python v3.12 or higher
+- Make sure the communication port is open
+- Make sure that there is not Firewall active that would prevent the communication between your Miner and Validators.
+5. Git clone the BitAds repo, install the needed packages and start your Miner’s script.
+6. Login into your BitAds.ai account:
+- Get your unique links from the dashboard for each active campaigns
+- Start promoting it over the internet and try to bring organic traffic to it 
 
 
 # Creating a Wallet
