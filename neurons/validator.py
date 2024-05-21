@@ -194,17 +194,24 @@ class Validator(BaseValidatorNeuron):
                                 if task.new[aggregation][miner_wallet]['at'] == task.new[aggregation][miner_wallet]['visits']:
                                     at = 0
                                 else:
-                                    at = task.new[aggregation][miner_wallet]['at'] / task.new[aggregation][miner_wallet]['visits']
+                                    if task.new[aggregation][miner_wallet]['at'] > 0 and task.new[aggregation][miner_wallet]['visits'] > 0:
+                                        at = task.new[aggregation][miner_wallet]['at'] / task.new[aggregation][miner_wallet]['visits']
                             else:
                                 at = 0
                             at = min(at, 1)
                         if at != 1 and at != 0:
                             at = min(1 - at, 1)
 
+                        UVPS = 0
+                        if task.new[aggregation][miner_wallet]['visits_unique'] > 0 and task.new[aggregation][miner_wallet]['visits'] > 0:
+                            UVPS = task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['visits']
+
                         ats = Wats * at
-                        uvps = Wuvps * (task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['visits'])
+                        uvps = Wuvps * UVPS
                         ati = ats + uvps
-                        u_norm = task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['umax']
+                        u_norm = 0
+                        if task.new[aggregation][miner_wallet]['visits_unique'] > 0:
+                            u_norm = task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['umax']
                         ctr_norm = ctr / task.ctr_max
                         rating = round(((task.wu * u_norm) + (task.wc * ctr_norm)) * ati, 5)
                         rating = min(rating, 1)
