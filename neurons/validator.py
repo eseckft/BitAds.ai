@@ -202,19 +202,26 @@ class Validator(BaseValidatorNeuron):
                         if at != 1 and at != 0:
                             at = min(1 - at, 1)
 
-                        UVPS = 0
-                        if task.new[aggregation][miner_wallet]['visits_unique'] > 0 and task.new[aggregation][miner_wallet]['visits'] > 0:
-                            UVPS = task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['visits']
+                        if at < 0.25:
+                            rating = 0
+                        else:
+                            UVPS = 0
+                            if task.new[aggregation][miner_wallet]['visits_unique'] > 0 and \
+                                    task.new[aggregation][miner_wallet]['visits'] > 0:
+                                UVPS = task.new[aggregation][miner_wallet]['visits_unique'] / \
+                                       task.new[aggregation][miner_wallet]['visits']
 
-                        ats = Wats * at
-                        uvps = Wuvps * UVPS
-                        ati = ats + uvps
-                        u_norm = 0
-                        if task.new[aggregation][miner_wallet]['visits_unique'] > 0:
-                            u_norm = task.new[aggregation][miner_wallet]['visits_unique'] / task.new[aggregation][miner_wallet]['umax']
-                        ctr_norm = ctr / task.ctr_max
-                        rating = round(((task.wu * u_norm) + (task.wc * ctr_norm)) * ati, 5)
-                        rating = min(rating, 1)
+                            ats = Wats * at
+                            uvps = Wuvps * UVPS
+                            ati = ats + uvps
+                            u_norm = 0
+                            if task.new[aggregation][miner_wallet]['visits_unique'] > 0:
+                                u_norm = task.new[aggregation][miner_wallet]['visits_unique'] / \
+                                         task.new[aggregation][miner_wallet]['umax']
+                            ctr_norm = ctr / task.ctr_max
+                            rating = round(((task.wu * u_norm) + (task.wc * ctr_norm)) * ati, 5)
+                            rating = min(rating, 1)
+
 
                         task.new[aggregation][miner_wallet]['rating'] = rating
 
