@@ -52,7 +52,7 @@ class FileStorage(BaseStorage):
                 prefix=LogLevel.LOCAL,
                 msg=colorize(Color.YELLOW, f"Save campaign to: {path}"),
             )
-            file.write(task.json(indent=4))
+            file.write(json.dumps(task, indent=4))
 
     def remove_campaign(self, campaign_id: Union[int, str]):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/campaign_id/{campaign_id}_{self._hotkey}.json"
@@ -72,7 +72,7 @@ class FileStorage(BaseStorage):
                     f"Save campaign unique url to: {path}",
                 ),
             )
-            file.write(data.json(indent=4))
+            file.write(json.dumps(data, indent=4))
 
     def save_miner_unique_url_stats(self, data: Aggregation):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_stats/{data.product_unique_id}_{data.product_item_unique_id}.json"
@@ -83,7 +83,7 @@ class FileStorage(BaseStorage):
                     f"Save campaign unique url statistics to: {path}",
                 ),
             )
-            file.write(data.json(indent=4))
+            file.write(json.dumps(data, indent=4))
 
     def save_miner_unique_url_score(
         self,
@@ -99,7 +99,7 @@ class FileStorage(BaseStorage):
                     f"Save campaign unique url score to: {path}",
                 ),
             )
-            file.write(data.json(indent=4))
+            file.write(json.dumps(data, indent=4))
 
     def unique_link_exists(self, campaign_id: Union[int, str]):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link/{campaign_id}_{self._hotkey}.json"
