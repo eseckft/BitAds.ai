@@ -35,7 +35,7 @@ else
     echo "Process is not currently managed by PM2."
 fi
 
-python3 -m pip install --upgrade bittensor
+#python3 -m pip install --upgrade bittensor
 python3 -m pip install -r requirements.txt
 python3 -m pip install -e .
 python3 setup.py install_lib
