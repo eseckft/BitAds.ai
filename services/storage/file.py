@@ -46,14 +46,13 @@ class FileStorage(BaseStorage):
                 )
 
     def save_campaign(self, task: GetMinerUniqueIdResponse):
-        # path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/campaign_id/{task.product_unique_id}.json"
-        # with open(path, "w") as file:
-        #     bt.logging.info(
-        #         prefix=LogLevel.LOCAL,
-        #         msg=colorize(Color.YELLOW, f"Save campaign to: {path}"),
-        #     )
-        #     file.write(json.dumps(task, indent=4))
-        pass
+        path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/campaign_id/{task.product_unique_id}.json"
+        with open(path, "w") as file:
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=colorize(Color.YELLOW, f"Save campaign to: {path}"),
+            )
+            file.write(task.json(indent=4))
 
     def remove_campaign(self, campaign_id: Union[int, str]):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/campaign_id/{campaign_id}_{self._hotkey}.json"
@@ -65,28 +64,26 @@ class FileStorage(BaseStorage):
             )
 
     def save_miner_unique_url(self, data: GetMinerUniqueIdResponse):
-        # path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link/{data.product_unique_id}_{self._hotkey}.json"
-        # with open(path, "w") as file:
-        #     bt.logging.info(
-        #         prefix=LogLevel.LOCAL,
-        #         msg=yellow(
-        #             f"Save campaign unique url to: {path}",
-        #         ),
-        #     )
-        #     file.write(json.dumps(data, indent=4))
-        pass
+        path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link/{data.product_unique_id}_{self._hotkey}.json"
+        with open(path, "w") as file:
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=yellow(
+                    f"Save campaign unique url to: {path}",
+                ),
+            )
+            file.write(data.json(indent=4))
 
     def save_miner_unique_url_stats(self, data: Aggregation):
-        # path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_stats/{data.product_unique_id}_{data.product_item_unique_id}.json"
-        # with open(path, "w") as file:
-        #     bt.logging.info(
-        #         prefix=LogLevel.LOCAL,
-        #         msg=yellow(
-        #             f"Save campaign unique url statistics to: {path}",
-        #         ),
-        #     )
-        #     file.write(json.dumps(data, indent=4))
-        pass
+        path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_stats/{data.product_unique_id}_{data.product_item_unique_id}.json"
+        with open(path, "w") as file:
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=yellow(
+                    f"Save campaign unique url statistics to: {path}",
+                ),
+            )
+            file.write(data.json(indent=4))
 
     def save_miner_unique_url_score(
         self,
@@ -94,16 +91,15 @@ class FileStorage(BaseStorage):
         product_item_unique_id: Union[int, str],
         data: Score,
     ):
-        # path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_score/{product_unique_id}_{product_item_unique_id}.json"
-        # with open(path, "w") as file:
-        #     bt.logging.info(
-        #         prefix=LogLevel.LOCAL,
-        #         msg=yellow(
-        #             f"Save campaign unique url score to: {path}",
-        #         ),
-        #     )
-        #     file.write(json.dumps(data, indent=4))
-        pass
+        path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link_score/{product_unique_id}_{product_item_unique_id}.json"
+        with open(path, "w") as file:
+            bt.logging.info(
+                prefix=LogLevel.LOCAL,
+                msg=yellow(
+                    f"Save campaign unique url score to: {path}",
+                ),
+            )
+            file.write(data.json(indent=4))
 
     def unique_link_exists(self, campaign_id: Union[int, str]):
         path = f"{self._root_dir}/{self._neuron_type}/{self._hotkey}/unique_link/{campaign_id}_{self._hotkey}.json"
