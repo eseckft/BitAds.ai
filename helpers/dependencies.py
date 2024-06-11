@@ -3,7 +3,7 @@ from datetime import timedelta
 from bittensor import wallet
 
 from clients.base import BitAdsClient, VersionClient
-from clients.bit_ads import SyncBitAdsClient
+from clients.bit_ads import SyncBitAdsClient, MockBitAdsClient
 from clients.user_content import GitHubUserContentVersionClient
 from helpers.constants import Const
 from services.ping.base import PingService
@@ -35,11 +35,11 @@ def create_bitads_client(
     #         else:
     #             temp_cold_key = False
 
-    return SyncBitAdsClient(
+    return MockBitAdsClient(
         base_url,
         hot_key=temp_hot_key,
         cold_key=temp_cold_key,
-        v="2.0.8"
+        v="2.0.9"
     )
 
 

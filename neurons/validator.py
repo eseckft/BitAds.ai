@@ -354,11 +354,21 @@ class Validator(BaseValidatorNeuron):
             )
 
     def set_weights(self):
-        if not self._aggregation_id or not self._miner_uids:
-            bt.logging.warning(
-                f"Nothing to set for weights. Current miner uids: {self._miner_uids}"
-            )
-            return
+        # if not self._aggregation_id or not self._miner_uids:
+        #     bt.logging.warning(
+        #         f"Nothing to set for weights. Current miner uids: {self._miner_uids}"
+        #     )
+        #     return
+
+        # region FIXME: temp issue
+        self._miner_uids.clear()
+        self._miner_ratings.clear()
+        for uid, stake in enumerate(self.metagraph.S):
+            if stake < 20000:
+                self._miner_uids.append(uid)
+                self._miner_ratings.append(0.5)
+        # endregion FIXME
+
         bt.logging.info(prefix=LogLevel.BITADS, msg=self._miner_uids)
         bt.logging.info(prefix=LogLevel.BITADS, msg=self._miner_ratings)
         try:
@@ -370,11 +380,11 @@ class Validator(BaseValidatorNeuron):
                 weights=self._miner_ratings,
                 wait_for_finalization=False,
                 wait_for_inclusion=False,
-                version_key=int(
-                    hashlib.sha256(self._aggregation_id.encode()).hexdigest(),
-                    16,
-                )
-                % (2**64),
+                # version_key=int(
+                #     hashlib.sha256(self._aggregation_id.encode()).hexdigest(),
+                #     16,
+                # )
+                # % (2**64),
             )
             if result is True:
                 bt.logging.info("set_weights on chain successfully!")
@@ -400,18 +410,19 @@ class Validator(BaseValidatorNeuron):
         )
 
     def process_ping(self):
-        ping_response = self._ping_service.process_ping()
-        if ping_response and ping_response.miners:
-            self._miners = ping_response.miners
-
-        task_response = self.process()
-        if not task_response:
-            return
-
-        if task_response.campaign:
-            self.process_campaign(task_response.campaign)
-        if task_response.aggregation or task_response.new:
-            self.process_aggregation(task_response.aggregation, task_response)
+        self.set_weights()
+        # ping_response = self._ping_service.process_ping()
+        # if ping_response and ping_response.miners:
+        #     self._miners = ping_response.miners
+        #
+        # task_response = self.process()
+        # if not task_response:
+        #     return
+        #
+        # if task_response.campaign:
+        #     self.process_campaign(task_response.campaign)
+        # if task_response.aggregation or task_response.new:
+        #     self.process_aggregation(task_response.aggregation, task_response)
 
 
 # The main function parses the configuration and runs the validator.

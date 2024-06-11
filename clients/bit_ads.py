@@ -57,3 +57,15 @@ class SyncBitAdsClient(BitAdsClient, BaseHTTPClient):
             ),
         )
         return GetMinerUniqueIdResponse.parse_obj(body) if body else None
+
+class MockBitAdsClient(BitAdsClient, BaseHTTPClient):
+    def subnet_ping(self) -> Optional[PingResponse]:
+        pass
+
+    def get_task(self) -> Optional[TaskResponse]:
+        pass
+
+    def get_miner_unique_id(
+        self, campaign_id: Union[str, int]
+    ) -> Optional[GetMinerUniqueIdResponse]:
+        pass
