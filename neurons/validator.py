@@ -17,8 +17,6 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-
-import hashlib
 import time
 from datetime import datetime, timedelta
 from typing import Callable, List, Optional
@@ -177,7 +175,7 @@ class Validator(BaseValidatorNeuron):
                             continue
                         axon = self.metagraph.axons[uid]
                         if axon.hotkey != miner_wallet:
-                         continue
+                            continue
 
                         if task.new[aggregation][miner_wallet]['visits_unique'] == 0:
                             ctr = 0.0
