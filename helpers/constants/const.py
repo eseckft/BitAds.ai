@@ -3,7 +3,7 @@ from typing import Tuple
 
 
 class Const:
-    API_BITADS_DOMAIN = "https://api.bitads.ai"
+    API_BITADS_DOMAIN = "https://auvsrslw2g.execute-api.eu-central-1.amazonaws.com"
     GITHUB_USER_CONTENT_DOMAIN = "https://raw.githubusercontent.com"
 
     ROOT_DIR = "./bitads_campaigns"
