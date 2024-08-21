@@ -21,17 +21,17 @@ API Docs: https://bitads.ai/api <br>
 GitHub: https://github.com/eseckft/BitAds.ai
 
 # Integration with Bittensor
-
+<p align="center">
+  <img src="docs/bittensor_logo.png" alt="shopify" width="50%" />
+</p>
 BitAds leverages Bittensor’s decentralized network to distribute marketing tasks among miners, where Validators will evaluate the sales brought by miners and score them accordingly.
 By harnessing the collaborative efforts of the network's participants, BitAds aims to significantly enhance the visibility and adoption of Bittensor, establishing a robust foundation for the future growth of both BitAds and Bittensor.
 
 # Integration with Shopify
 <p align="center">
-  <img src="docs/shopify_logo.svg" alt="shopify" width="100%" />
+  <img src="docs/shopify_logo.png" alt="shopify" width="50%" />
 </p>
-
-BitAds leverages Bittensor’s decentralized network to distribute marketing tasks among miners, where Validators will evaluate the sales brought by miners and score them accordingly.
-By harnessing the collaborative efforts of the network's participants, BitAds aims to significantly enhance the visibility and adoption of Bittensor, establishing a robust foundation for the future growth of both BitAds and Bittensor.
+BitAds is now fully integrated with Shopify through our BitAds app, available in the Shopify Store. This app enables detailed tracking of sales on any website where it's installed, identifying the specific miner's unique link used and the exact products purchased through it.
 
 # The BitAds.ai Ecosystem
 
