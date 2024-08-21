@@ -26,6 +26,9 @@ BitAds leverages Bittensor’s decentralized network to distribute marketing tas
 By harnessing the collaborative efforts of the network's participants, BitAds aims to significantly enhance the visibility and adoption of Bittensor, establishing a robust foundation for the future growth of both BitAds and Bittensor.
 
 # Integration with Shopify
+<p align="center">
+  <img src="docs/shopify_logo.svg" alt="shopify" width="100%" />
+</p>
 
 BitAds leverages Bittensor’s decentralized network to distribute marketing tasks among miners, where Validators will evaluate the sales brought by miners and score them accordingly.
 By harnessing the collaborative efforts of the network's participants, BitAds aims to significantly enhance the visibility and adoption of Bittensor, establishing a robust foundation for the future growth of both BitAds and Bittensor.
