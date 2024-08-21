@@ -25,6 +25,11 @@ GitHub: https://github.com/eseckft/BitAds.ai
 BitAds leverages Bittensor’s decentralized network to distribute marketing tasks among miners, where Validators will evaluate the sales brought by miners and score them accordingly.
 By harnessing the collaborative efforts of the network's participants, BitAds aims to significantly enhance the visibility and adoption of Bittensor, establishing a robust foundation for the future growth of both BitAds and Bittensor.
 
+# Integration with Shopify
+
+BitAds leverages Bittensor’s decentralized network to distribute marketing tasks among miners, where Validators will evaluate the sales brought by miners and score them accordingly.
+By harnessing the collaborative efforts of the network's participants, BitAds aims to significantly enhance the visibility and adoption of Bittensor, establishing a robust foundation for the future growth of both BitAds and Bittensor.
+
 # The BitAds.ai Ecosystem
 
 **BitAds.ai platform:**<br> Serves as the central hub for managing and analyzing marketing campaigns, offering essential tools for both miners and validators.<br><br>
@@ -37,17 +42,19 @@ Miners are incentivized with TAO tokens, not based on the client's payment offer
 
 
 
-# The First Incentivized Marketing task
-![alt text](docs/keyvault_store.jpg)<br>
-In the beginning, BitAds will work with its own online store, incentivizing Bittensor miners to attract sales for Microsoft software licenses, but we are also looking to collaborate with more online stores to demonstrate the network's marketing capabilities and incentivizing participation. <br>
+# The First Incentivized Marketing Task
+<p align="center">
+  <img src="docs/keyvault_store.jpg" alt="keyvault.store" width="75%" />
+</p>
+In the beginning, BitAds will work with its own Shopify store, incentivizing Bittensor miners to attract sales for Microsoft software licenses, but we are also looking to collaborate with more online stores to demonstrate the network's marketing capabilities and incentivizing participation. <br>
 https://keyvault.store
 
 # FirstAds.ai - The First Web App
 <p align="center">
-  <img src="docs/firstads.png" alt="Description of Image" width="50%" />
+  <img src="docs/firstads.png" alt="FirstAds.ai" width="50%" />
 </p>
 
-The first application developed on the BitAds subnet is FirstAds. This platform enables users to create and promote their campaigns, incentivizing BitAds miners to generate organic traffic for these campaigns at a minimal cost. <br>
+The first application developed on the BitAds subnet is FirstAds. This platform enables users to create and promote their campaigns, incentivizing BitAds miners to attract sales for these campaigns at a minimal cost. <br>
 https://firstads.ai
 
 # Advantages of BitAds.ai
@@ -56,131 +63,79 @@ https://firstads.ai
 BitAds emphasizes optimal decentralization by ensuring a broad distribution of miners and validators.
 
 :moneybag:**Cost-Effectiveness** <br>
-By operating on low-cost systems requirements and incentivizing miners with TAO tokens, BitAds offers a highly economical advertising solution for both parties, clients and promoters.
+By operating on low-cost systems requirements and incentivizing miners with TAO tokens, BitAds offers a highly economical marketing solution for both parties, advertisers (clients) and publishers (miners).
 
 :gem:**Quality Traffic** <br>
-The incentive mechanism encourages miners to drive high-quality organic traffic to their links.
+The incentive mechanism encourages miners to drive high-quality organic traffic to their links, as conversion rates will also play a crucial role in determining their rewards.
 
 :star:**Miners Competition** <br>
-Miners are motivated to outperform each other in attracting the best traffic to clients' websites, in order to generate more rewards. This competition enhances the effectiveness of advertising campaigns, ensuring that clients will receive optimal visibility and engagement.
+Miners are motivated to outperform each other in attracting the best traffic to clients' websites to generate more sales. This healthy competition boosts the effectiveness of marketing campaigns, ensuring that clients see a direct increase in sales for their products.
 
 # Income Sources for Validators
 :white_check_mark:**Validators can monetize their participation in BitAds.ai Subnet through various avenues, including:** <br>
-- promoting their own products <br>
-- engaging in affiliate marketing (for example - Amazon Affiliate Program, ClickBank) <br>
+- promoting their own products and stores <br>
 - developing applications using the BitAds.ai API <br>
 - offering paid API access to others
 
 # Scoring Mechanism
 
-The scoring formula for BitAds miners incorporates a thoughtful approach to quantifying the effectiveness and impact of miners based on multiple key performance indicators: 
+The scoring formula for BitAds miners incorporates a thoughtful approach to quantifying the effectiveness and impact of miners based on multiple key performance indicators.
 
-**1. Unique visits (UV)** <br>
+**The Main Parameters:**
+
+**1. Total visits (TV)** <br>
 This measures the total number of distinct visitors directed to the campaign via the miner's unique link. It's a direct indicator of the reach and traffic generated by the miner.
 
-**2. Total visits (TV)** <br>
-Total number of visits directed to the campaign via the miner's unique link.
+**2. Total Sales (TS)** <br>
+This measures the total number of sales generated by the miner.
 
-**3. Click through rate (CTR)** <br>
-Expressed as a decimal, this metric captures the efficiency of the campaign in engaging visitors. Specifically, it measures the proportion of visitors who click the "call to action" button and resolve the captha if prompted. A CTR of 5% is represented as 0.05, for example.
+**3. Sales amount (SA)** <br>
+This parameter will indicate the total amount of sales in fiat currency (dollars).
 
-**4. Maximum expected values (UVmax and CTRmax)** <br>
-These thresholds are set to normalize the unique visits and CTR, ensuring they're scaled to a value between 0 and 1. This normalization facilitates a fair comparison between miners, accounting for varying scales of performance. Let's say UVmax is set to 1000, and CTRmax is 0.15.  
+**4. Conversion Rate (CR)** <br>
+The percentage of visitors who bought the product. 
 
-**Normalization is performed as follows:** <br>
-```bash
-Unorm = UV / UVmax
-CTRnorm = CTR / CTRmax
-```
-**5. Weight of parameters (Wuv and Wctr)** <br>
-These weights reflect the relative importance of Unique visits and CTR in calculating the miner's score. By adjusting these weights, you can balance the importance on traffic generation versus engagement. 
+**5. Miner Repuation (MR) ** <br>
+This parameter will be based on the miner's number of sales on the last 30 days.
 
-In our model, both parameters are equally valued:
-```bash
-Wuv = 0.5
-Wctr = 0.5
-```
-**6. Artificial traffic indicator (ATI)** <br>
-This parameter will calculate the level of artificial traffic, which will be based on two different metrics (OTS and UVPS), representing organic traffic score and unique visits percentage score.
-```bash
-ATI = (Wots * OTS) + (Wuvps * UVPS)
-```
-**7. "Wots" and "Wuvps"** <br> 
-Represents the weights of OTS and UVPS parameters. By adjusting these values we can decide on the importance of each parameter relative to the other when calculating the ATI.
-```bash
-Wots (weights organic traffic score) = 0.5 
-Wuvps (weights unique visits percentage score) = 0.5
-```
-**8. Organic traffic score (OTS)** <br>
-This parameter will calculate the percentage of organic traffic, by excluding the artificial traffic from the unique visits.
-```bash
-OTS = 1 - (AT / UV)
-```
-**9. Artificial traffic (AT)** <br>
-This parameter will count all the artificial traffic, based on multiple metrics that takes into account the user's behavior. 
+**6. Total Refunds (TR)** <br>
+Total number of refunds occurring from specific miner.
 
-**10. Unique visits percentage score (UVPS)** <br>
-This parameter will calculate the percentage of unique visits.
+**7. Refunds Percentage (RP)** <br>
+This will indicate the percentage of buyers who asked for a refund.<br> 
 ```bash
-UVPS = UV / TV
+( RP = TR/TS)
 ```
 
-**All the values needed for Score Calculation:** <br>
+**8. Refunds Score (RS)** <br>
+This value will help us penalize miners who receive too many refunds from buyers. This measure is designed to prevent score manipulation, where miners might be incentivized to purchase the products they promote and then request refunds to artificially boost their scores. <br> <br>
 
+**Maximum Expected Values:** These are set to normalize the Main Parameters values (SA, CR and MR), ensuring they're scaled to a value between 0 and 1.
 ```bash
-UV - the number of Unique visitors
-CTR - the click-through rate (as a decimal)
-Unorm = U / Umax
-CTRnorm = CTR / CTRmax
-Wuv - Weight for Unique Visitors = 0.5
-Wctr - Weight for CTR = 0.5
-ATI - Artificial traffic indicator = ATI = (Wots * OTS) + (Wuvps * UVPS)
-AT - Artifical traffic
-OTS - Organic traffic score = (1- (AT / V))
-UVPS - Unique visits percentage = (UV / TV)
-Wots - Weight for organic traffic score = 0.5
-Wuvps - Weight for unique visits percentage = 0.5
+SALESmax = $500 standard (this value will be calculated based on the average amount that a miner sold in the last 30 days)
+CRmax = 0.05
+MRmax = 100 standard (this value will also be calculated based on the average number of sales per miner on the last 30 days)
 
-FINAL MINER SCORE = (( Wuv * Unorm ) + ( Wctr * CTRnorm )) * ATI, where ATI = (Wots * OTS) + (Wuvps * UVPS)
-FINAL MINER SCORE = (( Wuv * Unorm ) + ( Wctr * CTRnorm )) * ((Wots * OTS) + (Wuvps * UVPS))
+SALESnorm = SALES / SALESmax
+CRnorm = CR / CRmax
+MRnorm = MR / MRmax
 ```
-Example:
+The Weights of the main parameters (SA, CR and MR). By adjusting these values we can decide on the importance of each parameter relative to the other.
 ```bash
-UVmax = 1000
-CTRmax = 0.15
-Weights: Wu = 0.5 ; Wc = 0.5
-Weights: Wots = 0.5 ; Wuvps = 0.5
+Wsales = 0.60
+Wcr = 0.30
+Wmr = 0.10
 ```
-Miner scenario:
+**Miner Score:**
 ```bash
-- TV = 10000
-- UV = 1000
-- CTR = 0.05
-- UA = 100
-- DPDV = 200
-- VWI = 300
-```
-The score will be calculated:
-```bash
-Unorm = 1000/1000 = 1
-CTRnorm = 0.05/0.15 = 0.33
-AT = 600
-OTS = (1 - (600/1000) = 1 - 0.6 = 0.4
-UVPS = 1000 / 10000 = 0.1
-
-FINAL MINER SCORE = (( Wu * Unorm ) + ( Wc * CTRnorm )) * ((Wots * OTS) + (Wuvps * UVPS))
-                  = ((0.5 * 1) + (0.5 * 0.33)) * ((0.5 * 0.4) + (0.5 * 0.10))
-                  = (0.5 + 0.165) * (0.2 + 0.05)
-                  = 0.665 * 0.205
-                  = 0.13632
-```
-Conditions:
-```bash
-- if MINER SCORE > 1, MINER SCORE = 1. 
-- miner Score will have maximum 5 decimals.
+MINER SCORE = ((Wsales * SALESnorm) + (Wcr * CRnorm) + (Wmr * MRnorm)) * RF
 ```
 
-# Subnet Security 
+**Conditions:**
+- If MINER SCORE > 1 then MINER SCORE = 1
+- MINER SCORE will have maximum 5 decimals
+
+# Subnet Security ===========> To be added/modified later
 
 **BitAds campaigns have multiple levels of protection against fraudulent activity such as bot or script-driven fake activity. In particular, verification for human authenticity occurs through:**
 - AWS WAF [(Web Application Firewall) ](https://aws.amazon.com/waf/)
@@ -200,36 +155,19 @@ Additionally, every 30 minutes, there is an update of the lists of allowed parti
 
 # Roadmap
 
-1. **Decentralized Data and Campaign Management** <br>
-- Miners and validators will now collect data separately. Only data that matches across all participants will be used to ensure accuracy.
-- All data on visits will be stored locally on each participant's server, improving security and access speed.
-- Active campaigns will run without interruption, even if the BitAds API is down. While new campaigns cannot be initiated until the API is restored, all other subnetwork operations will continue to function seamlessly.
+1. **Integration with E-Commerce platforms** <br>
+- Shopify ( :white_check_mark: done)
+- WooCommerce ( ⌛ in progress)
+- Wix (TBA)
+- Squarespace (TBA)
+- BigCommerce (TBA)
 
-2. **Conversion Tracking** <br>
-- Begin by integrating conversion tracking functionality within BitAds to accurately measure conversion rates on client websites. This will provide valuable insights into the effectiveness of advertisements and user interactions.
-- Integrate BitAds plugins with Shopify and WooCommerce to seamlessly track conversions from advertising campaigns. This enables more accurate data collection and improves marketing optimizations directly within the e-commerce platforms.
-- Redirect 90% of the incentive towards conversions (sales), while allocating the remaining 10% for visits and clicks.
+2. **Performance Analytics** <br>
+Enhance campaign performance analytics for validators to improve monitoring and effectiveness on BitAds.ai.
 
-3. **Template and Design Expansion** <br>
-Add more templates, colors, and layouts to BitAds landing pages.
-
-4. **Device Targeting** <br>
-Implement device targeting feature to specify desired traffic source.
-
-5. **Performance Analytics** <br>
-Implement daily performance analytics for validators to enhance campaign monitoring.
-
-6. **Geo-Location** <br>
-Implement geo-location filtering to enable validators and clients to specify desired traffic origins in BitAds.
-
-7. **Campaign Information Bot** <br>
-Launch an interactive discord/telegram bot to provide miners with immediate access to campaign information and notifications.
-
-8. **Traffic Source Analysis** <br>
+3. **Traffic Source Analysis** <br>
 Implement traffic source analysis to precisely track visitor origins.
 
-9. **Domain Selection Expansion** <br>
-Expand landing page domains to enable validators and clients to select from a wider range of options.
 
 # How to Mine TAO on Subnet 16
 1. Create a Bittensor wallet (coldkey & hotkey).
@@ -243,7 +181,7 @@ Expand landing page domains to enable validators and clients to select from a wi
 5. Git clone the BitAds repo, install the needed packages and start your Miner’s script.
 6. Login into your BitAds.ai account:
 - Get your unique links from the dashboard for each active campaigns
-- Start promoting it over the internet and try to bring organic traffic to it 
+- Start promoting it over the internet and try to bring sales to it 
 
 
 # Creating a Wallet
@@ -283,7 +221,7 @@ If you encounter any issues during the installation process, refer to the troubl
 
 **Prerequisites:**
 - Ensure that you have Python 3.12 or a later version installed on your system.
-- Run your local Subtensor, instructions on how to install Subtensor locally can be found here: [Subtensor Installation Guide](https://github.com/opentensor/subtensor/blob/main/docs/running-subtensor-locally.md)
+- Run your local Subtensor, instructions on how to install Subtensor locally can be found here: [Subtensor Installation Guide](https://github.com/opentensor/subtensor/blob/main/docs/running-subtensor-locally.md) or you can use Finney
 
 ```basg 
 git clone https://github.com/eseckft/BitAds.ai.git
