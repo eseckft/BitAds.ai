@@ -1,50 +1,46 @@
-# BitAds.ai - Decentralized Advertising on Bittensor
+# BitAds.ai - Decentralized Marketing on Bittensor
 
-**Revolutionizing the online advertising landscape through the power of decentralization.**
-**Discover how BitAds leverages the Bittensor Network to offer cost-effective, high-quality advertising through a unique incentive mechanism for miners and validators.**
+**Revolutionizing the online marketing landscape through the power of decentralization.**
+**Discover how BitAds leverages the Bittensor Network to offer cost-effective, high-quality marketing through a unique incentive mechanism for miners and validators.**
 ![alt text](docs/bitads.png)
 
 
 :no_entry_sign:**The Problem:**
 
-The current advertising landscape, particularly as shaped by the web2 paradigm, presents significant challenges not only for the users who are subjected to ads but also for the companies that invest heavily in advertising. At the heart of these challenges are the highly centralized tech organizations that dominate and control the industry, such as Google AdSense, Facebook Audience Network, and Apple Advertising. This centralized control results in a significant power imbalance, lack of transparency, and high costs. 
+In 2024, the advertising industry is expected to lose over $100 billion due to ad fraud and ineffective strategies. Ad fraud, including fake clicks and bot traffic, inflates engagement metrics and wastes significant ad spend. Traditional models, like pay-per-click and pay-per-impression, often fail to deliver real value, as they don't directly correlate with actual sales, leading to wasted budgets and reduced trust. 
 
 :bulb:**The Solution:**
 
-The BitAds network emerges as a revolutionary solution, harnessing the power of blockchain technology to foster a decentralized and incentivised advertising environment. By reimagining the foundational principles of advertising transactions, BitAds seeks to rectify the issues of transparency, fraud, inefficiency, and the high costs associated with conventional advertising methods.
+BitAds addresses these challenges by focusing on actual sales rather than clicks or impressions. With its newly implemented Conversion Tracking system on Bittensor Subnet 16, BitAds ensures advertisers only pay for successful sales, reducing fraud and guaranteeing that every dollar spent leads to real outcomes. Miners earn TAO rewards based on the sales they generate, not just traffic, driving higher-quality advertising.
 
 :link:**Usefull Links:** <br>
 
-Subnet Video Presentation: https://www.youtube.com/watch?v=5vJjnIrzMLk <br>
+Subnet Video Presentation: Link <br>
 Whitepaper: https://bitads.ai/whitepaper <br>
-Roadmap: https://bitads.ai/roadmap <br>
 API Docs: https://bitads.ai/api <br>
 GitHub: https://github.com/eseckft/BitAds.ai
 
-# The BitAds.ai Ecosystem
-
-**1. Validators, Miners, and BitAds Core:**
-
-Validators create and manage advertising campaigns using the BitAds Core platform, which provides tools for creating landing pages and tracking campaign performance. <br><br>
-Miners generate unique links for campaigns to promote across the internet. They are rewarded with TAO tokens for driving organic traffic to these links. BitAds Core acts as the central platform for campaign management, traffic analysis, and miner validation.
-
-**2. Incentive Mechanism:**
-Miners are incentivized with TAO tokens, not based on the client's payment offer, but on the organic traffic they attract. This system ensures cost-effective advertising for clients while rewarding miners substantially for their efforts.
-<br>
-![alt text](docs/bitads_diagram.png)
-
 # Integration with Bittensor
 
-BitAds leverages Bittensor’s decentralized network to distribute advertising tasks among miners. <br><br>
-Initially, BitAds will focus on promoting the Bittensor project itself, demonstrating the network's marketing capabilities and incentivizing participation. <br><br>
-Taking into consideration the potential emission of the subnet, this will potentially serve as the most powerful marketing engine for the Bittensor project. <br><br>
+BitAds leverages Bittensor’s decentralized network to distribute marketing tasks among miners, where Validators will evaluate the sales brought by miners and score them accordingly.
 By harnessing the collaborative efforts of the network's participants, BitAds aims to significantly enhance the visibility and adoption of Bittensor, establishing a robust foundation for the future growth of both BitAds and Bittensor.
 
-# The First Incentivized Campaign
-![alt text](docs/bittensor_campaign.png)<br>
-The first campaign ["Join the Bittensor Revolution where AI meets the Decentralization"](https://x.bitads.ai/lty9sdtvcg55s/) on the BitAds Network will be BittensorWiki, a platform where you can find everything you need to know about the Bittensor Network. <br>
-In fact, this campaign will serve as a powerful marketing tool for the Bittensor Network, as miners will be incentivized to generate organic traffic for the BittensorWiki campaign. <br>
-https://bittensorwiki.com
+# The BitAds.ai Ecosystem
+
+**BitAds.ai platform:**<br> Serves as the central hub for managing and analyzing marketing campaigns, offering essential tools for both miners and validators.<br><br>
+**Validators:**<br> Use the platform to create and manage marketing campaigns, evaluating and scoring miners' tasks based on a defined scoring mechanism.<br><br>
+**Miners:**<br> Promote these campaigns across the internet using their unique links and are rewarded with TAO tokens for successfully driving sales. <br><br>
+**Incentive Mechanism:**<br>
+Miners are incentivized with TAO tokens, not based on the client's payment offer, but on the sales they attract. This system ensures cost-effective advertising for clients while rewarding miners substantially for their efforts.
+<br><br>
+![alt text](docs/bitads_diagram.png)
+
+
+
+# The First Incentivized Marketing task
+![alt text](docs/keyvault_store.jpg)<br>
+In the beginning, BitAds will work with its own online store, incentivizing Bittensor miners to attract sales for Microsoft software licenses, but we are also looking to collaborate with more online stores to demonstrate the network's marketing capabilities and incentivizing participation. <br>
+https://keyvault.store
 
 # FirstAds.ai - The First Web App
 <p align="center">
