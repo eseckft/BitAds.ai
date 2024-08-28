@@ -41,15 +41,13 @@ BitAds is now fully integrated with Shopify through our BitAds app, available in
 **Incentive Mechanism:**<br>
 Miners are incentivized with TAO tokens, not based on the client's payment offer, but on the sales they attract. This system ensures cost-effective advertising for clients while rewarding miners substantially for their efforts.
 <br><br>
-![alt text](docs/bitads_diagram.png)
-
 
 
 # The First Incentivized Marketing Task
 <p align="center">
   <img src="docs/keyvault_store.jpg" alt="keyvault.store" width="75%" />
 </p>
-In the beginning, BitAds will work with its own Shopify store, incentivizing Bittensor miners to attract sales for Microsoft software licenses, but we are also looking to collaborate with more online stores to demonstrate the network's marketing capabilities and incentivizing participation. <br>
+In the beginning, BitAds will work with its own Shopify store, incentivizing Bittensor miners to attract sales for Microsoft software licenses. We are also looking to collaborate with more online stores to demonstrate the network's marketing capabilities and incentivizing participation. <br>
 https://keyvault.store
 
 # FirstAds.ai - The First Web App
