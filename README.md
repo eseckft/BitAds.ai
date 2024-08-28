@@ -223,39 +223,12 @@ Please make sure to follow the installation steps carefully to ensure that Bitte
 If you encounter any issues during the installation process, refer to the troubleshooting section in the Bittensor documentation or reach out to our support team for assistance.
 
 **Prerequisites:**
+
 - Ensure that you have Python 3.12 or a later version installed on your system.
-- Run your local Subtensor, instructions on how to install Subtensor locally can be found here: [Subtensor Installation Guide](https://github.com/opentensor/subtensor/blob/main/docs/running-subtensor-locally.md) or you can use Finney
+- Run your local Subtensor, instructions on how to install Subtensor locally can be found
+  here: [Subtensor Installation Guide](https://github.com/opentensor/subtensor/blob/main/docs/running-subtensor-locally.md)
 
-```basg 
-git clone https://github.com/eseckft/BitAds.ai.git
-cd BitAds.ai
-python3 -m pip install -e .
-python3 setup.py install_lib
-python3 setup.py build
-```
+**After registration, you can start the scripts using the following instructions:**
 
-**After registration, you can start the miner script using the following command:**
-
-# With autoupdates
-
-```bash
-pm2 start run_miner_auto_update.py --interpreter python3 -- --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug
-```
-
-**And for running the validator script, use:**
-
-```bash
-pm2 start run_validator_auto_update.py --interpreter python3 -- --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug
-```
-
-# Without auto updates
-
-```bash
-python neurons/miner.py --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug
-```
-
-**And for running the validator script, use:**
-
-```bash
-python neurons/validator.py --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug
-```
+- [Mining](docs/mining.md)
+- [Validating](docs/validating.md)
