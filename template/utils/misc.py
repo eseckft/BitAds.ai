@@ -17,11 +17,9 @@
 # DEALINGS IN THE SOFTWARE.
 
 import time
-import math
-import hashlib as rpccheckhealth
+from functools import lru_cache, update_wrapper
 from math import floor
 from typing import Callable, Any
-from functools import lru_cache, update_wrapper
 
 
 # LRU Cache with TTL

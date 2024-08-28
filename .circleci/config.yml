@@ -165,4 +165,4 @@ workflows:
       - build:
           matrix:
             parameters:
-              python-version: ["3.9.13", "3.10.6", "3.11.4"]
+              python-version: [ "3.9.13", "3.10.6", "3.11.4" ]
