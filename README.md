@@ -138,24 +138,6 @@ MINER SCORE = ((Wsales * SALESnorm) + (Wcr * CRnorm) + (Wmr * MRnorm)) * RF
 - If MINER SCORE > 1 then MINER SCORE = 1
 - MINER SCORE will have maximum 5 decimals
 
-# Subnet Security ===========> To be added/modified later
-
-**BitAds campaigns have multiple levels of protection against fraudulent activity such as bot or script-driven fake activity. In particular, verification for human authenticity occurs through:**
-- AWS WAF [(Web Application Firewall) ](https://aws.amazon.com/waf/)
-- CAPTCHA
-- Visitor "Fingerprint"
-
-All incoming requests are forwarded to AWS WAF for inspection by the web ACL. <br>
-
-AWS WAF is a web security service that helps protect web applications from common web threats such as SQL injections, cross-site scripting (XSS), and cross-site request forgery (CSRF). <br>
-
-Human Verification Check is an additional layer of protection in AWS WAF, designed to help distinguish humans from bots. It is useful for preventing automated attacks such as DDoS attacks and spam. 
-In BitAds.ai architecture it is one of the levels of protection against traffic manipulation. <br>
-
-Each time the BidAds.ai API is accessed, validators' and miners' scripts transmit their Bittensor wallet keys for verification of their presence in the registered users' database. BidAds also checks the status of each user (whether they are active or blocked), as well as the compatibility of validators' and miners' script code versions with the current version provided by BitAds.ai developers. This, on the one hand, requires users to constantly update their scripts and prevents unauthorized interference with them. <br>
-
-Additionally, every 30 minutes, there is an update of the lists of allowed participants in the process. Miners receive a list of validators, and validators receive a list of miners with whom they can communicate. This way, the system is protected from external intrusion.
-
 # Roadmap
 
 1. **Integration with E-Commerce platforms** <br>
