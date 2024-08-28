@@ -31,7 +31,7 @@ By harnessing the collaborative efforts of the network's participants, BitAds ai
 <p align="center">
   <img src="docs/shopify_logo.png" alt="shopify" width="50%" />
 </p>
-BitAds is now fully integrated with Shopify through our BitAds app, available in the Shopify Store. This app enables detailed tracking of sales on any website where it's installed, identifying the specific miner's unique link used and the exact products purchased through it.
+BitAds is now fully integrated with Shopify through our BitAds app (soon to be available in the Shopify Store). This app enables detailed tracking of sales on any website where it's installed, identifying the specific miner's unique link used and the exact products purchased through it.
 
 # The BitAds.ai Ecosystem
 
