@@ -9,6 +9,9 @@
 
 In 2024, the advertising industry is expected to lose over $100 billion due to ad fraud and ineffective strategies. Ad fraud, including fake clicks and bot traffic, inflates engagement metrics and wastes significant ad spend. Traditional models, like pay-per-click and pay-per-impression, often fail to deliver real value, as they don't directly correlate with actual sales, leading to wasted budgets and reduced trust. 
 
+The rise of AI is expected to significantly increase the potential for ad fraud over the next five years by 20-30%.
+This increase could lead to global losses exceeding $150 billion annually by 2028, as fraudsters use AI to generate more convincing fake clicks, impressions, and user interactions. 
+
 :bulb:**The Solution:**
 
 BitAds addresses these challenges by focusing on actual sales rather than clicks or impressions. With its newly implemented Conversion Tracking system on Bittensor Subnet 16, BitAds ensures advertisers only pay for successful sales, reducing fraud and guaranteeing that every dollar spent leads to real outcomes. Miners earn TAO rewards based on the sales they generate, not just traffic, driving higher-quality advertising.
