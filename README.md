@@ -45,6 +45,12 @@ BitAds is now fully integrated with Shopify through our BitAds app (soon to be a
 Miners are incentivized with TAO tokens, not based on the client's payment offer, but on the sales they attract. This system ensures cost-effective advertising for clients while rewarding miners substantially for their efforts.
 <br><br>
 
+# How BitAds works?
+
+1. Advertisers launch marketing campaigns on BitAds through one of the apps built on top of the platform. <br>
+2. BitAds leverages the Bittensor network to distribute marketing tasks among miners. <br>
+3. These miners promote campaigns across the web, driving real sales and earning TAO rewards based on their effectiveness. <br>
+4. Validators then evaluate and score these efforts, ensuring transparency and fairness in the process.
 
 # The First Incentivized Marketing Task
 <p align="center">
@@ -63,23 +69,23 @@ https://firstads.ai
 
 # Advantages of BitAds.ai
 
-:globe_with_meridians:**Decentralization** <br>
+**Decentralization** <br>
 BitAds emphasizes optimal decentralization by ensuring a broad distribution of miners and validators.
 
-:moneybag:**Cost-Effectiveness** <br>
-By operating on low-cost systems requirements and incentivizing miners with TAO tokens, BitAds offers a highly economical marketing solution for both parties, advertisers (clients) and publishers (miners).
+**Multi-Strategy Marketing Approach** <br>
+When advertisers use BitAds, they’re essentially tapping into hundreds or even thousands of different marketing strategies deployed by miners simultaneously.
 
-:gem:**Quality Traffic** <br>
-The incentive mechanism encourages miners to drive high-quality organic traffic to their links, as conversion rates will also play a crucial role in determining their rewards.
+**Cost-Effectiveness** <br>
+By operating on low-cost systems requirements and incentivizing miners with TAO tokens, BitAds offers a highly economical marketing solution for both parties, advertisers (clients) and miners (promoters).
 
-:star:**Miners Competition** <br>
-Miners are motivated to outperform each other in attracting the best traffic to clients' websites to generate more sales. This healthy competition boosts the effectiveness of marketing campaigns, ensuring that clients see a direct increase in sales for their products.
+**High-Quality Traffic** <br>
+The incentive mechanism encourages miners to drive sales and achieve high conversion rates for the products or services being promoted through marketing campaigns.
 
-# Income Sources for Validators
-:white_check_mark:**Validators can monetize their participation in BitAds.ai Subnet through various avenues, including:** <br>
-- promoting their own products and stores <br>
-- developing applications using the BitAds.ai API <br>
-- offering paid API access to others
+**Competitive Environment** <br>
+The competitive environment fostered among miners ensures continuous innovation and optimization of marketing strategies, leading to high-quality traffic and better sales outcomes.
+
+**Income Sources for Validators** <br>
+Validators on BitAds can generate income through multiple channels, including promoting their own products, developing applications on the platform, or offering paid access to their APIs.
 
 # Scoring Mechanism
 
@@ -161,7 +167,7 @@ Implement traffic source analysis to precisely track visitor origins.
 3. Register an account to https://bitads.ai using the correct coldkey/hotkey pair of your Miner.
 4. Hardware requirements:
 - VPS with Ubuntu v.20 or higher
-- Python v3.12 or higher
+- Python v3.11 or higher
 - Make sure the communication port is open
 - Make sure that there is not Firewall active that would prevent the communication between your Miner and Validators.
 5. Git clone the BitAds repo, install the needed packages and start your Miner’s script.
@@ -207,7 +213,7 @@ If you encounter any issues during the installation process, refer to the troubl
 
 **Prerequisites:**
 
-- Ensure that you have Python 3.12 or a later version installed on your system.
+- Ensure that you have Python 3.11 or a later version installed on your system.
 - Run your local Subtensor, instructions on how to install Subtensor locally can be found
   here: [Subtensor Installation Guide](https://github.com/opentensor/subtensor/blob/main/docs/running-subtensor-locally.md)
 
