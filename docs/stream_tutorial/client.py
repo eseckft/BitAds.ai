@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+
 import bittensor as bt
 
 from protocol import StreamPrompting

@@ -5,31 +5,35 @@ This is a highly advisable workflow to follow to keep your subtensor project org
 ## Table of contents
 
 - [Bittensor Subnet Development Workflow](#bittensor-subnet-development-workflow)
-  - [Main Branches](#main-branches)
-  - [Development Model](#development-model)
-      - [Feature Branches](#feature-branches)
-      - [Release Branches](#release-branches)
-      - [Hotfix Branches](#hotfix-branches)
-  - [Git Operations](#git-operations)
-      - [Creating a Feature Branch](#creating-a-feature-branch)
-      - [Merging Feature Branch into Staging](#merging-feature-branch-into-staging)
-      - [Creating a Release Branch](#creating-a-release-branch)
-      - [Finishing a Release Branch](#finishing-a-release-branch)
-      - [Creating a Hotfix Branch](#creating-a-hotfix-branch)
-      - [Finishing a Hotfix Branch](#finishing-a-hotfix-branch)
-  - [Continuous Integration (CI) and Continuous Deployment (CD)](#continuous-integration-ci-and-continuous-deployment-cd)
-  - [Versioning and Release Notes](#versioning-and-release-notes)
-  - [Pending Tasks](#pending-tasks)
+    - [Main Branches](#main-branches)
+    - [Development Model](#development-model)
+        - [Feature Branches](#feature-branches)
+        - [Release Branches](#release-branches)
+        - [Hotfix Branches](#hotfix-branches)
+    - [Git Operations](#git-operations)
+        - [Creating a Feature Branch](#creating-a-feature-branch)
+        - [Merging Feature Branch into Staging](#merging-feature-branch-into-staging)
+        - [Creating a Release Branch](#creating-a-release-branch)
+        - [Finishing a Release Branch](#finishing-a-release-branch)
+        - [Creating a Hotfix Branch](#creating-a-hotfix-branch)
+        - [Finishing a Hotfix Branch](#finishing-a-hotfix-branch)
+    - [Continuous Integration (CI) and Continuous Deployment (CD)](#continuous-integration-ci-and-continuous-deployment-cd)
+    - [Versioning and Release Notes](#versioning-and-release-notes)
+    - [Pending Tasks](#pending-tasks)
 
 ## Main Branches
 
 Bittensor's codebase consists of two main branches: **main** and **staging**.
 
 **main**
-- This is Bittensor's live production branch, which should only be updated by the core development team. This branch is protected, so refrain from pushing or merging into it unless authorized.
+
+- This is Bittensor's live production branch, which should only be updated by the core development team. This branch is
+  protected, so refrain from pushing or merging into it unless authorized.
 
 **staging**
-- This branch is continuously updated and is where you propose and merge changes. It's essentially Bittensor's active development branch.
+
+- This branch is continuously updated and is where you propose and merge changes. It's essentially Bittensor's active
+  development branch.
 
 ## Development Model
 
@@ -39,7 +43,9 @@ Bittensor's codebase consists of two main branches: **main** and **staging**.
 - Merge back into: `staging`
 - Naming convention: `feature/<ticket>/<descriptive-sentence>`
 
-Feature branches are used to develop new features for upcoming or future releases. They exist as long as the feature is in development, but will eventually be merged into `staging` or discarded. Always delete your feature branch after merging to avoid unnecessary clutter.
+Feature branches are used to develop new features for upcoming or future releases. They exist as long as the feature is
+in development, but will eventually be merged into `staging` or discarded. Always delete your feature branch after
+merging to avoid unnecessary clutter.
 
 ### Release Branches
 
@@ -47,7 +53,9 @@ Feature branches are used to develop new features for upcoming or future release
 - Merge back into: `staging` and then `main`
 - Naming convention: `release/<version>/<descriptive-message>/<creator's-name>`
 
-Release branches support the preparation of a new production release, allowing for minor bug fixes and preparation of metadata (version number, configuration, etc). All new features should be merged into `staging` and wait for the next big release.
+Release branches support the preparation of a new production release, allowing for minor bug fixes and preparation of
+metadata (version number, configuration, etc). All new features should be merged into `staging` and wait for the next
+big release.
 
 ### Hotfix Branches
 
@@ -55,9 +63,10 @@ General workflow:
 
 - Branch off from: `main` or `staging`
 - Merge back into: `staging` then `main`
-- Naming convention: `hotfix/<version>/<descriptive-message>/<creator's-name>` 
+- Naming convention: `hotfix/<version>/<descriptive-message>/<creator's-name>`
 
-Hotfix branches are meant for quick fixes in the production environment. When a critical bug in a production version must be resolved immediately, a hotfix branch is created.
+Hotfix branches are meant for quick fixes in the production environment. When a critical bug in a production version
+must be resolved immediately, a hotfix branch is created.
 
 ## Git Operations
 
@@ -66,7 +75,8 @@ Hotfix branches are meant for quick fixes in the production environment. When a 
 1. Branch from the **staging** branch.
     1. Command: `git checkout -b feature/my-feature staging`
 
-> Rebase frequently with the updated staging branch so you do not face big conflicts before submitting your pull request. Remember, syncing your changes with other developers could also help you avoid big conflicts.
+> Rebase frequently with the updated staging branch so you do not face big conflicts before submitting your pull
+> request. Remember, syncing your changes with other developers could also help you avoid big conflicts.
 
 #### Merge feature branch into staging
 
@@ -80,6 +90,7 @@ In other words, integrate your changes into a branch that will be tested and pre
 This operation is done by Github when merging a PR.
 
 So, what you have to keep in mind is:
+
 - Open the PR against the `staging` branch.
 - After merging a PR you should delete your feature branch. This will be strictly enforced.
 
@@ -88,7 +99,6 @@ So, what you have to keep in mind is:
 1. Create branch from staging: `git checkout -b release/3.4.0/descriptive-message/creator's_name staging`
 2. Updating version with major or minor: `./scripts/update_version.sh major|minor`
 3. Commit file changes with new version: `git commit -a -m "Updated version to 3.4.0"`
-
 
 #### Finishing a Release Branch
 
@@ -105,10 +115,11 @@ To keep the changes made in the __release__ branch, we need to merge those back 
 - Switch branch to staging: `git checkout staging`.
 - Merging release branch into staging: `git merge --no-ff release/3.4.0/optional-descriptive-message`
 
-This step may well lead to a merge conflict (probably even, since we have changed the version number). If so, fix it and commit.
-
+This step may well lead to a merge conflict (probably even, since we have changed the version number). If so, fix it and
+commit.
 
 #### Creating a hotfix branch
+
 1. Create branch from main: `git checkout -b hotfix/3.3.4/descriptive-message/creator's-name main`
 2. Update patch version: `./scripts/update_version.sh patch`
 3. Commit file changes with new version: `git commit -a -m "Updated version to 3.3.4"`
@@ -128,26 +139,36 @@ Finishing a hotfix branch involves merging the bugfix into both `main` and `stag
 8. Push changes to origin/staging: `git push origin staging`
 9. Delete hotfix branch: `git branch -d hotfix/3.3.4/optional-descriptive-message`
 
-The one exception to the rule here is that, **when a release branch currently exists, the hotfix changes need to be merged into that release branch, instead of** `staging`. Back-merging the bugfix into the __release__ branch will eventually result in the bugfix being merged into `develop` too, when the release branch is finished. (If work in develop immediately requires this bugfix and cannot wait for the release branch to be finished, you may safely merge the bugfix into develop now already as well.)
+The one exception to the rule here is that, **when a release branch currently exists, the hotfix changes need to be
+merged into that release branch, instead of** `staging`. Back-merging the bugfix into the __release__ branch will
+eventually result in the bugfix being merged into `develop` too, when the release branch is finished. (If work in
+develop immediately requires this bugfix and cannot wait for the release branch to be finished, you may safely merge the
+bugfix into develop now already as well.)
 
 Finally, we remove the temporary branch:
 
 - `git branch -d hotfix/3.3.4/optional-descriptive-message`
+
 ## Continuous Integration (CI) and Continuous Deployment (CD)
 
-Continuous Integration (CI) is a software development practice where members of a team integrate their work frequently. Each integration is verified by an automated build and test process to detect integration errors as quickly as possible. 
+Continuous Integration (CI) is a software development practice where members of a team integrate their work frequently.
+Each integration is verified by an automated build and test process to detect integration errors as quickly as possible.
 
-Continuous Deployment (CD) is a software engineering approach in which software functionalities are delivered frequently through automated deployments.
+Continuous Deployment (CD) is a software engineering approach in which software functionalities are delivered frequently
+through automated deployments.
 
-- **CircleCI job**: Create jobs in CircleCI to automate the merging of staging into main and release version (needed to release code) and building and testing Bittensor (needed to merge PRs).
+- **CircleCI job**: Create jobs in CircleCI to automate the merging of staging into main and release version (needed to
+  release code) and building and testing Bittensor (needed to merge PRs).
 
 > It is highly recommended to set up your own circleci pipeline with your subnet
 
 ## Versioning and Release Notes
 
-Semantic versioning helps keep track of the different versions of the software. When code is merged into main, generate a new version. 
+Semantic versioning helps keep track of the different versions of the software. When code is merged into main, generate
+a new version.
 
-Release notes provide documentation for each version released to the users, highlighting the new features, improvements, and bug fixes. When merged into main, generate GitHub release and release notes.
+Release notes provide documentation for each version released to the users, highlighting the new features, improvements,
+and bug fixes. When merged into main, generate GitHub release and release notes.
 
 ## Pending Tasks
 
@@ -158,7 +179,7 @@ Follow these steps when you are contributing to the bittensor subnet:
     - Document not released developments
     - When merged into staging, generate information about what's merged into staging but not released.
     - When merged into main, generate GitHub release and release notes.
-- CircleCI jobs 
+- CircleCI jobs
     - Merge staging into main and release version (needed to release code)
     - Build and Test Bittensor (needed to merge PRs)
 

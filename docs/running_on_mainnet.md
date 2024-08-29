@@ -1,18 +1,21 @@
 # Running Subnet on Mainnet
 
-This tutorial shows how to use the bittensor `btcli` to create a subnetwork and connect your incentive mechanism to it. 
+This tutorial shows how to use the bittensor `btcli` to create a subnetwork and connect your incentive mechanism to it.
 
 **IMPORTANT:** Before attempting to register on mainnet, we strongly recommend that you:
+
 - First run [Running Subnet Locally](running_on_staging.md), and
 - Then run [Running on the Testnet](running_on_testnet.md).
 
-Your incentive mechanisms running on the mainnet are open to anyone. They emit real TAO. Creating these mechanisms incur a `lock_cost` in TAO.
+Your incentive mechanisms running on the mainnet are open to anyone. They emit real TAO. Creating these mechanisms incur
+a `lock_cost` in TAO.
 
 **DANGER**
+
 - Do not expose your private keys.
 - Only use your testnet wallet.
 - Do not reuse the password of your mainnet wallet.
-- Make sure your incentive mechanism is resistant to abuse. 
+- Make sure your incentive mechanism is resistant to abuse.
 
 ## Prerequisites
 
@@ -46,15 +49,17 @@ Install the Bittensor subnet template package:
 python -m pip install -e . # Install your subnet template package
 ```
 
-## 2. Create wallets 
+## 2. Create wallets
 
 Create wallets for subnet owner, subnet validator and for subnet miner.
-  
-This step creates local coldkey and hotkey pairs for your three identities: subnet owner, subnet validator and subnet miner. 
 
-The owner will create and control the subnet. The owner must have at least 100  TAO before the owner can run next steps. 
+This step creates local coldkey and hotkey pairs for your three identities: subnet owner, subnet validator and subnet
+miner.
 
-The validator and miner will be registered to the subnet created by the owner. This ensures that the validator and miner can run the respective validator and miner scripts.
+The owner will create and control the subnet. The owner must have at least 100 TAO before the owner can run next steps.
+
+The validator and miner will be registered to the subnet created by the owner. This ensures that the validator and miner
+can run the respective validator and miner scripts.
 
 **NOTE**: You can also use existing wallets to register. Creating new keys is shown here for reference.
 
@@ -65,6 +70,7 @@ btcli wallet new_coldkey --wallet.name owner
 ```
 
 Create a coldkey and hotkey for the subnet miner wallet:
+
 ```bash
 btcli wallet new_coldkey --wallet.name miner
 ```
@@ -89,9 +95,11 @@ btcli wallet new_hotkey --wallet.name validator --wallet.hotkey default
 
 ## 3. Getting the price of subnet creation
 
-Creating subnets on mainnet is competitive. The cost is determined by the rate at which new subnets are being registered onto the Bittensor blockchain. 
+Creating subnets on mainnet is competitive. The cost is determined by the rate at which new subnets are being registered
+onto the Bittensor blockchain.
 
-By default you must have at least 100 TAO on your owner wallet to create a subnet. However, the exact amount will fluctuate based on demand. The below code shows how to get the current price of creating a subnet.
+By default you must have at least 100 TAO on your owner wallet to create a subnet. However, the exact amount will
+fluctuate based on demand. The below code shows how to get the current price of creating a subnet.
 
 ```bash
 btcli subnet lock_cost 
@@ -105,7 +113,8 @@ The above command will show:
 
 ## 4. Purchasing a slot
 
-Using your TAO balance, you can register your subnet to the mainchain. This will create a new subnet on the mainchain and give you the owner permissions to it. The below command shows how to purchase a slot. 
+Using your TAO balance, you can register your subnet to the mainchain. This will create a new subnet on the mainchain
+and give you the owner permissions to it. The below command shows how to purchase a slot.
 
 **NOTE**: Slots cost TAO to lock. You will get this TAO back when the subnet is deregistered.
 
@@ -123,11 +132,13 @@ Enter the owner wallet name. This gives permissions to the coldkey.
 ✅ Registered subnetwork with netuid: 1 # Your subnet netuid will show here, save this for later.
 ```
 
-## 5. (Optional) Register keys 
+## 5. (Optional) Register keys
 
-**NOTE**: While this is not enforced, we recommend subnet owners to run a subnet validator and a subnet miner on the subnet to demonstrate proper use to the community.
+**NOTE**: While this is not enforced, we recommend subnet owners to run a subnet validator and a subnet miner on the
+subnet to demonstrate proper use to the community.
 
-This step registers your subnet validator and subnet miner keys to the subnet giving them the **first two slots** on the subnet.
+This step registers your subnet validator and subnet miner keys to the subnet giving them the **first two slots** on the
+subnet.
 
 Register your miner key to the subnet:
 

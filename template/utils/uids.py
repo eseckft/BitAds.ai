@@ -1,13 +1,14 @@
-import torch
 import random
-import bittensor as bt
 from typing import List
+
+import bittensor as bt
+import torch
+
+from template.base.neuron import BaseNeuron
 
 
 def check_uid_availability(
-    metagraph: "bt.metagraph.Metagraph",
-    uid: int,
-    vpermit_tao_limit: int,
+    metagraph: "bt.metagraph.Metagraph", uid: int, vpermit_tao_limit: int
 ) -> bool:
     """Check if uid is available. The UID should be available if it is serving and has less than vpermit_tao_limit stake
     Args:
@@ -64,3 +65,17 @@ def get_random_uids(
         )
     uids = torch.tensor(random.sample(available_uids, k))
     return uids
+
+
+def get_axons(
+    self: BaseNeuron,
+    *hotkeys,
+    not_check_self: bool = False,
+    include_hotkeys: bool = False,
+):
+    return [
+        self.metagraph.axons[uid]
+        for uid in range(self.metagraph.n.item())
+        if (not_check_self or uid != self.uid)
+        and (include_hotkeys or self.metagraph.axons[uid].hotkey in hotkeys)
+    ]
