@@ -22,6 +22,7 @@ Subnet Video Presentation: Link <br>
 Overview: https://bit.ly/BitAdsOverview <br>
 Workflow: https://bit.ly/BitAdsWorkflow <br>
 Whitepaper: https://bitads.ai/whitepaper <br>
+Roadmap: https://bitads.ai/roadmap <br>
 API Docs: https://bitads.ai/api <br>
 GitHub: https://github.com/eseckft/BitAds.ai
 
@@ -147,21 +148,6 @@ MINER SCORE = ((Wsales * SALESnorm) + (Wcr * CRnorm) + (Wmr * MRnorm)) * RF
 **Conditions:**
 - If MINER SCORE > 1 then MINER SCORE = 1
 - MINER SCORE will have maximum 5 decimals
-
-# Roadmap
-
-1. **Integration with E-Commerce platforms** <br>
-- Shopify ( :white_check_mark: done)
-- WooCommerce ( ⌛ in progress)
-- Wix (TBA)
-- Squarespace (TBA)
-- BigCommerce (TBA)
-
-2. **Performance Analytics** <br>
-Enhance campaign performance analytics for validators to improve monitoring and effectiveness on BitAds.ai.
-
-3. **Traffic Source Analysis** <br>
-Implement traffic source analysis to precisely track visitor origins.
 
 
 # How to Mine TAO on Subnet 16
