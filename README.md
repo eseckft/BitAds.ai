@@ -56,21 +56,6 @@ Miners are incentivized with TAO tokens, not based on the client's payment offer
 3. These miners promote campaigns across the web, driving real sales and earning TAO rewards based on their effectiveness. <br>
 4. Validators then evaluate and score these efforts, ensuring transparency and fairness in the process.
 
-# The First Incentivized Marketing Task
-<p align="center">
-  <img src="docs/keyvault_store.jpg" alt="keyvault.store" width="75%" />
-</p>
-In the beginning, BitAds will work with its own Shopify store, incentivizing Bittensor miners to attract sales for Microsoft software licenses. We are also looking to collaborate with more online stores to demonstrate the network's marketing capabilities and incentivizing participation. <br>
-https://keyvault.store
-
-# FirstAds.ai - The First Web App
-<p align="center">
-  <img src="docs/firstads.png" alt="FirstAds.ai" width="50%" />
-</p>
-
-The first application developed on the BitAds subnet is FirstAds. This platform enables users to create and promote their campaigns, incentivizing BitAds miners to attract sales for these campaigns at a minimal cost. <br>
-https://firstads.ai
-
 # Advantages of BitAds.ai
 
 **Decentralization** <br>
@@ -149,44 +134,29 @@ MINER SCORE = ((Wsales * SALESnorm) + (Wcr * CRnorm) + (Wmr * MRnorm)) * RF
 - If MINER SCORE > 1 then MINER SCORE = 1
 - MINER SCORE will have maximum 5 decimals
 
+# The First Incentivized Marketing Task
+<p align="center">
+  <img src="docs/keyvault_store.jpg" alt="keyvault.store" width="75%" />
+</p>
+In the beginning, BitAds will work with its own Shopify store, incentivizing Bittensor miners to attract sales for Microsoft software licenses. We are also looking to collaborate with more online stores to demonstrate the network's marketing capabilities and incentivizing participation. <br>
+https://keyvault.store
 
-# How to Mine TAO on Subnet 16
-1. Create a Bittensor wallet (coldkey & hotkey).
-2. Register your hotkey to the Subnet 16.
-3. Register an account to https://bitads.ai using the correct coldkey/hotkey pair of your Miner.
-4. Hardware requirements:
-- VPS with Ubuntu v.20 or higher
-- Python v3.11 or higher
-- Make sure the communication port is open
-- Make sure that there is not Firewall active that would prevent the communication between your Miner and Validators.
-5. Git clone the BitAds repo, install the needed packages and start your Miner’s script.
-6. Login into your BitAds.ai account:
-- Get your unique links from the dashboard for each active campaigns
-- Start promoting it over the internet and try to bring sales to it 
+# FirstAds.ai - The First Web App
+<p align="center">
+  <img src="docs/firstads.png" alt="FirstAds.ai" width="50%" />
+</p>
 
+The first application developed on the BitAds subnet is FirstAds. This platform enables users to create and promote their campaigns, incentivizing BitAds miners to attract sales for these campaigns at a minimal cost. <br>
+https://firstads.ai
 
-# Creating a Wallet
-
-Before proceeding, you'll need to create a wallet. A wallet is required for managing your digital assets and interacting with the functionalities provided by this repository.
-
-Detailed instructions on how to create a wallet can be found in the official documentation [here](https://docs.bittensor.com/getting-started/wallets).
-
-Please ensure that you follow the steps outlined in the documentation carefully to set up your wallet correctly.
-
-# Registration in Subnetwork
-
-To fully utilize the functionalities provided by this repository, it is necessary to register within the BitAds.ai Subnetwork (UID 16). 
-```bash
-btcli subnet register --netuid 16 --wallet.name <name> --wallet.hotkey <name>
-```
 
 # Usage of Scripts
 
-Please note that the usage of scripts within this repository is restricted to registered users of [BitAds.ai](https://BitAds.ai)
+To utilize any scripts provided here as a Validator, you must first sign up and authenticate yourself on the BitAds.ai platform. This step is necessary for BitAds to verify the script version and to monitor active validators within the subnets. You can register here: [BitAds.ai](https://BitAds.ai)
 
-To utilize any scripts provided here, you must first sign up and authenticate yourself on the [BitAds.ai](https://BitAds.ai) platform. Once registered, you will be granted access to the necessary resources and functionalities. 
+This process is not mandatory for miners, but it is highly recommended as it makes it easier to access their unique links for each marketing campaign.
 
-**The validators will be manually approved after we receive written confirmation on Discord about their registration.**
+**Validators will be manually approved after we receive written confirmation on Discord regarding their registration.**
 
 For any inquiries regarding script usage or registration, please refer to the official documentation on [BitAds.ai](https://BitAds.ai) or contact our support team.
 
@@ -200,13 +170,43 @@ Please make sure to follow the installation steps carefully to ensure that Bitte
 
 If you encounter any issues during the installation process, refer to the troubleshooting section in the Bittensor documentation or reach out to our support team for assistance.
 
-**Prerequisites:**
+<h3>Prerequisites:</h3>
 
 - Ensure that you have Python 3.11 or a later version installed on your system.
 - Run your local Subtensor, instructions on how to install Subtensor locally can be found
   here: [Subtensor Installation Guide](https://github.com/opentensor/subtensor/blob/main/docs/running-subtensor-locally.md)
 
-**After registration, you can start the scripts using the following instructions:**
+<h3>Creating a Wallet:</h3>
+
+Before proceeding, you'll need to create a wallet. A wallet is required for managing your digital assets and interacting with the functionalities provided by this repository.
+
+Detailed instructions on how to create a wallet can be found in the official documentation [here](https://docs.bittensor.com/getting-started/wallets).
+
+Please ensure that you follow the steps outlined in the documentation carefully to set up your wallet correctly.
+
+<h3>Registration in Subnetwork:</h3>
+
+To fully utilize the functionalities provided by this repository, it is necessary to register within the BitAds.ai Subnetwork (UID 16). 
+```bash
+btcli subnet register --netuid 16 --wallet.name <name> --wallet.hotkey <name>
+```
+
+<h3>After registration, you can start the scripts using the following instructions:</h3>
 
 - [Mining](docs/mining.md)
 - [Validating](docs/validating.md)
+
+# How to Mine TAO on Subnet 16
+1. Create a Bittensor wallet (coldkey & hotkey).
+2. Register your hotkey to the Subnet 16.
+3. Register an account to https://bitads.ai using the correct coldkey/hotkey pair of your Miner.
+4. Hardware requirements:
+- VPS with Ubuntu v.20 or higher
+- Python v3.11 or higher
+- Make sure the communication port is open
+- Make sure that there is not Firewall active that would prevent the communication between your Miner and Validators.
+5. Git clone the BitAds repo, install the needed packages and start your Miner’s script.
+6. Login into your BitAds.ai account:
+- Get your unique links from the dashboard for each active marketing campaign
+- Start promoting it over the internet and try to bring sales to it 
+
