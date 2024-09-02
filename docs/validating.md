@@ -93,17 +93,6 @@ The `run_validator_auto_update.py` script is used to launch the validator with a
 ensures that the local repository is always up-to-date with the remote repository and restarts the validator if
 necessary.
 
-### Starting the Auto-Update for Landings
-
-To automatically load necessary landings and unzip them, you can use the `update_landings.sh` script with `pm2`. This
-script will periodically download the latest landings and update the `statics` directory.
-
-```bash
-pm2 start update_landings.sh --name auto_update_landings --cron-restart="* * * * *" --no-autorestart
-```
-
-This script will automatically load necessary landings and unzip them.
-
 ### Generating a Self-Signed SSL Certificate
 
 To secure the communication for your validator server, you may need to generate a self-signed SSL certificate. This can
