@@ -149,17 +149,6 @@ https://keyvault.store
 The first application developed on the BitAds subnet is FirstAds. This platform enables users to create and promote their campaigns, incentivizing BitAds miners to attract sales for these campaigns at a minimal cost. <br>
 https://firstads.ai
 
-
-# Usage of Scripts
-
-To utilize any scripts provided here as a Validator, you must first sign up and authenticate yourself on the BitAds.ai platform. This step is necessary for BitAds to verify the script version and to monitor active validators within the subnets. You can register here: [BitAds.ai](https://BitAds.ai)
-
-This process is not mandatory for miners, but it is highly recommended as it makes it easier to access their unique links for each marketing campaign.
-
-**Validators will be manually approved after we receive written confirmation on Discord regarding their registration.**
-
-For any inquiries regarding script usage or registration, please refer to the official documentation on [BitAds.ai](https://BitAds.ai) or contact our support team.
-
 # Installation Guide
 
 To begin using this repository, the first step is to install Bittensor. Bittensor is a prerequisite for running the scripts and tools provided here. 
