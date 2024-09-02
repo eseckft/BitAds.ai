@@ -2,7 +2,6 @@ from typing import Tuple
 
 import bittensor as bt
 
-from common.miner.db.unit_of_work.base import MinerActiveUnitOfWork
 from common.services.recent_activity.base import RecentActivityService
 from neurons.base.operations import BaseOperation
 from neurons.protocol import RecentActivity
