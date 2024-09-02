@@ -9,7 +9,6 @@ import bittensor as bt
 import uvicorn
 from fastapi import FastAPI, Request, Depends, BackgroundTasks, Header, HTTPException, status
 from fastapi.responses import RedirectResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
 
 from common import dependencies as common_dependencies, utils
 from common.clients.bitads.base import BitAdsClient
@@ -22,10 +21,9 @@ from common.schemas.bitads import FormulaParams
 from common.schemas.campaign import CampaignType
 from common.services.geoip.base import GeoIpService
 from proxies.apis.fetch_from_db_test import router as test_router
-from proxies.apis.version import router as version_router
-from proxies.apis.logging import router as logs_router
 from proxies.apis.get_database import router as database_router
-
+from proxies.apis.logging import router as logs_router
+from proxies.apis.version import router as version_router
 
 subtensor = common_dependencies.get_subtensor(CommonEnviron.SUBTENSOR_NETWORK)
 database_manager = common_dependencies.get_database_manager(
@@ -56,7 +54,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(version="0.2.3", lifespan=lifespan)
-app.mount("/statics", StaticFiles(directory="statics"), name="statics")
+# app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
 app.include_router(version_router)
 app.include_router(test_router)
