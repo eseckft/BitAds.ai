@@ -58,6 +58,12 @@ addresses:
 wget https://git.io/GeoLite2-Country.mmdb
 ```
 
+### Git Clone the repositroy
+
+```bash
+git clone https://github.com/eseckft/BitAds.ai.git
+```
+
 ### Installing Dependencies
 
 1. **Upgrade `pip`**:
@@ -77,6 +83,11 @@ wget https://git.io/GeoLite2-Country.mmdb
 3. **Install pm2**
 
    Installation instructions can be found [here](https://pm2.io/docs/runtime/guide/installation/)
+
+### Create account on BitAds.ai (Optional)
+
+For easy access to unique links for each marketing campaign and miner statistics, it is highly recommended to have a registered account on BitAds. You can register here: [BitAds.ai](https://bitads.ai/register)  <br>
+
 
 ## Launch
 
