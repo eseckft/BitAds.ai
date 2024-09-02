@@ -18,13 +18,17 @@ BitAds addresses these challenges by focusing on actual sales rather than clicks
 
 :link:**Usefull Links:** <br>
 
-Subnet Video Presentation: Link <br>
-Overview: https://bit.ly/BitAdsOverview <br>
-Workflow: https://bit.ly/BitAdsWorkflow <br>
-Whitepaper: https://bitads.ai/whitepaper <br>
-Roadmap: https://bitads.ai/roadmap <br>
-API Docs: https://bitads.ai/api <br>
-GitHub: https://github.com/eseckft/BitAds.ai
+- Subnet Video Presentation: Link <br>
+- Overview: https://bit.ly/BitAdsOverview <br>
+- Workflow: https://bit.ly/BitAdsWorkflow <br>
+- Whitepaper: https://bitads.ai/whitepaper <br>
+- Roadmap: https://bitads.ai/roadmap <br>
+- API Docs: https://bitads.ai/api <br>
+- GitHub: https://github.com/eseckft/BitAds.ai
+
+🔨**Installation Guide:** <br>
+- [Miner](https://github.com/eseckft/BitAds.ai/blob/feature/conversion-tracking/docs/mining.md)
+- [Validator](https://github.com/eseckft/BitAds.ai/blob/feature/conversion-tracking/docs/validating.md)
 
 
 # Integration with Bittensor
