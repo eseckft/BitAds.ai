@@ -1,6 +1,7 @@
-import bittensor as bt
 import argparse
 import os
+
+import bittensor as bt
 
 
 def check_config(cls, config: "bt.Config"):

@@ -1,8 +1,7 @@
-import pydantic
-import bittensor as bt
+from typing import List
 
-from abc import ABC, abstractmethod
-from typing import List, Union, Callable, Awaitable
+import bittensor as bt
+import pydantic
 from starlette.responses import StreamingResponse
 
 

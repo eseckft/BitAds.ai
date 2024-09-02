@@ -1,13 +1,16 @@
 # BitAds.ai - Decentralized Marketing on Bittensor
 
 **Revolutionizing the online marketing landscape through the power of decentralization.**
-**Discover how BitAds leverages the Bittensor Network to offer cost-effective, high-quality marketing through a unique incentive mechanism for miners and validators.**
-![alt text](docs/bitads.png)
+**Discover how BitAds leverages the Bittensor Network to offer cost-effective, high-quality marketing through a unique incentive mechanism for miners and validators.** <br><br>
+![alt text](docs/BitAds_Ecommerce_Integration.png)
 
 
 :no_entry_sign:**The Problem:**
 
 In 2024, the advertising industry is expected to lose over $100 billion due to ad fraud and ineffective strategies. Ad fraud, including fake clicks and bot traffic, inflates engagement metrics and wastes significant ad spend. Traditional models, like pay-per-click and pay-per-impression, often fail to deliver real value, as they don't directly correlate with actual sales, leading to wasted budgets and reduced trust. 
+
+The rise of AI is expected to significantly increase the potential for ad fraud over the next five years by 20-30%.
+This increase could lead to global losses exceeding $150 billion annually by 2028, as fraudsters use AI to generate more convincing fake clicks, impressions, and user interactions. 
 
 :bulb:**The Solution:**
 
@@ -15,10 +18,18 @@ BitAds addresses these challenges by focusing on actual sales rather than clicks
 
 :link:**Usefull Links:** <br>
 
-Subnet Video Presentation: Link <br>
-Whitepaper: https://bitads.ai/whitepaper <br>
-API Docs: https://bitads.ai/api <br>
-GitHub: https://github.com/eseckft/BitAds.ai
+- Subnet Video Presentation: Link <br>
+- Overview: https://bit.ly/BitAdsOverview <br>
+- Workflow: https://bit.ly/BitAdsWorkflow <br>
+- Whitepaper: https://bitads.ai/whitepaper <br>
+- Roadmap: https://bitads.ai/roadmap <br>
+- API Docs: https://bitads.ai/api <br>
+- GitHub: https://github.com/eseckft/BitAds.ai
+
+🔨**Installation Guide:** <br>
+- [Miner](https://github.com/eseckft/BitAds.ai/blob/feature/conversion-tracking/docs/mining.md)
+- [Validator](https://github.com/eseckft/BitAds.ai/blob/feature/conversion-tracking/docs/validating.md)
+
 
 # Integration with Bittensor
 <p align="center">
@@ -31,7 +42,7 @@ By harnessing the collaborative efforts of the network's participants, BitAds ai
 <p align="center">
   <img src="docs/shopify_logo.png" alt="shopify" width="50%" />
 </p>
-BitAds is now fully integrated with Shopify through our BitAds app, available in the Shopify Store. This app enables detailed tracking of sales on any website where it's installed, identifying the specific miner's unique link used and the exact products purchased through it.
+BitAds is now fully integrated with Shopify through our BitAds app (soon to be available in the Shopify Store). This app enables detailed tracking of sales on any website where it's installed, identifying the specific miner's unique link used and the exact products purchased through it.
 
 # The BitAds.ai Ecosystem
 
@@ -41,44 +52,33 @@ BitAds is now fully integrated with Shopify through our BitAds app, available in
 **Incentive Mechanism:**<br>
 Miners are incentivized with TAO tokens, not based on the client's payment offer, but on the sales they attract. This system ensures cost-effective advertising for clients while rewarding miners substantially for their efforts.
 <br><br>
-![alt text](docs/bitads_diagram.png)
 
+# How BitAds works?
 
-
-# The First Incentivized Marketing Task
-<p align="center">
-  <img src="docs/keyvault_store.jpg" alt="keyvault.store" width="75%" />
-</p>
-In the beginning, BitAds will work with its own Shopify store, incentivizing Bittensor miners to attract sales for Microsoft software licenses, but we are also looking to collaborate with more online stores to demonstrate the network's marketing capabilities and incentivizing participation. <br>
-https://keyvault.store
-
-# FirstAds.ai - The First Web App
-<p align="center">
-  <img src="docs/firstads.png" alt="FirstAds.ai" width="50%" />
-</p>
-
-The first application developed on the BitAds subnet is FirstAds. This platform enables users to create and promote their campaigns, incentivizing BitAds miners to attract sales for these campaigns at a minimal cost. <br>
-https://firstads.ai
+1. Advertisers launch marketing campaigns on BitAds through one of the apps built on top of the platform. <br>
+2. BitAds leverages the Bittensor network to distribute marketing tasks among miners. <br>
+3. These miners promote campaigns across the web, driving real sales and earning TAO rewards based on their effectiveness. <br>
+4. Validators then evaluate and score these efforts, ensuring transparency and fairness in the process.
 
 # Advantages of BitAds.ai
 
-:globe_with_meridians:**Decentralization** <br>
+**Decentralization** <br>
 BitAds emphasizes optimal decentralization by ensuring a broad distribution of miners and validators.
 
-:moneybag:**Cost-Effectiveness** <br>
-By operating on low-cost systems requirements and incentivizing miners with TAO tokens, BitAds offers a highly economical marketing solution for both parties, advertisers (clients) and publishers (miners).
+**Multi-Strategy Marketing Approach** <br>
+When advertisers use BitAds, they’re essentially tapping into hundreds or even thousands of different marketing strategies deployed by miners simultaneously.
 
-:gem:**Quality Traffic** <br>
-The incentive mechanism encourages miners to drive high-quality organic traffic to their links, as conversion rates will also play a crucial role in determining their rewards.
+**Cost-Effectiveness** <br>
+By operating on low-cost systems requirements and incentivizing miners with TAO tokens, BitAds offers a highly economical marketing solution for both parties, advertisers (clients) and miners (promoters).
 
-:star:**Miners Competition** <br>
-Miners are motivated to outperform each other in attracting the best traffic to clients' websites to generate more sales. This healthy competition boosts the effectiveness of marketing campaigns, ensuring that clients see a direct increase in sales for their products.
+**High-Quality Traffic** <br>
+The incentive mechanism encourages miners to drive sales and achieve high conversion rates for the products or services being promoted through marketing campaigns.
 
-# Income Sources for Validators
-:white_check_mark:**Validators can monetize their participation in BitAds.ai Subnet through various avenues, including:** <br>
-- promoting their own products and stores <br>
-- developing applications using the BitAds.ai API <br>
-- offering paid API access to others
+**Competitive Environment** <br>
+The competitive environment fostered among miners ensures continuous innovation and optimization of marketing strategies, leading to high-quality traffic and better sales outcomes.
+
+**Income Sources for Validators** <br>
+Validators on BitAds can generate income through multiple channels, including promoting their own products, developing applications on the platform, or offering paid access to their APIs.
 
 # Scoring Mechanism
 
@@ -138,79 +138,20 @@ MINER SCORE = ((Wsales * SALESnorm) + (Wcr * CRnorm) + (Wmr * MRnorm)) * RF
 - If MINER SCORE > 1 then MINER SCORE = 1
 - MINER SCORE will have maximum 5 decimals
 
-# Subnet Security ===========> To be added/modified later
+# The First Incentivized Marketing Task
+<p align="center">
+  <img src="docs/keyvault_store.jpg" alt="keyvault.store" width="75%" />
+</p>
+In the beginning, BitAds will work with its own Shopify store, incentivizing Bittensor miners to attract sales for Microsoft software licenses. We are also looking to collaborate with more online stores to demonstrate the network's marketing capabilities and incentivizing participation. <br>
+https://keyvault.store
 
-**BitAds campaigns have multiple levels of protection against fraudulent activity such as bot or script-driven fake activity. In particular, verification for human authenticity occurs through:**
-- AWS WAF [(Web Application Firewall) ](https://aws.amazon.com/waf/)
-- CAPTCHA
-- Visitor "Fingerprint"
+# FirstAds.ai - The First Web App
+<p align="center">
+  <img src="docs/firstads.png" alt="FirstAds.ai" width="50%" />
+</p>
 
-All incoming requests are forwarded to AWS WAF for inspection by the web ACL. <br>
-
-AWS WAF is a web security service that helps protect web applications from common web threats such as SQL injections, cross-site scripting (XSS), and cross-site request forgery (CSRF). <br>
-
-Human Verification Check is an additional layer of protection in AWS WAF, designed to help distinguish humans from bots. It is useful for preventing automated attacks such as DDoS attacks and spam. 
-In BitAds.ai architecture it is one of the levels of protection against traffic manipulation. <br>
-
-Each time the BidAds.ai API is accessed, validators' and miners' scripts transmit their Bittensor wallet keys for verification of their presence in the registered users' database. BidAds also checks the status of each user (whether they are active or blocked), as well as the compatibility of validators' and miners' script code versions with the current version provided by BitAds.ai developers. This, on the one hand, requires users to constantly update their scripts and prevents unauthorized interference with them. <br>
-
-Additionally, every 30 minutes, there is an update of the lists of allowed participants in the process. Miners receive a list of validators, and validators receive a list of miners with whom they can communicate. This way, the system is protected from external intrusion.
-
-# Roadmap
-
-1. **Integration with E-Commerce platforms** <br>
-- Shopify ( :white_check_mark: done)
-- WooCommerce ( ⌛ in progress)
-- Wix (TBA)
-- Squarespace (TBA)
-- BigCommerce (TBA)
-
-2. **Performance Analytics** <br>
-Enhance campaign performance analytics for validators to improve monitoring and effectiveness on BitAds.ai.
-
-3. **Traffic Source Analysis** <br>
-Implement traffic source analysis to precisely track visitor origins.
-
-
-# How to Mine TAO on Subnet 16
-1. Create a Bittensor wallet (coldkey & hotkey).
-2. Register your hotkey to the Subnet 16.
-3. Register an account to https://bitads.ai using the correct coldkey/hotkey pair of your Miner.
-4. Hardware requirements:
-- VPS with Ubuntu v.20 or higher
-- Python v3.12 or higher
-- Make sure the communication port is open
-- Make sure that there is not Firewall active that would prevent the communication between your Miner and Validators.
-5. Git clone the BitAds repo, install the needed packages and start your Miner’s script.
-6. Login into your BitAds.ai account:
-- Get your unique links from the dashboard for each active campaigns
-- Start promoting it over the internet and try to bring sales to it 
-
-
-# Creating a Wallet
-
-Before proceeding, you'll need to create a wallet. A wallet is required for managing your digital assets and interacting with the functionalities provided by this repository.
-
-Detailed instructions on how to create a wallet can be found in the official documentation [here](https://docs.bittensor.com/getting-started/wallets).
-
-Please ensure that you follow the steps outlined in the documentation carefully to set up your wallet correctly.
-
-# Registration in Subnetwork
-
-To fully utilize the functionalities provided by this repository, it is necessary to register within the BitAds.ai Subnetwork (UID 16). 
-```bash
-btcli subnet register --netuid 16 --wallet.name <name> --wallet.hotkey <name>
-```
-
-# Usage of Scripts
-
-Please note that the usage of scripts within this repository is restricted to registered users of [BitAds.ai](https://BitAds.ai)
-
-To utilize any scripts provided here, you must first sign up and authenticate yourself on the [BitAds.ai](https://BitAds.ai) platform. Once registered, you will be granted access to the necessary resources and functionalities. 
-
-**The validators will be manually approved after we receive written confirmation on Discord about their registration.**
-
-For any inquiries regarding script usage or registration, please refer to the official documentation on [BitAds.ai](https://BitAds.ai) or contact our support team.
+The first application developed on the BitAds subnet is FirstAds. This platform enables users to create and promote their campaigns, incentivizing BitAds miners to attract sales for these campaigns at a minimal cost. <br>
+https://firstads.ai
 
 # Installation Guide
 
@@ -222,40 +163,43 @@ Please make sure to follow the installation steps carefully to ensure that Bitte
 
 If you encounter any issues during the installation process, refer to the troubleshooting section in the Bittensor documentation or reach out to our support team for assistance.
 
-**Prerequisites:**
-- Ensure that you have Python 3.12 or a later version installed on your system.
-- Run your local Subtensor, instructions on how to install Subtensor locally can be found here: [Subtensor Installation Guide](https://github.com/opentensor/subtensor/blob/main/docs/running-subtensor-locally.md) or you can use Finney
+<h3>Prerequisites:</h3>
 
-```basg 
-git clone https://github.com/eseckft/BitAds.ai.git
-cd BitAds.ai
-python3 -m pip install -e .
-python3 setup.py install_lib
-python3 setup.py build
-```
+- Ensure that you have Python 3.11 or a later version installed on your system.
+- Run your local Subtensor, instructions on how to install Subtensor locally can be found
+  here: [Subtensor Installation Guide](https://github.com/opentensor/subtensor/blob/main/docs/running-subtensor-locally.md)
 
-**After registration, you can start the miner script using the following command:**
+<h3>Creating a Wallet:</h3>
 
-# With autoupdates
+Before proceeding, you'll need to create a wallet. A wallet is required for managing your digital assets and interacting with the functionalities provided by this repository.
 
+Detailed instructions on how to create a wallet can be found in the official documentation [here](https://docs.bittensor.com/getting-started/wallets).
+
+Please ensure that you follow the steps outlined in the documentation carefully to set up your wallet correctly.
+
+<h3>Registration in Subnetwork:</h3>
+
+To fully utilize the functionalities provided by this repository, it is necessary to register within the BitAds.ai Subnetwork (UID 16). 
 ```bash
-pm2 start run_miner_auto_update.py --interpreter python3 -- --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug
+btcli subnet register --netuid 16 --wallet.name <name> --wallet.hotkey <name>
 ```
 
-**And for running the validator script, use:**
+<h3>After registration, you can start the scripts using the following instructions:</h3>
 
-```bash
-pm2 start run_validator_auto_update.py --interpreter python3 -- --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug
-```
+- [Mining](docs/mining.md)
+- [Validating](docs/validating.md)
 
-# Without auto updates
+# How to Mine TAO on Subnet 16
+1. Create a Bittensor wallet (coldkey & hotkey).
+2. Register your hotkey to the Subnet 16.
+3. Register an account to https://bitads.ai using the correct coldkey/hotkey pair of your Miner.
+4. Hardware requirements:
+- VPS with Ubuntu v.20 or higher
+- Python v3.11 or higher
+- Make sure the communication port is open
+- Make sure that there is not Firewall active that would prevent the communication between your Miner and Validators.
+5. Git clone the BitAds repo, install the needed packages and start your Miner’s script.
+6. Login into your BitAds.ai account:
+- Get your unique links from the dashboard for each active marketing campaign
+- Start promoting it over the internet and try to bring sales to it 
 
-```bash
-python neurons/miner.py --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug
-```
-
-**And for running the validator script, use:**
-
-```bash
-python neurons/validator.py --netuid 16 --subtensor.network local --wallet.name <name> --wallet.hotkey <name> --logging.debug
-```

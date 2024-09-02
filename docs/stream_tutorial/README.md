@@ -1,42 +1,56 @@
 # Bittensor Streaming Tutorial
+
 This document is intented as a developer-friendly walkthrough of integrating streaming into your bittensor application.
 
 If you prefer to jump right into a complete stand-alone example, see:
+
 - `miner.py`
 - `protocol.py`
 - `client.py`
 
 Start your miner:
+
 ```bash
 python miner.py --netuid 8 --wallet.name default --wallet.hotkey miner --subtensor.network test --axon.port 10000 --logging.trace
 ```
 
 Run the client:
+
 ```bash
 python client.py --netuid 8 --my_uid 1 --network test
 ```
 
 ## Overview
-This tutorial is designed to show you how to use the streaming API to integrate into your application. It will cover the following topics:
+
+This tutorial is designed to show you how to use the streaming API to integrate into your application. It will cover the
+following topics:
+
 - writing your streaming protocol (inherits from bittensor.StreamingSynapse)
 - writing your streaming server (uses your streaming protocol)
 - writing your streaming client (uses your streaming protocol)
 
 ### Defining your streaming protocol
-When designing your protocol, it would be helpful to look at the bittensor.StreamingSynapse for reference. Below is a condensed snippet of the abstract methods that you will need to implement in your subclass.
+
+When designing your protocol, it would be helpful to look at the bittensor.StreamingSynapse for reference. Below is a
+condensed snippet of the abstract methods that you will need to implement in your subclass.
 
 You will need to implement two methods:
 
 - `process_streaming_response`
 - `extract_response_json`
 
-These two methods are the core of your streaming protocol. The first method process_streaming_response is called as the response is being streamed from the network. It is responsible for handling the streaming response, such as parsing and accumulating data. The second method extract_response_json is  called after the response has been processed and is responsible for retrieving structured data to be post-processed in the dendrite in bittensor core code.
+These two methods are the core of your streaming protocol. The first method process_streaming_response is called as the
+response is being streamed from the network. It is responsible for handling the streaming response, such as parsing and
+accumulating data. The second method extract_response_json is called after the response has been processed and is
+responsible for retrieving structured data to be post-processed in the dendrite in bittensor core code.
 
 ```python
 class StreamingSynapse(bittensor.Synapse, ABC):
     ...
+
     class BTStreamingResponse(_StreamingResponse):
         ...
+
     @abstractmethod
     async def process_streaming_response(self, response: Response):
         """
@@ -62,23 +76,26 @@ class StreamingSynapse(bittensor.Synapse, ABC):
             response: The response object from which to extract JSON data.
         """
         ...
+
     ...
 ```
 
-See the full reference code at the bittensor [repo](https://github.com/opentensor/bittensor/blob/master/bittensor/stream.py).
-
+See the full reference code at the
+bittensor [repo](https://github.com/opentensor/bittensor/blob/master/bittensor/stream.py).
 
 #### Create your protocol
+
 Let's walk through how to create a protocol using the bittensor.StreamingSynapse class.
+
 ```python
 class MyStreamingSynapse(bt.StreamingSynapse):
     # define your expected data fields here as pydantic field objects
     # This allows you to control what information is passed along the network
     messages: List[str] = pydantic.Field(
-        ..., # this ellipsis (...) indicates the object is required
-        title="Messages", # What is the name of this field?
+        ...,  # this ellipsis (...) indicates the object is required
+        title="Messages",  # What is the name of this field?
         description="A list of messages in the Prompting scenario. Immutable.",
-        allow_mutation=False, # disallow modification of this field after creation
+        allow_mutation=False,  # disallow modification of this field after creation
     )
     completion: str = pydantic.Field(
         "",
@@ -103,7 +120,7 @@ class MyStreamingSynapse(bt.StreamingSynapse):
         async for chunk in response.content.iter_any():
             tokens = chunk.decode("utf-8").split("\n")
             yield tokens
-    
+
     # implement `extract_response_json` to extract the JSON data from the response headers
     # this will be dependent on the data you are streaming and how you want to structure it
     # it MUST conform to the following format expected by the bittensor dendrite:
@@ -121,12 +138,14 @@ class MyStreamingSynapse(bt.StreamingSynapse):
             ...
         }
     """
+
     def extract_response_json(self, response: MyStreamingSynapse) -> dict:
         # iterate over the response headers and extract the necessary data
         headers = {
             k.decode("utf-8"): v.decode("utf-8")
             for k, v in response.__dict__["_raw_headers"]
         }
+
         # helper function to extract data from headers
         def extract_info(prefix):
             return {
@@ -134,30 +153,34 @@ class MyStreamingSynapse(bt.StreamingSynapse):
                 for key, value in headers.items()
                 if key.startswith(prefix)
             }
+
         # return the extracted data in the expected format
         return {
             "name": headers.get("name", ""),
             "timeout": float(headers.get("timeout", 0)),
             "total_size": int(headers.get("total_size", 0)),
             "header_size": int(headers.get("header_size", 0)),
-            "dendrite": extract_info("bt_header_dendrite"), # dendrite info
-            "axon": extract_info("bt_header_axon"), # axon info
-            "messages": self.messages, # field object
+            "dendrite": extract_info("bt_header_dendrite"),  # dendrite info
+            "axon": extract_info("bt_header_axon"),  # axon info
+            "messages": self.messages,  # field object
         }
 ```
 
-[Here](https://github.com/opentensor/text-prompting/blob/main/prompting/protocol.py#L131) is a full example implementation of a streaming protocol based on the text-prompting network.
+[Here](https://github.com/opentensor/text-prompting/blob/main/prompting/protocol.py#L131) is a full example
+implementation of a streaming protocol based on the text-prompting network.
 
 Please read the docstrings provided, they can be very helpful!
 
 ### Writing the server
+
 Great! Now we have our protocol defined, let's see how to define our server.
 This will generate the tokens to be streamed in this prompting example.
 
 For brevity we will not be building a full miner, but inspecting the central components.
+
 ```python
 class MyStreamPromptingMiner(bt.Miner):
-    ... # any relevant methods you'd need for your miner
+    ...  # any relevant methods you'd need for your miner
 
     # define your server forward here
     # NOTE: It is crucial that your typehints are correct and reflect your streaming protocol object
@@ -178,7 +201,7 @@ class MyStreamPromptingMiner(bt.Miner):
             # `text` may be the input prompt to your model in a real-world scenario.
             # let's tokenize them into IDs for the sake of this example.
             input_ids = tokenizer(text, return_tensors="pt").input_ids.squeeze()
-            
+
             # You may want to buffer your tokens before sending them back to the client.
             # this can be useful so we aren't flooding the client with individual tokens
             # and allows you more fine-grained control over how much data is sent back 
@@ -188,7 +211,7 @@ class MyStreamPromptingMiner(bt.Miner):
             # Iterate over the tokens and send the generationed tokens back to the client  
             # when we have sufficient (N) tokens in the buffer.       
             for token in model(input_ids):
-                buffer.append(token) # Add token to buffer
+                buffer.append(token)  # Add token to buffer
 
                 # If buffer has N tokens, send them back to the client.
                 if len(buffer) == N:
@@ -218,9 +241,11 @@ class MyStreamPromptingMiner(bt.Miner):
 ```
 
 #### Complete Example
+
 Here is a full example for reference:
 > This inherits from the prompting (text-prompting) miner base class.
-> Take a look at the `prompting/baseminer/miner.py` file [here](https://github.com/opentensor/text-prompting/blob/main/prompting/baseminer/miner.py) for more details.
+> Take a look at the `prompting/baseminer/miner.py`
+> file [here](https://github.com/opentensor/text-prompting/blob/main/prompting/baseminer/miner.py) for more details.
 
 ```python
 class StreamingTemplateMiner(prompting.Miner):
@@ -303,7 +328,7 @@ class StreamingTemplateMiner(prompting.Miner):
             buffer = []
             bt.logging.debug(f"Input text: {text}")
             bt.logging.debug(f"Input ids: {input_ids}")
-             
+
             N = 3  # Number of tokens to send back to the client at a time
             for token in model(input_ids):
                 bt.logging.trace(f"appending token: {token}")
@@ -343,13 +368,16 @@ class StreamingTemplateMiner(prompting.Miner):
 ```
 
 ### Writing the client
+
 Excellent! Now we have defined our server, now we can define our client.
 
 This has assumed you have:
+
 1. Registered your miner on the chain (`finney`/`test`)
 2. Are serving your miner on an open port (e.g. `12345`)
 
 Steps:
+
 - Instantiate your synapse subclass with the relevant information. E.g. `messages`, `roles`, etc.
 - Instantiate your wallet and a dendrite client
 - Query the dendrite client with your synapse object
@@ -363,7 +391,8 @@ import bittensor as bt
 # Create your streaming synapse subclass object to house the request body
 syn = MyStreamingSynapse(
     roles=["user"],
-    messages=["hello this is a test of a streaming response. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."]
+    messages=[
+        "hello this is a test of a streaming response. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."]
 )
 
 # Create a wallet instance that must be registered on the network
@@ -381,8 +410,20 @@ axon = metagraph.axons[my_uid]
 # Create a Dendrite instance to handle client-side communication.
 dendrite = bt.dendrite(wallet=wallet)
 
+This is an async function
+so
+we
+can
+use
+the
+`await` keyword
+when
+querying
+the
+server
+with the dendrite object.
 
-This is an async function so we can use the `await` keyword when querying the server with the dendrite object.
+
 async def main():
     # Send a request to the Axon using the Dendrite, passing in a StreamPrompting 
     # instance with roles and messages. The response is awaited, as the Dendrite 
@@ -397,7 +438,7 @@ async def main():
     # Now that we have our responses we want to iterate over the yielded tokens
     # iterate over the async generator to extract the yielded tokens on server side
     for resp in responses:
-        i=0
+        i = 0
         async for chunk in resp:
             i += 1
             if i % 5 == 0:
@@ -412,21 +453,25 @@ async def main():
     # The synapse object contains the completion attribute which contains the
     # accumulated tokens from the streaming response.
 
+
 if __name__ == "__main__":
     # Run the main function with asyncio
     asyncio.run(main())
-    
+
 ```
+
 There you have it!
 
 ### Complete example
+
 If you would like to see a complete standalone example that only depends on bittensor>=6.2.0, look below:
 
 - client.py
 - streaming_miner.py
-- 
+-
 
 # client.py
+
 ```python
 # Import bittensor and the text-prompting packages
 import bittensor as bt
@@ -434,8 +479,9 @@ import prompting
 
 # Create a StreamPrompting synapse object to house the request body
 syn = prompting.protocol.StreamPrompting(
-    roles=["user"], 
-    messages=["hello this is a test of a streaming response. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."])
+    roles=["user"],
+    messages=[
+        "hello this is a test of a streaming response. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."])
 syn
 
 # create a wallet instance that must be registered on the network
@@ -458,7 +504,6 @@ d
 
 
 async def main():
-        
     # Send a request to the Axon using the Dendrite, passing in a StreamPrompting 
     # instance with roles and messages. The response is awaited, as the Dendrite 
     # communicates asynchronously with the Axon. Returns a list of async generator.
@@ -468,11 +513,11 @@ async def main():
         deserialize=False,
         streaming=True
     )
-    responses 
+    responses
 
     # iterate over the async generator to extract the yielded tokens on server side
     for resp in responses:
-        i=0
+        i = 0
         async for chunk in resp:
             i += 1
             if i % 5 == 0:
@@ -484,7 +529,9 @@ async def main():
                 synapse = chunk
         break
 
+
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())
 ```

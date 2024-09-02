@@ -16,17 +16,18 @@
 # DEALINGS IN THE SOFTWARE.
 
 import copy
-import typing
+from abc import ABC, abstractmethod
 
 import bittensor as bt
 
-from abc import ABC, abstractmethod
+from common.environ import Environ
+from common.helpers import const
+from template import __spec_version__ as spec_version
+from template.mock import MockSubtensor, MockMetagraph
 
 # Sync calls set weights and also resyncs the metagraph.
 from template.utils.config import check_config, add_args, config
 from template.utils.misc import ttl_get_block
-from template import __spec_version__ as spec_version
-from template.mock import MockSubtensor, MockMetagraph
 
 
 class BaseNeuron(ABC):
@@ -36,14 +37,41 @@ class BaseNeuron(ABC):
     In addition to creating a wallet, subtensor, and metagraph, this class also handles the synchronization of the network state via a basic checkpointing mechanism based on epoch length.
     """
 
-    neuron_type: str = "BaseNeuron"
+    neuron_type: str = "neuron"
 
     @classmethod
     def check_config(cls, config: "bt.Config"):
+        network = config.subtensor.network
+        config.netuid = const.NETUIDS[network]
+        config.bitads.url = const.BITADS_API_URLS[network]
+        config.main_db.url = Environ.DB_URL_TEMPLATE.format(
+            name="main", network=network
+        )
+        config.active_db.url = Environ.DB_URL_TEMPLATE.format(
+            name=f"{cls.neuron_type}_active", network=network
+        )
+        config.history_db.url = Environ.DB_URL_TEMPLATE.format(
+            name=f"{cls.neuron_type}_history", network=network
+        )
         check_config(cls, config)
 
     @classmethod
     def add_args(cls, parser):
+        parser.add_argument(
+            "--main_db.url", type=str, help="Main DB url", default=""
+        )
+        parser.add_argument(
+            "--active_db.url", type=str, help="Active DB url", default=""
+        )
+        parser.add_argument(
+            "--history_db.url", type=str, help="History DB url", default=""
+        )
+        parser.add_argument(
+            "--bitads.url",
+            type=str,
+            help="BitAds url",
+            default=const.API_BITADS_DOMAIN,
+        )
         add_args(cls, parser)
 
     @classmethod
@@ -66,7 +94,7 @@ class BaseNeuron(ABC):
         self.check_config(self.config)
 
         # Set up logging with the provided configuration and directory.
-        bt.logging(config=self.config, logging_dir=self.config.full_path)
+        bt.logging(config=self.config.logging, logging_dir=self.config.logging.full_path, record_log=True)
 
         # If a gpu is required, set the device to cuda:N (e.g. cuda:0)
         self.device = self.config.neuron.device
@@ -107,10 +135,6 @@ class BaseNeuron(ABC):
             f"Running neuron on subnet: {self.config.netuid} with uid {self.uid} using network: {self.subtensor.chain_endpoint}"
         )
         self.step = 0
-
-    @abstractmethod
-    async def forward(self, synapse: bt.Synapse) -> bt.Synapse:
-        ...
 
     @abstractmethod
     def run(self):
@@ -163,10 +187,8 @@ class BaseNeuron(ABC):
 
         # Define appropriate logic for when set weights.
         return (
-            (self.block - self.metagraph.last_update[self.uid])
-            > self.config.neuron.epoch_length
-            and self.neuron_type != "MinerNeuron"
-        )  # don't set weights if you're a miner
+            self.block - self.metagraph.last_update[self.uid]
+        ) > self.config.neuron.epoch_length and self.neuron_type != "miner"  # don't set weights if you're a miner
 
     def save_state(self):
         bt.logging.warning(

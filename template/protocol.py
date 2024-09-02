@@ -1,7 +1,7 @@
 # The MIT License (MIT)
 # Copyright © 2023 Yuma Rao
-# TODO(developer): Set your name
-# Copyright © 2023 <your name>
+# Copyright © 2023 bittensor.com
+
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -16,13 +16,9 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import base64
 import typing
 
 import bittensor as bt
-import pydantic
-
-from schemas.bit_ads import GetMinerUniqueIdResponse, Campaign
 
 
 # This is the protocol for the dummy miner and validator.
@@ -77,73 +73,3 @@ class Dummy(bt.Synapse):
         5
         """
         return self.dummy_output
-
-
-class Task(bt.Synapse):
-    dummy_input: Campaign
-    dummy_output: typing.Optional[GetMinerUniqueIdResponse] = None
-
-    def deserialize(self) -> typing.Optional[GetMinerUniqueIdResponse]:
-        return self.dummy_output
-
-    def to_headers(self) -> dict:
-        result = super().to_headers()
-        result["bt_header_input_obj_dummy_input"] = base64.b64encode(
-            self.dummy_input.json().encode()
-        ).decode("utf-8")
-        return result
-
-
-"""
-Represents a software version with major, minor, and patch components.
-"""
-
-
-class Version(pydantic.BaseModel):
-    major_version: typing.Optional[int] = None
-    minor_version: typing.Optional[int] = None
-    patch_version: typing.Optional[int] = None
-
-
-class MapSynapse(bt.Synapse):
-    version: typing.Optional[Version] = None
-
-
-"""
-A specialized Synapse representing the status of a miner, 
-including its availability and memory resources.
-"""
-
-
-class MinerStatus(MapSynapse):
-    free_memory: typing.Optional[int] = None
-    available: typing.Optional[bool] = None
-
-
-class SpeedTest(MapSynapse):
-    result: typing.Optional[typing.Dict] = None
-
-
-class Retrieve(bt.Synapse):
-    pass
-
-
-class TextToSpeech(bt.Synapse):
-    pass
-
-
-class MusicGeneration(bt.Synapse):
-    pass
-
-
-class VoiceClone(bt.Synapse):
-    pass
-
-
-"""
-Defines the status of a validator, particularly whether it is available for processing requests.
-"""
-
-
-class ValidatorStatus(pydantic.BaseModel):
-    available: typing.Optional[bool] = None

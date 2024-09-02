@@ -1,7 +1,6 @@
 # The MIT License (MIT)
 # Copyright © 2023 Yuma Rao
-# TODO(developer): Set your name
-# Copyright © 2023 <your name>
+# Copyright © 2023 bittensor.com
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
@@ -17,14 +16,13 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import re
-import os
 import codecs
-import pathlib
-from os import path
+import os
+import re
 from io import open
+from os import path
+
 from setuptools import setup, find_packages
-from pkg_resources import parse_requirements
 
 
 def read_requirements(path):
@@ -69,10 +67,10 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/eseckft/BitAds.ai",
-    author="bittensor.com",  # TODO(developer): Change this value to your module subnet author name.
+    author="bittensor.com",
     packages=find_packages(),
     include_package_data=True,
-    author_email="",  # TODO(developer): Change this value to your module subnet author email.
+    author_email="",
     license="MIT",
     python_requires=">=3.8",
     install_requires=requirements,

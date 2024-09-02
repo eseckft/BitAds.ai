@@ -16,10 +16,11 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import os
-import torch
 import argparse
+import os
+
 import bittensor as bt
+import torch
 from loguru import logger
 
 
@@ -29,7 +30,7 @@ def check_config(cls, config: "bt.Config"):
 
     full_path = os.path.expanduser(
         "{}/{}/{}/netuid{}/{}".format(
-            config.logging.logging_dir,  # TODO: change from ~/.bittensor/miners to ~/.bittensor/neurons
+            config.logging.logging_dir,
             config.wallet.name,
             config.wallet.hotkey,
             config.netuid,
@@ -120,16 +121,7 @@ def add_args(cls, parser):
     )
 
 
-def add_miner_args(cls, parser):
-    """Add miner specific arguments to the parser."""
-
-    parser.add_argument(
-        "--neuron.name",
-        type=str,
-        help="Trials for this neuron go in neuron.root / (wallet_cold - wallet_hot) / neuron.name. ",
-        default="miner",
-    )
-
+def add_blacklist_args(cls, parser):
     parser.add_argument(
         "--blacklist.force_validator_permit",
         action="store_true",
@@ -143,6 +135,19 @@ def add_miner_args(cls, parser):
         help="If set, miners will accept queries from non registered entities. (Dangerous!)",
         default=False,
     )
+
+
+def add_miner_args(cls, parser):
+    """Add miner specific arguments to the parser."""
+
+    parser.add_argument(
+        "--neuron.name",
+        type=str,
+        help="Trials for this neuron go in neuron.root / (wallet_cold - wallet_hot) / neuron.name. ",
+        default="miner",
+    )
+
+    add_blacklist_args(cls, parser)
 
     parser.add_argument(
         "--wandb.project_name",
