@@ -34,10 +34,11 @@ API_ERROR_CODES = {
 
 API_BITADS_DOMAIN = "https://prod-s.a.bitads.ai"
 
-NETUIDS = {"finney": 16, "test": 173}
+NETUIDS = {"finney": 16, "test": 173, "local": 16}
 
 BITADS_API_URLS = {
     "finney": API_BITADS_DOMAIN,
+    "local": API_BITADS_DOMAIN,
     "test": "https://dev-s.a.bitads.ai",
 }
 
