@@ -10,13 +10,15 @@ using the auto-update feature.
 
 1. [Deployment](#deployment)
     - [Creating a Virtual Environment](#creating-a-virtual-environment)
+    - [Country Detection](#country-detection)
+    - [Git Clone the repository](#git-clone-the-repository)
     - [Installing Dependencies](#installing-dependencies)
-2. [Country Detection](#country-detection)
-3. [Launch](#launch)
+    - [Create account on BitAds.ai (Optional)](#create-account-on-bitadsai-optional)
+2. [Launch](#launch)
     - [Running the Miner with Auto-Update](#running-the-miner-with-auto-update)
     - [Example Command](#example-command)
-4. [Subsequent Important Steps](#subsequent-important-steps)
-5. [Reinitialization](#reinitialization)
+3. [Subsequent Important Steps](#subsequent-important-steps)
+4. [Reinitialization](#reinitialization)
 
 ## Deployment
 
@@ -58,7 +60,7 @@ addresses:
 wget https://git.io/GeoLite2-Country.mmdb
 ```
 
-### Git Clone the repositroy
+### Git Clone the repository
 
 ```bash
 git clone https://github.com/eseckft/BitAds.ai.git
