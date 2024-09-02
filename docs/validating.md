@@ -10,14 +10,15 @@ and using the auto-update feature.
 
 1. [Deployment](#deployment)
     - [Creating a Virtual Environment](#creating-a-virtual-environment)
-    - [Installing Dependencies](#installing-dependencies)
-2. [Country Detection](#country-detection)
-3. [Launch](#launch)
+    - [Country Detection](#country-detection)
+    - [Git Clone the repositroy](#git-clone-the-repository)
+    - [Create account on BitAds.ai (Mandatory)](#create-account-on-bitadsai-mandatory)
+    - [Installing Dependencies](#installing-dependencies) 
+2. [Launch](#launch)
     - [Running the Validator with Auto-Update](#running-the-validator-with-auto-update)
-    - [Starting the Auto-Update for Landings](#starting-the-auto-update-for-landings)
     - [Example Command](#example-command)
-4. [Subsequent Important Steps](#subsequent-important-steps)
-5. [Reinitialization](#reinitialization)
+3. [Subsequent Important Steps](#subsequent-important-steps)
+4. [Reinitialization](#reinitialization)
 
 ## Deployment
 
@@ -59,6 +60,12 @@ addresses:
 wget https://git.io/GeoLite2-Country.mmdb
 ```
 
+### Git Clone the repositroy
+
+```bash
+git clone https://github.com/eseckft/BitAds.ai.git
+```
+
 ### Installing Dependencies
 
 1. **Upgrade `pip`**:
@@ -85,13 +92,14 @@ wget https://git.io/GeoLite2-Country.mmdb
    apt install unzip
    ```
 
+### Create account on BitAds.ai (Mandatory)
+
+Validator registration is required. This allows the server to ping, informing us of your activity so we can include it in the DNS records, ensuring the participant is accessible via x.bitads.ai or v.bitads.ai. <br>
+Without an account, Validators won't be able to set weights on the subnet. Having an account gives Validators easy access to miner and campaign statistics, as well as the API key needed to build their own application on the BitAds subnet. <br>
+You can register here: [BitAds.ai](https://bitads.ai/register)
+
+
 ## Launch
-
-### Running the Validator with Auto-Update
-
-The `run_validator_auto_update.py` script is used to launch the validator with an auto-update feature. This script
-ensures that the local repository is always up-to-date with the remote repository and restarts the validator if
-necessary.
 
 ### Generating a Self-Signed SSL Certificate
 
