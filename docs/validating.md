@@ -64,6 +64,7 @@ wget https://git.io/GeoLite2-Country.mmdb
 
 ```bash
 git clone https://github.com/eseckft/BitAds.ai.git
+cd BitAds.ai
 ```
 
 ### Installing Dependencies
