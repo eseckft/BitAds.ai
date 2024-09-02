@@ -77,11 +77,11 @@ app.include_router(logs_router)
 app.include_router(database_router)
 
 
-app.mount(
-    "/campaigns",
-    StaticFiles(directory="statics/campaigns", html=True),
-    name="statics",
-)
+# app.mount(
+#     "/campaigns",
+#     StaticFiles(directory="statics/campaigns", html=True),
+#     name="statics",
+# )
 
 
 def validate_hash(
