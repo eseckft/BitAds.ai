@@ -50,9 +50,10 @@ target_metadata = {
     "main_engine": MainBase.metadata,
 }
 
-SUBTENSOR_NETWORK = os.environ.get("SUBTENSOR_NETWORK", "finney")
+subtensor_network = os.environ.get("SUBTENSOR_NETWORK", "finney")
+subtensor_network = "finney" if "local" in subtensor_network else subtensor_network
 for engine in target_metadata.keys():
-    config.set_section_option(engine, "subtensor.network", SUBTENSOR_NETWORK)
+    config.set_section_option(engine, "subtensor.network", subtensor_network)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

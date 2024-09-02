@@ -99,6 +99,9 @@ class DatabaseManager:
             neuron_type (str): Type of neuron.
             subtensor_network (str): Name of the subtensor network.
         """
+        subtensor_network = (
+            "finney" if "local" in subtensor_network else subtensor_network
+        )
         self.active_db = _create_engine(
             Environ.DB_URL_TEMPLATE.format(
                 name=f"{neuron_type}_active", network=subtensor_network
