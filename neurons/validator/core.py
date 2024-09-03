@@ -270,7 +270,7 @@ class CoreValidator(BaseValidatorNeuron):
 
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
-    bt.logging.set_trace()
+    bt.logging.set_debug()
     log_startup("Validator")
     with dependencies.get_core_validator() as validator:
         while True:
