@@ -111,7 +111,7 @@ class CoreMiner(BaseMinerNeuron):
         await self.recent_activity_service.clear_old_recent_activity()
         bt.logging.info("End clear recent activity")
 
-    async def _sync_visits(self, delay: float = 6.0):
+    async def _sync_visits(self, delay: float = 12.0):
         while True:
             try:
                 await self.__sync_visits()
@@ -120,7 +120,7 @@ class CoreMiner(BaseMinerNeuron):
             finally:
                 await asyncio.sleep(delay)
 
-    async def __sync_visits(self, timeout: float = 5.0):
+    async def __sync_visits(self, timeout: float = 11.0):
         bt.logging.info("Start sync process")
         offset = await self.miner_service.get_last_update_visit(
             self.wallet.get_hotkey().ss58_address

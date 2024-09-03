@@ -124,7 +124,7 @@ class CoreValidator(BaseValidatorNeuron):
         )
         bt.logging.info("End ping miners")
 
-    async def _forward_bitads_data(self, delay: float = 6.0):
+    async def _forward_bitads_data(self, delay: float = 12.0):
         while True:
             try:
                 await self.__forward_bitads_data()
@@ -133,7 +133,7 @@ class CoreValidator(BaseValidatorNeuron):
             finally:
                 await asyncio.sleep(delay)
 
-    async def __forward_bitads_data(self, timeout: float = 5.0):
+    async def __forward_bitads_data(self, timeout: float = 11.0):
         bt.logging.info("Start sync bitads process")
         offset = await self.bitads_service.get_last_update_bitads_data(
             self.wallet.get_hotkey().ss58_address
