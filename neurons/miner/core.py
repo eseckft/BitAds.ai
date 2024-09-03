@@ -126,13 +126,14 @@ class CoreMiner(BaseMinerNeuron):
             self.wallet.get_hotkey().ss58_address
         )
         bt.logging.debug(f"Sync visits with offset: {offset}")
+        bt.logging.debug(f"Sync visits with miners: {self.miners}")
         responses = await forward_each_axon(
             self,
             SyncVisits(offset=offset),
             *self.miners,
             timeout=timeout,
         )
-
+        bt.logging.debug(f"Sync visits responses: {responses}")
         visits = {visit for synapse in responses.values() for visit in synapse.visits}
         await self.miner_service.add_visits(visits)
         bt.logging.info("End sync process")
