@@ -2,7 +2,7 @@
 # Copyright © 2023 Yuma Rao
 # Copyright © 2023 bittensor.com
 import asyncio
-from typing import TypeVar, Dict
+from typing import TypeVar, Dict, List
 
 import bittensor as bt
 
@@ -66,13 +66,7 @@ async def forward_each_axon(
     self, synapse: SYNAPSE, *hotkeys, timeout: float = 12
 ) -> Dict[str, SYNAPSE]:
     axons = uids.get_axons(self, *hotkeys)
-    async with asyncio.TaskGroup() as tg:
-        responses = {
-            axon.hotkey: tg.create_task(
-                self.dendrite.forward(
-                    axons=axon, synapse=synapse, timeout=timeout
-                )
-            )
-            for axon in axons
-        }
-    return {hotkey: await task for hotkey, task in responses.items()}
+    responses: List[SYNAPSE] = await self.dendrite.forward(
+        axons=axons, synapse=synapse, timeout=timeout
+    )
+    return {r.axon.hotkey: r for r in responses}
