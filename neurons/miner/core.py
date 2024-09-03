@@ -56,8 +56,6 @@ class CoreMiner(BaseMinerNeuron):
         # Create asyncio event loop to manage async tasks.
         self.loop = asyncio.get_event_loop()
 
-        self.loop.create_task(self._sync_visits())
-
         self.bit_ads_client = common_dependencies.create_bitads_client(
             self.wallet, self.config.bitads.url
         )
@@ -92,8 +90,9 @@ class CoreMiner(BaseMinerNeuron):
 
     def sync(self):
         super().sync()
-        self.loop.run_until_complete(self._send_load_data())
         self.loop.run_until_complete(self._ping_bitads())
+        self.loop.run_until_complete(self.__sync_visits())
+        self.loop.run_until_complete(self._send_load_data())
         self.loop.run_until_complete(self._clear_recent_activity())
 
     @execute_periodically(Environ.PING_PERIOD)
