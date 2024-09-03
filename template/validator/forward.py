@@ -2,6 +2,7 @@
 # Copyright © 2023 Yuma Rao
 # Copyright © 2023 bittensor.com
 import asyncio
+import time
 from typing import TypeVar, Dict, List
 
 import bittensor as bt
@@ -65,8 +66,32 @@ async def forward(self):
 async def forward_each_axon(
     self, synapse: SYNAPSE, *hotkeys, timeout: float = 12
 ) -> Dict[str, SYNAPSE]:
+    # Helper function to log elapsed time
+    def log_elapsed_time(start_time, step_name):
+        elapsed_time = time.time() - start_time
+        bt.logging.debug(f"[{step_name}] Elapsed time: {elapsed_time:.4f} seconds")
+
+    # Start timing
+    start_time = time.time()
+
+    # Step 1: Get axons
+    step_start_time = time.time()
     axons = uids.get_axons(self, *hotkeys)
+    log_elapsed_time(step_start_time, "Get axons")
+
+    # Step 2: Forward axons
+    step_start_time = time.time()
     responses: List[SYNAPSE] = await self.dendrite.forward(
         axons=axons, synapse=synapse, timeout=timeout
     )
-    return {r.axon.hotkey: r for r in responses}
+    log_elapsed_time(step_start_time, "Forward axons")
+
+    # Step 3: Build and return the result dictionary
+    step_start_time = time.time()
+    result = {r.axon.hotkey: r for r in responses}
+    log_elapsed_time(step_start_time, "Build result dictionary")
+
+    # Final elapsed time
+    log_elapsed_time(start_time, "Total elapsed time")
+
+    return result
