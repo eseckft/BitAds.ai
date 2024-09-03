@@ -70,9 +70,8 @@ class CoreValidator(BaseValidatorNeuron):
         self.miner_ratings = dict()
         self.active_campaigns: List[Campaign] = list()
 
-        self.loop.create_task(self._calculate_campaigns_umax())
+        # self.loop.create_task(self._calculate_campaigns_umax())
         self.loop.create_task(self._evaluate_miners())
-        self.loop.create_task(self._forward_bitads_data())
 
     async def forward(self, _: bt.Synapse = None):
         """
@@ -83,6 +82,7 @@ class CoreValidator(BaseValidatorNeuron):
         - Rewarding the miners
         - Updating the scores
         """
+        await self.__forward_bitads_data()
         await self.forward_ping()
         await self.forward_recent_activity()
 
