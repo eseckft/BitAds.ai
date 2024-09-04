@@ -198,6 +198,7 @@ class CoreValidator(BaseValidatorNeuron):
             uids=list(miner_ratings.keys()),
             weights=list(miner_ratings.values()),
             wait_for_finalization=True,
+            wait_for_inclusion=True
         )
         self.miner_ratings.clear()
         if result is True:
