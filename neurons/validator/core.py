@@ -198,9 +198,9 @@ class CoreValidator(BaseValidatorNeuron):
             weights=list(miner_ratings.values()),
             wait_for_finalization=True,
         )
+        self.miner_ratings.clear()
         if result is True:
             bt.logging.info("set_weights on chain successfully!")
-            self.miner_ratings.clear()
         else:
             bt.logging.error("set_weights failed", msg)
 
