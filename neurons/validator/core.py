@@ -186,9 +186,8 @@ class CoreValidator(BaseValidatorNeuron):
         hotkey_to_uid = {n.hotkey: n.uid for n in self.metagraph.neurons}
 
         miner_ratings = {
-            hotkey_to_uid[hotkey]: rating
-            for hotkey, rating in self.miner_ratings.items()
-            if hotkey in hotkey_to_uid
+            uid: self.miner_ratings.get(hotkey, 0.0)
+            for hotkey, uid in hotkey_to_uid.items()
         }
         bt.logging.debug(f"UID to rating: {miner_ratings}")
 
@@ -197,8 +196,7 @@ class CoreValidator(BaseValidatorNeuron):
             netuid=self.config.netuid,
             uids=list(miner_ratings.keys()),
             weights=list(miner_ratings.values()),
-            wait_for_finalization=False,
-            wait_for_inclusion=False,
+            wait_for_finalization=True,
         )
         if result is True:
             bt.logging.info("set_weights on chain successfully!")
