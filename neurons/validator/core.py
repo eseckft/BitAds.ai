@@ -200,10 +200,13 @@ class CoreValidator(BaseValidatorNeuron):
             netuid=self.config.netuid,
             uids=list(miner_ratings.keys()),
             weights=list(miner_ratings.values()),
-            wait_for_finalization=False,
+            wait_for_finalization=True,
             wait_for_inclusion=False,
         )
-        self.update_scores(torch.FloatTensor(list(miner_ratings.values())).to(self.device), list(miner_ratings.keys()))
+        self.update_scores(
+            torch.FloatTensor(list(miner_ratings.values())).to(self.device),
+            list(miner_ratings.keys()),
+        )
         self.miner_ratings.clear()
         if result is True:
             bt.logging.info("set_weights on chain successfully!")
