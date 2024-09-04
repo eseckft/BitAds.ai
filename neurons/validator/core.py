@@ -192,13 +192,14 @@ class CoreValidator(BaseValidatorNeuron):
         }
         bt.logging.debug(f"UID to rating: {miner_ratings}")
 
+        current_block = self.subtensor.get_current_block()
         result, msg = self.subtensor.set_weights(
             wallet=self.wallet,
             netuid=self.config.netuid,
             uids=list(miner_ratings.keys()),
             weights=list(miner_ratings.values()),
             wait_for_finalization=True,
-            wait_for_inclusion=True
+            version_key=current_block
         )
         self.miner_ratings.clear()
         if result is True:
