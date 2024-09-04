@@ -69,7 +69,7 @@ class CoreValidator(BaseValidatorNeuron):
         self.evaluate_miners_blocks = Environ.EVALUATE_MINERS_BLOCK_N
         self.miner_ratings = dict()
         self.active_campaigns: List[Campaign] = list()
-        self.last_evaluate_block = -1
+        self.last_evaluate_block = 0
 
         # self.loop.create_task(self._calculate_campaigns_umax())
         self.loop.create_task(self._evaluate_miners())
@@ -250,7 +250,12 @@ class CoreValidator(BaseValidatorNeuron):
         while True:
             try:
                 current_block = self.subtensor.get_current_block()
-                if current_block % self.evaluate_miners_blocks == 0:
+                if (current_block % self.evaluate_miners_blocks == 0) or (
+                    # self.last_evaluate_block and
+                    current_block - self.last_evaluate_block
+                    >= self.evaluate_miners_blocks
+                ):
+                    self.last_evaluate_block = current_block
                     from_block = current_block - Environ.CALCULATE_UMAX_BLOCKS
                     bt.logging.info(
                         f"Start evaluate miners from "
