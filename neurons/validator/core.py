@@ -9,6 +9,8 @@ from typing import List
 
 # Bittensor
 import bittensor as bt
+import torch
+
 from common.helpers import const
 
 from common import dependencies as common_dependencies, utils
@@ -201,10 +203,10 @@ class CoreValidator(BaseValidatorNeuron):
             wait_for_finalization=False,
             wait_for_inclusion=False,
         )
+        self.update_scores(torch.FloatTensor(list(miner_ratings.values())).to(self.device), list(miner_ratings.keys()))
         self.miner_ratings.clear()
         if result is True:
             bt.logging.info("set_weights on chain successfully!")
-            self.miner_ratings.clear()
         else:
             bt.logging.error("set_weights failed", msg)
 
