@@ -69,6 +69,7 @@ class CoreValidator(BaseValidatorNeuron):
         self.evaluate_miners_blocks = Environ.EVALUATE_MINERS_BLOCK_N
         self.miner_ratings = dict()
         self.active_campaigns: List[Campaign] = list()
+        self.last_evaluate_block = -1
 
         # self.loop.create_task(self._calculate_campaigns_umax())
         self.loop.create_task(self._evaluate_miners())
