@@ -16,6 +16,7 @@ from fastapi import (
     Request,
     Query,
     Body,
+    status
 )
 from pydantic import ValidationError
 
@@ -69,7 +70,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version="0.2.6", lifespan=lifespan)
+app = FastAPI(version="0.2.7", lifespan=lifespan)
 
 app.include_router(version_router)
 app.include_router(test_router)
@@ -111,8 +112,11 @@ async def init_from_shopify(
     order_details = body.data.order_details
     client_info = order_details.client_info
     customer_details = order_details.customer_info
+    existed_datas = await bitads_service.get_data_by_ids({x_unique_id})
+    if not existed_datas:
+        raise HTTPException(status_code=status.HTTP_428_PRECONDITION_REQUIRED)
     try:
-        data = await validator_service.add_tracking_data(
+        await validator_service.add_tracking_data(
             ValidatorTrackingData(
                 id=x_unique_id,
                 user_agent=client_info.user_agent,
@@ -124,15 +128,11 @@ async def init_from_shopify(
                 validator_hotkey=wallet.get_hotkey().ss58_address,
             )
         )
-        await bitads_service.add_or_update_validator_bitads_data(data, body.data)
-        data_exists = True
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=json.loads(e.json()))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=json.loads(e.json()))
     except KeyError:
-        data_exists = True
+        pass
 
-    if not data_exists:
-        return
     modifier = 1 if body.data.type == Action.sale else -1
     data = None
     for item in body.data.order_details.items:
