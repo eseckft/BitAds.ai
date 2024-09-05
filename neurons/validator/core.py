@@ -148,7 +148,7 @@ class CoreValidator(BaseValidatorNeuron):
             *self.miners,
             timeout=timeout,
         )
-
+        bt.logging.debug(f"Sync visits responses: {responses}")
         visits = {visits for synapse in responses.values() for visits in synapse.visits}
         bt.logging.debug(
             f"Received visits from miners with ids: {[v.id for v in visits]}"
