@@ -69,7 +69,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version="0.2.5", lifespan=lifespan)
+app = FastAPI(version="0.2.6", lifespan=lifespan)
 
 app.include_router(version_router)
 app.include_router(test_router)
@@ -111,7 +111,6 @@ async def init_from_shopify(
     order_details = body.data.order_details
     client_info = order_details.client_info
     customer_details = order_details.customer_info
-    data_exists = False
     try:
         data = await validator_service.add_tracking_data(
             ValidatorTrackingData(
@@ -131,17 +130,17 @@ async def init_from_shopify(
         raise HTTPException(status_code=400, detail=json.loads(e.json()))
     except KeyError:
         data_exists = True
-    finally:
-        if not data_exists:
-            return
-        modifier = 1 if body.data.type == Action.sale else -1
-        data = None
-        for item in body.data.order_details.items:
-            data = await validator_service.send_action(
-                x_unique_id, body.data.type, float(item.price) * modifier
-            )
-        if data:
-            await bitads_service.add_or_update_validator_bitads_data(data, body.data)
+
+    if not data_exists:
+        return
+    modifier = 1 if body.data.type == Action.sale else -1
+    data = None
+    for item in body.data.order_details.items:
+        data = await validator_service.send_action(
+            x_unique_id, body.data.type, float(item.price) * modifier
+        )
+    if data:
+        await bitads_service.add_or_update_validator_bitads_data(data, body.data)
 
 
 @app.put(
