@@ -79,5 +79,4 @@ def get_axons(
         if (not_check_self or uid != self.uid)
         and (include_hotkeys or self.metagraph.axons[uid].hotkey in hotkeys)
     ]
-    random.shuffle(result)
     return result

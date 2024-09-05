@@ -140,7 +140,7 @@ class CoreValidator(BaseValidatorNeuron):
         bt.logging.info("Start sync bitads process")
         offset = await self.bitads_service.get_last_update_bitads_data(
             self.wallet.get_hotkey().ss58_address
-        ) - timedelta(days=5)
+        )
         bt.logging.debug(f"Sync visits with offset: {offset} with miners: {self.miners}")
         responses = await forward_each_axon(
             self,
@@ -148,7 +148,7 @@ class CoreValidator(BaseValidatorNeuron):
             *self.miners,
             timeout=timeout,
         )
-        bt.logging.debug(f"Sync visits responses: {responses}")
+
         visits = {visits for synapse in responses.values() for visits in synapse.visits}
         bt.logging.debug(
             f"Received visits from miners with ids: {[v.id for v in visits]}"
