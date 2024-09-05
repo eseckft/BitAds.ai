@@ -87,10 +87,11 @@ cd BitAds.ai
 
    Installation instructions can be found [here](https://pm2.io/docs/runtime/guide/installation/)
 
-4. **Install unzip**
+4. **Update/install sqlite3**
 
    ```bash
-   apt install unzip
+   apt update
+   apt install sqlite3
    ```
 
 ### Create account on BitAds.ai (Mandatory)
