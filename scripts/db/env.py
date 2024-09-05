@@ -51,7 +51,7 @@ target_metadata = {
 }
 
 subtensor_network = os.environ.get("SUBTENSOR_NETWORK", "finney")
-subtensor_network = "finney" if "local" in subtensor_network else subtensor_network
+subtensor_network = "finney" if "test" != subtensor_network else subtensor_network
 for engine in target_metadata.keys():
     config.set_section_option(engine, "subtensor.network", subtensor_network)
 

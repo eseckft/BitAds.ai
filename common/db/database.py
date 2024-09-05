@@ -100,7 +100,7 @@ class DatabaseManager:
             subtensor_network (str): Name of the subtensor network.
         """
         subtensor_network = (
-            "finney" if "local" in subtensor_network else subtensor_network
+            "finney" if "test" != subtensor_network else subtensor_network
         )
         self.active_db = _create_engine(
             Environ.DB_URL_TEMPLATE.format(

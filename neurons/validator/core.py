@@ -195,7 +195,6 @@ class CoreValidator(BaseValidatorNeuron):
         }
         bt.logging.debug(f"UID to rating: {miner_ratings}")
 
-
         result, msg = self.subtensor.set_weights(
             wallet=self.wallet,
             netuid=self.config.netuid,

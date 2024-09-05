@@ -18,7 +18,6 @@ from fastapi import (
     Body,
 )
 from pydantic import ValidationError
-from starlette.staticfiles import StaticFiles
 
 from common import dependencies as common_dependencies, utils
 from common.clients.bitads.base import BitAdsClient
@@ -39,6 +38,7 @@ from proxies.apis.fetch_from_db_test import router as test_router
 from proxies.apis.get_database import router as database_router
 from proxies.apis.logging import router as logs_router
 from proxies.apis.version import router as version_router
+from fastapi.responses import JSONResponse
 
 subtensor = common_dependencies.get_subtensor(CommonEnviron.SUBTENSOR_NETWORK)
 
@@ -69,7 +69,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version="0.2.3", lifespan=lifespan)
+app = FastAPI(version="0.2.4", lifespan=lifespan)
 
 app.include_router(version_router)
 app.include_router(test_router)
@@ -82,6 +82,14 @@ app.include_router(database_router)
 #     StaticFiles(directory="statics/campaigns", html=True),
 #     name="statics",
 # )
+
+
+@app.exception_handler(Exception)
+async def server_error_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc)},
+    )
 
 
 def validate_hash(
