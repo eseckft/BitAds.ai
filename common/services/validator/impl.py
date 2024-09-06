@@ -21,7 +21,7 @@ from common.db.repositories.completed_visit import (
 )
 from common.helpers import const
 from common.schemas.aggregated import AggregationSchema, AggregatedData
-from common.schemas.bitads import Campaign
+from common.schemas.bitads import Campaign, BitAdsDataSchema
 from common.schemas.campaign import CampaignType
 from common.schemas.completed_visit import CompletedVisitSchema
 from common.schemas.visit import VisitStatus
@@ -201,7 +201,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
             return tracking_data.increment_counts(session, id_, **kwargs)
 
     async def add_tracking_data(
-        self, data: ValidatorTrackingData
+        self, data: ValidatorTrackingData, bitads_data: BitAdsDataSchema = None
     ) -> Optional[ValidatorTrackingData]:
         """Adds tracking data for a validator.
 
@@ -211,11 +211,28 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         Raises:
             KeyError: If tracking data with the same ID already exists.
         """
-        now = datetime.utcnow()
-        unique_deadline = now - timedelta(hours=self._params.unique_visits_duration)
         with self.database_manager.get_session("active") as session:
-            if tracking_data.get_data(session, data.id):
-                raise KeyError
+            existed_data = tracking_data.get_data(session, data.id)
+            if existed_data:
+                sales = data.sales if data.sales else existed_data.sales
+                refund = data.refund if data.refund else existed_data.refund
+                sales_amount = data.sale_amount
+                if bitads_data.refund_info and data.sales:
+                    sales_amount -= round(
+                        sum(float(i.price) for i in bitads_data.refund_info.items),
+                        self.ndigits,
+                    )
+                if bitads_data.order_info and data.refund:
+                    sales_amount += round(
+                        sum(float(i.price) for i in bitads_data.order_info.items),
+                        self.ndigits,
+                    )
+                return tracking_data.update_order_amounts(
+                    session, data.id, sales, refund, sales_amount
+                )
+
+            now = datetime.utcnow()
+            unique_deadline = now - timedelta(hours=self._params.unique_visits_duration)
             return tracking_data.add_data(session, data, unique_deadline)
 
     async def add_tracking_datas(

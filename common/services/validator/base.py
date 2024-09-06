@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Dict, Set, List, Optional
 
-from common.schemas.bitads import Campaign
+from common.schemas.bitads import Campaign, BitAdsDataSchema
 from common.schemas.completed_visit import CompletedVisitSchema
 from common.services.settings.base import SettingsContainer
 from common.validator.schemas import Action, ValidatorTrackingData
@@ -88,7 +88,7 @@ class ValidatorService(SettingsContainer, ABC):
 
     @abstractmethod
     async def add_tracking_data(
-        self, data: ValidatorTrackingData
+        self, data: ValidatorTrackingData, bit_ads_data: BitAdsDataSchema = None
     ) -> Optional[ValidatorTrackingData]:
         """Adds tracking data for a validator.
 
@@ -172,5 +172,7 @@ class ValidatorService(SettingsContainer, ABC):
         pass
 
     @abstractmethod
-    async def add_miner_ping(self, current_block: int, unique_id_to_hotkey: Dict[str, str]):
+    async def add_miner_ping(
+        self, current_block: int, unique_id_to_hotkey: Dict[str, str]
+    ):
         pass

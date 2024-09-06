@@ -383,3 +383,18 @@ def get_tracking_data_after(
     results = query.all()
 
     return {ValidatorTrackingData.model_validate(r) for r in results}
+
+
+def update_order_amounts(session: Session, id_: str, sales: int, refund: int, sales_amount: float):
+    stmt = (
+        update(TrackingData)
+        .where(TrackingData.id == id_)
+        .values(
+            refund=refund,
+            sales=sales,
+            sale_amount=sales_amount,
+        )
+        .returning(TrackingData)
+    )
+    result = session.execute(stmt)
+    return ValidatorTrackingData.model_validate(result.scalar_one())

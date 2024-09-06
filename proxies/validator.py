@@ -16,11 +16,12 @@ from fastapi import (
     Request,
     Query,
     Body,
-    status
+    status,
 )
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from common import dependencies as common_dependencies, utils
+from common import dependencies as common_dependencies, converters
 from common.clients.bitads.base import BitAdsClient
 from common.environ import Environ as CommonEnviron
 from common.helpers import const
@@ -33,13 +34,11 @@ from common.validator.schemas import (
     ValidatorTrackingData,
     InitVisitRequest,
     ActionRequest,
-    Action,
 )
 from proxies.apis.fetch_from_db_test import router as test_router
 from proxies.apis.get_database import router as database_router
 from proxies.apis.logging import router as logs_router
 from proxies.apis.version import router as version_router
-from fastapi.responses import JSONResponse
 
 subtensor = common_dependencies.get_subtensor(CommonEnviron.SUBTENSOR_NETWORK)
 
@@ -70,7 +69,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version="0.2.8", lifespan=lifespan)
+app = FastAPI(version="0.2.9", lifespan=lifespan)
 
 app.include_router(version_router)
 app.include_router(test_router)
@@ -108,39 +107,32 @@ def validate_hash(
 async def init_from_shopify(
     request: Request, body: ShopifyBody[SaleData], x_unique_id: Annotated[str, Header()]
 ) -> None:
+    existed_datas = await bitads_service.get_data_by_ids({x_unique_id})
+    if not existed_datas:
+        raise HTTPException(status_code=status.HTTP_428_PRECONDITION_REQUIRED)
+
     wallet: bt.wallet = request.app.state.wallet
     order_details = body.data.order_details
     client_info = order_details.client_info
     customer_details = order_details.customer_info
-    existed_datas = await bitads_service.get_data_by_ids({x_unique_id})
-    if not existed_datas:
-        raise HTTPException(status_code=status.HTTP_428_PRECONDITION_REQUIRED)
     try:
-        await validator_service.add_tracking_data(
-            ValidatorTrackingData(
-                id=x_unique_id,
-                user_agent=client_info.user_agent,
-                ip_address=client_info.browser_ip,
-                country=customer_details.address.country,
-                validator_block=subtensor.get_current_block(),
-                at=False,
-                device=utils.determine_device(client_info.user_agent),
-                validator_hotkey=wallet.get_hotkey().ss58_address,
-            )
+        data = await validator_service.add_tracking_data(
+            converters.to_tracking_data(
+                x_unique_id,
+                body.data,
+                client_info.user_agent,
+                client_info.browser_ip,
+                customer_details.address.country,
+                subtensor.get_current_block(),
+                wallet.get_hotkey().ss58_address,
+            ),
+            next(iter(existed_datas))
         )
-    except ValidationError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=json.loads(e.json()))
-    except KeyError:
-        pass
-
-    modifier = 1 if body.data.type == Action.sale else -1
-    data = None
-    for item in body.data.order_details.items:
-        data = await validator_service.send_action(
-            x_unique_id, body.data.type, float(item.price) * modifier
-        )
-    if data:
         await bitads_service.add_or_update_validator_bitads_data(data, body.data)
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=json.loads(e.json())
+        )
 
 
 @app.put(

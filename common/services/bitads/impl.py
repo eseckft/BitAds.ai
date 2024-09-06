@@ -1,6 +1,9 @@
 from datetime import datetime
 from typing import List, Set
 
+import bittensor as bt
+
+from common import converters
 from common.db.database import DatabaseManager
 from common.db.repositories import bitads_data
 from common.miner.schemas import VisitorSchema
@@ -9,8 +12,7 @@ from common.schemas.completed_visit import CompletedVisitSchema
 from common.schemas.sales import SalesStatus
 from common.schemas.shopify import SaleData
 from common.services.bitads.base import BitAdsService
-from common.validator.schemas import ValidatorTrackingData, Action
-import bittensor as bt
+from common.validator.schemas import ValidatorTrackingData
 
 
 class BitAdsServiceImpl(BitAdsService):
@@ -21,12 +23,7 @@ class BitAdsServiceImpl(BitAdsService):
         self, validator_data: ValidatorTrackingData, sale_data: SaleData
     ):
         with self.database_manager.get_session("active") as session:
-            extra_data = (
-                dict(order_info=sale_data.order_details, sale_date=datetime.utcnow())
-                if sale_data.type == Action.sale
-                else dict(refund_info=sale_data.order_details)
-            )
-            data = validator_data.model_dump() | extra_data
+            data = validator_data.model_dump() | converters.to_bitads_extra_data(sale_data)
             bitads_data.add_or_update(
                 session,
                 BitAdsDataSchema(
