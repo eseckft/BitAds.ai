@@ -7,7 +7,15 @@ from typing import Annotated, Optional
 
 import bittensor as bt
 import uvicorn
-from fastapi import FastAPI, Request, Depends, BackgroundTasks, Header, HTTPException, status
+from fastapi import (
+    FastAPI,
+    Request,
+    Depends,
+    BackgroundTasks,
+    Header,
+    HTTPException,
+    status,
+)
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -55,7 +63,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version="0.2.5", lifespan=lifespan)
+app = FastAPI(version="0.2.6", lifespan=lifespan)
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
 app.include_router(version_router)
@@ -69,7 +77,6 @@ log = logging.getLogger(__name__)
 
 @app.get("/{campaign_id}/{campaign_item}")
 async def fetch_request_data_and_redirect(
-    background_tasks: BackgroundTasks,
     campaign_id: str,
     campaign_item: str,
     request: Request,
@@ -82,16 +89,36 @@ async def fetch_request_data_and_redirect(
     if campaign_id not in campaign_ids:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
     id_ = str(uuid.uuid4())
-    background_tasks.add_task(
-        _save_request_info,
-        id_=id_,
-        campaign_id=campaign_id,
-        campaign_item=campaign_item,
+    ip = request.client.host
+    wallet: bt.wallet = request.app.state.wallet
+    ipaddr_info = geoip_service.get_ip_info(ip)
+    visitor = VisitorSchema(
+        id=id_,
         referer=referer,
+        ip_address=request.client.host,
+        campaign_id=campaign_id,
         user_agent=user_agent,
-        request=request,
-        geoip_service=geoip_service,
+        campaign_item=campaign_item,
+        miner_hotkey=wallet.get_hotkey().ss58_address,
+        miner_block=subtensor.get_current_block(),
+        at=False,
+        device=utils.determine_device(user_agent),
+        return_in_site=False,
+        country=ipaddr_info.country_name if ipaddr_info else None,
+        country_code=ipaddr_info.country_code if ipaddr_info else None,
     )
+    await miner_service.add_visit(visitor)
+    log.info(f"Saved visit: {visitor.id}")
+    # background_tasks.add_task(
+    #     _save_request_info,
+    #     id_=id_,
+    #     campaign_id=campaign_id,
+    #     campaign_item=campaign_item,
+    #     referer=referer,
+    #     user_agent=user_agent,
+    #     request=request,
+    #     geoip_service=geoip_service,
+    # )
     url = (
         f"{campaign_to_product_link[campaign_id]}?visit_hash={id_}"
         if campaign_id in campaign_to_product_link
