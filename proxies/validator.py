@@ -69,7 +69,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version="0.2.11", lifespan=lifespan)
+app = FastAPI(version="0.2.12", lifespan=lifespan, debug=True)
 
 app.include_router(version_router)
 app.include_router(test_router)
@@ -82,18 +82,6 @@ app.include_router(database_router)
 #     StaticFiles(directory="statics/campaigns", html=True),
 #     name="statics",
 # )
-
-
-@app.exception_handler(Exception)
-async def debug_exception_handler(request: Request, exc: Exception):
-    import traceback
-    return Response(
-        content="".join(
-            traceback.format_exception(
-                etype=type(exc), value=exc, tb=exc.__traceback__
-            )
-        )
-    )
 
 
 def validate_hash(
