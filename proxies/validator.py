@@ -18,7 +18,7 @@ from fastapi import (
     Body,
     status,
 )
-from fastapi.responses import JSONResponse
+from fastapi.responses import Response
 from pydantic import ValidationError
 
 from common import dependencies as common_dependencies, converters
@@ -69,7 +69,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version="0.2.10", lifespan=lifespan)
+app = FastAPI(version="0.2.11", lifespan=lifespan)
 
 app.include_router(version_router)
 app.include_router(test_router)
@@ -85,10 +85,14 @@ app.include_router(database_router)
 
 
 @app.exception_handler(Exception)
-async def server_error_handler(request: Request, exc: Exception):
-    return JSONResponse(
-        status_code=500,
-        content={"detail": str(exc)},
+async def debug_exception_handler(request: Request, exc: Exception):
+    import traceback
+    return Response(
+        content="".join(
+            traceback.format_exception(
+                etype=type(exc), value=exc, tb=exc.__traceback__
+            )
+        )
     )
 
 
