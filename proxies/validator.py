@@ -69,7 +69,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version="0.2.12", lifespan=lifespan, debug=True)
+app = FastAPI(version="0.2.13", lifespan=lifespan, debug=True)
 
 app.include_router(version_router)
 app.include_router(test_router)
