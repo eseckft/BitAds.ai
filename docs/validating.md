@@ -4,7 +4,9 @@
 
 This document provides detailed instructions for deploying, launching, reinitializing, and performing subsequent
 important steps for the validator project. The steps include setting up the environment, running the validator scripts,
-and using the auto-update feature.
+and using the auto-update feature. **Important: Ensure that port 443 is open and available, as it is required for secure
+HTTPS communication with the validator. All validator commands should be run from the `sudo su -` environment to avoid
+permission issues.**
 
 ## Table of Contents
 
@@ -26,6 +28,10 @@ and using the auto-update feature.
 
 Creating a virtual environment is an optional but recommended step to manage dependencies and isolate the project
 environment. The required Python version is 3.11+.
+
+**Note:** Ensure that port 443 is open and available. This port is used for secure communication (HTTPS) between your
+validator and external systems, such as the BitAds.ai platform. Without this, the validator won't be able to communicate
+securely.
 
 1. **Install Python 3.11+**:
    Ensure that Python 3.11+ is installed on your system. You can download it from
@@ -51,6 +57,13 @@ environment. The required Python version is 3.11+.
       source venv/bin/activate
       ```
 
+**Important:** After creating the environment, **all subsequent commands should be executed as the root user** to avoid
+permission issues. This can be done by switching to the `sudo su -` environment before proceeding:
+
+```bash
+sudo su -
+```
+
 ### Country Detection
 
 Download the Geo2Lite database, which is required for the project to detect and store the country information of IP
@@ -60,7 +73,7 @@ addresses:
 wget https://git.io/GeoLite2-Country.mmdb
 ```
 
-### Git Clone the repositroy
+### Git Clone the Repository
 
 ```bash
 git clone https://github.com/eseckft/BitAds.ai.git
@@ -116,6 +129,8 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem \
     -subj "/C=US/ST=State/L=City/O=Bitads/CN=localhost"
 ```
 
+**Note:** Port 443 must be open and available on your system for secure communication over HTTPS.
+
 ### Example Command
 
 To run the validator with auto-update, use the following command:
@@ -126,6 +141,10 @@ pm2 start run_validator_auto_update.py --interpreter python3 -- --subtensor.netw
 
 - Replace `<name>` with your wallet name and hotkey.
 - This command uses `pm2` to manage the process, ensuring it stays running and is easily restartable.
+
+**Important:** Ensure you are running this command in the `sudo su -` environment to avoid permission issues.
+
+---
 
 ## Subsequent Important Steps
 
@@ -155,10 +174,12 @@ pm2 start run_validator_auto_update.py --interpreter python3 -- --subtensor.netw
    pm2 logs
    ```
 
-By following these steps, you can successfully deploy, launch, and maintain your validator project. Continually update
-this document as needed to reflect any changes or new procedures.
+**Reminder:** Always ensure port 443 is open for secure communication, and make sure you're in the `sudo su -`
+environment when running these commands.
+
+---
 
 ## Reinitialization
 
-If you decide that in the process of neurons working something REALLY went wrong,
-that follow the [reinitialization process](reinitialization.md) instruction.
+If you decide that in the process of neurons working something REALLY went wrong, follow
+the [reinitialization process](reinitialization.md) instruction.
