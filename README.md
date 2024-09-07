@@ -27,8 +27,8 @@ BitAds addresses these challenges by focusing on actual sales rather than clicks
 - GitHub: https://github.com/eseckft/BitAds.ai
 
 🔨**Installation Guide:** <br>
-- [Miner](https://github.com/eseckft/BitAds.ai/blob/feature/conversion-tracking/docs/mining.md)
-- [Validator](https://github.com/eseckft/BitAds.ai/blob/feature/conversion-tracking/docs/validating.md)
+- [Miner](https://github.com/eseckft/BitAds.ai/blob/main/docs/mining.md)
+- [Validator](https://github.com/eseckft/BitAds.ai/blob/main/docs/validating.md)
 
 
 # Integration with Bittensor
