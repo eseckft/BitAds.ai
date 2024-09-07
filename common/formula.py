@@ -1,5 +1,4 @@
 from common.schemas.aggregated import AggregationSchema
-import bittensor as bt
 
 
 def process_aggregation(
@@ -121,31 +120,5 @@ def process_cpa(
 
     # Ensure the Miner Score is within the range [0, 1] and rounded to 5 decimal places
     RATING = round(min(RATING, 1.0), ndigits)
-
-    # Log all parameters and intermediate values
-    bt.logging.debug(
-        f"""
-    Process CPA - Parameters and Intermediate Values:
-    MR: {MR},
-    SALESmax: {SALESmax},
-    CRmax: {CRmax},
-    MRmax: {MRmax},
-    Wsales: {Wsales},
-    Wcr: {Wcr},
-    Wmr: {Wmr},
-    ndigits: {ndigits},
-    total_sales: {aggregation.total_sales},
-    visits_unique: {aggregation.visits_unique},
-    total_refunds: {aggregation.total_refunds},
-    sales_amount: {aggregation.sales_amount},
-    CVR (Conversion Rate): {CVR},
-    RP (Refund Percentage): {RP},
-    RF (Refund Score): {RF},
-    SALESnorm: {SALESnorm},
-    CRnorm: {CRnorm},
-    MRnorm: {MRnorm},
-    Final RATING: {RATING}
-    """
-    )
 
     return RATING
