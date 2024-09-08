@@ -132,7 +132,6 @@ class CoreMiner(BaseMinerNeuron):
             *self.miners,
             timeout=timeout,
         )
-        bt.logging.debug(f"Sync visits responses: {responses}")
         visits = {visit for synapse in responses.values() for visit in synapse.visits}
         await self.miner_service.add_visits(visits)
         bt.logging.info("End sync process")
