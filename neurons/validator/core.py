@@ -137,7 +137,7 @@ class CoreValidator(BaseValidatorNeuron):
             finally:
                 await asyncio.sleep(delay)
 
-    async def __forward_bitads_data(self, timeout: float = 11.0):
+    async def __forward_bitads_data(self, timeout: float = 2.0):
         bt.logging.info("Start sync bitads process")
         offset = await self.bitads_service.get_last_update_bitads_data(
             self.wallet.get_hotkey().ss58_address
@@ -205,7 +205,7 @@ class CoreValidator(BaseValidatorNeuron):
             weights=list(miner_ratings.values()),
             wait_for_finalization=True,
             wait_for_inclusion=False,
-            version_key=1725727158,
+            version_key=const.VERSION_KEY,
         )
         self.update_scores(
             torch.FloatTensor(list(miner_ratings.values())).to(self.device),

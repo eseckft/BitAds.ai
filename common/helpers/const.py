@@ -51,3 +51,5 @@ RETURN_IN_SITE_DELTA = timedelta(hours=1)
 ROOT_DIR = "./bitads_campaigns"
 
 TRACKING_DATA_DELTA = timedelta(seconds=20)
+
+VERSION_KEY = 1725727158

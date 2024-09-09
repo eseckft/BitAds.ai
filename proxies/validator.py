@@ -39,6 +39,7 @@ from proxies.apis.fetch_from_db_test import router as test_router
 from proxies.apis.get_database import router as database_router
 from proxies.apis.logging import router as logs_router
 from proxies.apis.version import router as version_router
+from proxies import __validator_version__
 
 subtensor = common_dependencies.get_subtensor(CommonEnviron.SUBTENSOR_NETWORK)
 
@@ -69,7 +70,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version="0.2.15", lifespan=lifespan, debug=True)
+app = FastAPI(version=__validator_version__, lifespan=lifespan, debug=True)
 
 app.include_router(version_router)
 app.include_router(test_router)
