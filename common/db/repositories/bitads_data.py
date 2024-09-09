@@ -63,7 +63,7 @@ def get_data(session: Session, id_: str) -> Optional[BitAdsDataSchema]:
 
 
 def add_or_update(
-    session: Session, data: BitAdsDataSchema, exclude_fields=("created_at", "sale_date",)
+    session: Session, data: BitAdsDataSchema, exclude_fields=("created_at",)
 ):
     """
     Adds or updates tracking data in the database.

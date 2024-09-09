@@ -36,7 +36,7 @@ def to_completed_visit(
 
 def to_bitads_extra_data(sale_data: SaleData):
     return (
-        dict(order_info=sale_data.order_details, sale_date=datetime.utcnow())
+        dict(order_info=sale_data.order_details, sale_date=sale_data.order_details.sale_date)
         if sale_data.type == Action.sale
         else dict(refund_info=sale_data.order_details)
     )
