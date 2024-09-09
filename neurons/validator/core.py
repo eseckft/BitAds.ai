@@ -138,7 +138,7 @@ class CoreValidator(BaseValidatorNeuron):
             finally:
                 await asyncio.sleep(delay)
 
-    async def __forward_bitads_data(self, timeout: float = 2.0):
+    async def __forward_bitads_data(self, timeout: float = 6.0):
         bt.logging.info("Start sync bitads process")
         offset = await self.bitads_service.get_last_update_bitads_data(
             self.wallet.get_hotkey().ss58_address
@@ -154,6 +154,11 @@ class CoreValidator(BaseValidatorNeuron):
         )
 
         visits = {visits for synapse in responses.values() for visits in synapse.visits}
+
+        if not visits:
+            bt.logging.debug("No visits received from miners")
+            return
+
         bt.logging.debug(
             f"Received visits from miners with ids: {[v.id for v in visits]}"
         )
