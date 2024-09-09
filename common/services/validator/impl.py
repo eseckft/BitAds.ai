@@ -130,8 +130,11 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
             sale_from=sale_from,
             sale_to=now,
         )
+        reputation_from = now - timedelta(
+            seconds=self.settings.mr_blocks * const.BLOCK_DURATION.total_seconds()
+        )
         miners_reputation = self._get_miners_reputation(
-            *cpa_campaign_ids, sale_from=sale_from, sale_to=now
+            *cpa_campaign_ids, sale_from=reputation_from, sale_to=now
         )
         cpa_miner_scores = self._calculate_cpa_miner_scores(
             cpa_aggregated_data, cpa_campaign_ids, miners_reputation
