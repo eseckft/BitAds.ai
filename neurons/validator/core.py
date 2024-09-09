@@ -32,6 +32,7 @@ from neurons.protocol import (
 from template.base.validator import BaseValidatorNeuron
 from template.utils.config import add_blacklist_args
 from template.validator.forward import forward_each_axon
+from template import __spec_version__
 
 
 class CoreValidator(BaseValidatorNeuron):
@@ -205,7 +206,7 @@ class CoreValidator(BaseValidatorNeuron):
             weights=list(miner_ratings.values()),
             wait_for_finalization=True,
             wait_for_inclusion=False,
-            version_key=const.VERSION_KEY,
+            version_key=__spec_version__,
         )
         self.update_scores(
             torch.FloatTensor(list(miner_ratings.values())).to(self.device),
