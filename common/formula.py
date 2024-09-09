@@ -76,6 +76,7 @@ def process_cpa(
     Wcr: float,
     Wmr: float,
     ndigits: int = 5,
+    miner_hotkey: str = None
 ) -> float:
     """
     Processes Cost-Per-Action (CPA) related data to calculate a rating based on sales, conversion rate,

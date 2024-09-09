@@ -74,7 +74,7 @@ class CoreValidator(BaseValidatorNeuron):
         self.last_evaluate_block = 0
 
         # self.loop.create_task(self._calculate_campaigns_umax())
-        self.loop.create_task(self._evaluate_miners())
+        # self.loop.create_task(self._evaluate_miners())
 
     async def forward(self, _: bt.Synapse = None):
         """
@@ -85,9 +85,10 @@ class CoreValidator(BaseValidatorNeuron):
         - Rewarding the miners
         - Updating the scores
         """
-        await self.__forward_bitads_data()
         await self.forward_ping()
+        await self.__forward_bitads_data()
         await self.forward_recent_activity()
+        await self._try_evaluate_miners()
 
     @execute_periodically(timedelta(minutes=30))
     async def forward_recent_activity(self):
@@ -141,7 +142,9 @@ class CoreValidator(BaseValidatorNeuron):
         offset = await self.bitads_service.get_last_update_bitads_data(
             self.wallet.get_hotkey().ss58_address
         )
-        bt.logging.debug(f"Sync visits with offset: {offset} with miners: {self.miners}")
+        bt.logging.debug(
+            f"Sync visits with offset: {offset} with miners: {self.miners}"
+        )
         responses = await forward_each_axon(
             self,
             SyncVisits(offset=offset),
@@ -202,7 +205,7 @@ class CoreValidator(BaseValidatorNeuron):
             weights=list(miner_ratings.values()),
             wait_for_finalization=True,
             wait_for_inclusion=False,
-            version_key=1725727158
+            version_key=1725727158,
         )
         self.update_scores(
             torch.FloatTensor(list(miner_ratings.values())).to(self.device),
@@ -257,28 +260,31 @@ class CoreValidator(BaseValidatorNeuron):
 
     async def _evaluate_miners(self):
         while True:
-            try:
-                current_block = self.subtensor.get_current_block()
-                if (current_block % self.evaluate_miners_blocks == 0) or (
-                    # self.last_evaluate_block and
-                    current_block - self.last_evaluate_block
-                    >= self.evaluate_miners_blocks
-                ):
-                    self.last_evaluate_block = current_block
-                    from_block = current_block - Environ.CALCULATE_UMAX_BLOCKS
-                    bt.logging.info(
-                        f"Start evaluate miners from "
-                        f"block {from_block} to block {current_block}"
-                    )
-                    self.miner_ratings = await self.validator_service.calculate_ratings(
-                        from_block, current_block
-                    )
-                    bt.logging.info("End evaluate miners")
-            except ValueError as ex:
-                bt.logging.warning(*ex.args)
-            except:
-                bt.logging.exception("Evaluate miners exception")
+            await self._try_evaluate_miners()
             await asyncio.sleep(1)
+
+    async def _try_evaluate_miners(self):
+        try:
+            current_block = self.subtensor.get_current_block()
+            if (current_block % self.evaluate_miners_blocks == 0) or (
+                # self.last_evaluate_block and
+                current_block - self.last_evaluate_block
+                >= self.evaluate_miners_blocks
+            ):
+                self.last_evaluate_block = current_block
+                from_block = current_block - Environ.CALCULATE_UMAX_BLOCKS
+                bt.logging.info(
+                    f"Start evaluate miners from "
+                    f"block {from_block} to block {current_block}"
+                )
+                self.miner_ratings = await self.validator_service.calculate_ratings(
+                    from_block, current_block
+                )
+                bt.logging.info("End evaluate miners")
+        except ValueError as ex:
+            bt.logging.warning(*ex.args)
+        except:
+            bt.logging.exception("Evaluate miners exception")
 
 
 # The main function parses the configuration and runs the validator.

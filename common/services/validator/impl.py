@@ -407,7 +407,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         for campaign_id, miners_data in aggregated_data.data.items():
             for miner_hotkey, aggregation in miners_data.items():
                 rating = self._calculate_cpa_rating(
-                    aggregation, miners_reputation.get(miner_hotkey)
+                    aggregation, miners_reputation.get(miner_hotkey), miner_hotkey
                 )
                 miner_scores[miner_hotkey] += rating / num_active_campaigns
 
@@ -434,7 +434,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
             ndigits=self.ndigits,
         )
 
-    def _calculate_cpa_rating(self, aggregation: AggregationSchema, MR: float) -> float:
+    def _calculate_cpa_rating(self, aggregation: AggregationSchema, MR: float, miner_hotkey: str) -> float:
         """Calculates CPA rating based on aggregation data and miner's reputation.
 
         Args:
@@ -454,6 +454,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
             Wcr=self._params.w_cr,
             Wmr=self._params.w_mr,
             ndigits=self.ndigits,
+            miner_hotkey=miner_hotkey
         )
 
     def _normalize_scores(self, miner_scores: Dict[str, float]) -> Dict[str, float]:
