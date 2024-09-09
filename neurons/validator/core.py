@@ -73,7 +73,6 @@ class CoreValidator(BaseValidatorNeuron):
         self.miner_ratings = dict()
         self.active_campaigns: List[Campaign] = list()
         self.last_evaluate_block = 0
-        self.temporary_offset = None
 
         # self.loop.create_task(self._calculate_campaigns_umax())
         # self.loop.create_task(self._evaluate_miners())
@@ -141,15 +140,12 @@ class CoreValidator(BaseValidatorNeuron):
 
     async def __forward_bitads_data(self, timeout: float = 2.0):
         bt.logging.info("Start sync bitads process")
-
-        # Fetch the last update offset (could be None initially)
-        offset = self.temporary_offset
-
+        offset = await self.bitads_service.get_last_update_bitads_data(
+            self.wallet.get_hotkey().ss58_address
+        )
         bt.logging.debug(
             f"Sync visits with offset: {offset} with miners: {self.miners}"
         )
-
-        # Forward SyncVisits with the current offset and the miners, with the provided timeout
         responses = await forward_each_axon(
             self,
             SyncVisits(offset=offset),
@@ -157,33 +153,12 @@ class CoreValidator(BaseValidatorNeuron):
             timeout=timeout,
         )
 
-        # Flatten visits from all responses
-        visits = {visit for synapse in responses.values() for visit in synapse.visits}
+        visits = {visits for synapse in responses.values() for visits in synapse.visits}
+        bt.logging.debug(
+            f"Received visits from miners with ids: {[v.id for v in visits]}"
+        )
 
-        # If visits are received, log and process them
-        if visits:
-            bt.logging.debug(
-                f"Received visits from miners with ids: {[v.id for v in visits]}"
-            )
-
-            # Add the visits to the bitads service
-            await self.bitads_service.add_by_visits(visits)
-
-            # Calculate the min of max created_at values from all miner responses
-            max_created_at_per_synapse = [
-                max(visit.created_at for visit in synapse.visits)
-                for synapse in responses.values()
-                if synapse.visits
-            ]
-
-            if max_created_at_per_synapse:
-                # The next sync should use the min of the max `created_at` values
-                self.temporary_offset = min(max_created_at_per_synapse)
-                bt.logging.debug(f"Next sync will start from created_at: {self.temporary_offset}")
-            else:
-                bt.logging.debug("No valid visit data to update the next offset.")
-
-        # Update sale status if needed
+        await self.bitads_service.add_by_visits(visits)
         if hasattr(self, "settings"):
             await self.bitads_service.update_sale_status_if_needed(
                 datetime.utcnow()
@@ -194,10 +169,9 @@ class CoreValidator(BaseValidatorNeuron):
             )
         else:
             bt.logging.info(
-                "There are no settings now, but it's not a problem. "
-                "We will update sale status when settings appear."
+                "There is no settings now, but it's not a problem. "
+                "We are update sale status when settings appears"
             )
-
         bt.logging.info("End sync bitads process")
 
     def sync(self):
