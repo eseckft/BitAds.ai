@@ -20,13 +20,13 @@ class AggregationSchema(BaseModel):
         sales_amount (float): Total amount of sales in monetary value.
     """
 
-    visits: int
-    visits_unique: int
-    at: int
-    count_through_rate_click: int
-    total_sales: int
-    total_refunds: int
-    sales_amount: float
+    visits: int = 0
+    visits_unique: int = 0
+    at: int = 0
+    count_through_rate_click: int = 0
+    total_sales: int = 0
+    total_refunds: int = 0
+    sales_amount: float = 0.0
 
 
 class AggregatedData(BaseModel):

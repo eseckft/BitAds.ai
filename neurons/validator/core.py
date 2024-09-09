@@ -32,6 +32,7 @@ from neurons.protocol import (
 from template.base.validator import BaseValidatorNeuron
 from template.utils.config import add_blacklist_args
 from template.validator.forward import forward_each_axon
+from template import __spec_version__
 
 
 class CoreValidator(BaseValidatorNeuron):
@@ -137,7 +138,7 @@ class CoreValidator(BaseValidatorNeuron):
             finally:
                 await asyncio.sleep(delay)
 
-    async def __forward_bitads_data(self, timeout: float = 2.0):
+    async def __forward_bitads_data(self, timeout: float = 6.0):
         bt.logging.info("Start sync bitads process")
         offset = await self.bitads_service.get_last_update_bitads_data(
             self.wallet.get_hotkey().ss58_address
@@ -153,6 +154,11 @@ class CoreValidator(BaseValidatorNeuron):
         )
 
         visits = {visits for synapse in responses.values() for visits in synapse.visits}
+
+        if not visits:
+            bt.logging.debug("No visits received from miners")
+            return
+
         bt.logging.debug(
             f"Received visits from miners with ids: {[v.id for v in visits]}"
         )
@@ -205,7 +211,7 @@ class CoreValidator(BaseValidatorNeuron):
             weights=list(miner_ratings.values()),
             wait_for_finalization=True,
             wait_for_inclusion=False,
-            version_key=const.VERSION_KEY,
+            version_key=__spec_version__,
         )
         self.update_scores(
             torch.FloatTensor(list(miner_ratings.values())).to(self.device),

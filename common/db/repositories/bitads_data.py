@@ -243,9 +243,9 @@ def get_miners_reputation(
 
     filters = []
     if from_date is not None:
-        filters.append(BitAdsData.created_at >= from_date)
+        filters.append(BitAdsData.sale_date >= from_date)
     if to_date is not None:
-        filters.append(BitAdsData.created_at <= to_date)
+        filters.append(BitAdsData.sale_date <= to_date)
     if campaign_ids:
         filters.append(BitAdsData.campaign_id.in_(campaign_ids))
 
