@@ -410,7 +410,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         for campaign_id, miners_data in aggregated_data.data.items():
             for miner_hotkey, aggregation in miners_data.items():
                 rating = self._calculate_cpa_rating(
-                    aggregation, miners_reputation.get(miner_hotkey), miner_hotkey
+                    aggregation, miners_reputation.get(miner_hotkey, 0.0), miner_hotkey
                 )
                 miner_scores[miner_hotkey] += rating / num_active_campaigns
 
