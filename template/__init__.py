@@ -21,11 +21,14 @@
 __version__ = "3.0.3"
 version_split = __version__.split(".")
 __spec_version__ = (
-    (10000 * int(version_split[0]))
-    + (1000 * int(version_split[1]))
-    + (100 * int(version_split[2]))
+    (1000000000 * int(version_split[0]))
+    + (100 * int(version_split[1]))
+    + (10 * int(version_split[2]))
 )
 
+
+print(__spec_version__)
+print(1725727158 > __spec_version__)
 from . import api
 from . import base
 
