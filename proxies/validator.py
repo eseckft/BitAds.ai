@@ -11,6 +11,7 @@ from common.environ import Environ as CommonEnviron
 from common.schemas.bitads import BitAdsDataSchema
 from common.schemas.shopify import ShopifyBody, SaleData
 from common.services.queue.exceptions import RefundNotExpectedWithoutOrder
+from common.validator import dependencies
 from common.validator.environ import Environ
 from proxies import __validator_version__
 from proxies.apis.fetch_from_db_test import router as test_router
@@ -22,7 +23,7 @@ database_manager = common_dependencies.get_database_manager(
     "validator", CommonEnviron.SUBTENSOR_NETWORK
 )
 bitads_service = common_dependencies.get_bitads_service(database_manager)
-order_queue = common_dependencies.get_order_queue_service(database_manager)
+order_queue = dependencies.get_order_queue_service(database_manager)
 
 
 # noinspection PyUnresolvedReferences

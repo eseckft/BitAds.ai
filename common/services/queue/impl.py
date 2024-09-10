@@ -1,3 +1,6 @@
+from typing import List, Dict
+
+from common.schemas.sales import OrderQueueSchema, OrderQueueStatus
 from common.services.queue.exceptions import RefundNotExpectedWithoutOrder
 from common.validator.schemas import Action
 
@@ -27,3 +30,10 @@ class OrderQueueServiceImpl(OrderQueueService):
                 raise RefundNotExpectedWithoutOrder
 
             order_queue.add_data(session, id_, sale_data.order_details)
+
+    async def get_data_to_process(self, limit: int = 500) -> List[OrderQueueSchema]:
+        with self.database_manager.get_session("active") as session:
+            return order_queue.get_data_for_processing(session, limit)
+
+    async def update_queue_status(self, id_to_status: Dict[str, OrderQueueStatus]) -> None:
+        pass

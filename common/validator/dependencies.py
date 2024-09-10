@@ -1,4 +1,11 @@
+from typing import Annotated
+
+from fastapi import Depends
+
 from common.db.database import DatabaseManager
+from common.dependencies import get_database_manager
+from common.services.queue.base import OrderQueueService
+from common.services.queue.impl import OrderQueueServiceImpl
 from common.services.validator.base import ValidatorService
 from common.services.validator.impl import ValidatorServiceImpl
 from neurons.validator.core import CoreValidator
@@ -27,3 +34,9 @@ def get_validator_service(
         ValidatorService: An instance of ValidatorServiceImpl configured with the provided DatabaseManager.
     """
     return ValidatorServiceImpl(database_manager)
+
+
+def get_order_queue_service(
+    database_manager: Annotated[DatabaseManager, Depends(get_database_manager)]
+) -> OrderQueueService:
+    return OrderQueueServiceImpl(database_manager)

@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import Optional, List
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from common.schemas.sales import OrderQueueSchema, OrderQueueStatus
@@ -42,3 +43,24 @@ def update_data(
         entity.refund_info = refund_info
 
     entity.status = OrderQueueStatus.PENDING
+
+
+def get_data_for_processing(
+    session: Session, limit: int = 500
+) -> List[OrderQueueSchema]:
+    # Query to select rows where status is not 'PROCESSED' and order by last_processing_date ascending
+    stmt = (
+        select(OrderQueue)
+        .where(OrderQueue.status != OrderQueueStatus.PROCESSED)
+        .order_by(OrderQueue.last_processing_date.asc())
+        .limit(limit)
+    )
+
+    # Execute the query
+    result = session.execute(stmt)
+
+    # Fetch all rows
+    rows = result.scalars().all()
+
+    # Return as Pydantic models
+    return [OrderQueueSchema.model_validate(row) for row in rows]
