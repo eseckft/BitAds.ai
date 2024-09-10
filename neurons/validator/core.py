@@ -275,6 +275,9 @@ class CoreValidator(BaseValidatorNeuron):
 
     async def _try_process_order_queue(self):
         data_to_process = await self.order_queue_service.get_data_to_process()
+        if not data_to_process:
+            bt.logging.info("No data to process in order queue")
+            return
         current_block = self.subtensor.get_current_block()
         hotkey = self.wallet.get_hotkey().ss58_address
         result = await self.bitads_service.add_by_queue_items(
