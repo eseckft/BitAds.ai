@@ -17,6 +17,7 @@ from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
 from common.helpers.logging import LogLevel, log_startup
 from common.schemas.bitads import FormulaParams, UserActivityRequest, Campaign
+from common.schemas.sales import OrderQueueStatus
 from common.utils import execute_periodically
 from common.validator import dependencies
 from common.validator.environ import Environ
@@ -76,7 +77,7 @@ class CoreValidator(BaseValidatorNeuron):
         self.miner_ratings = dict()
         self.active_campaigns: List[Campaign] = list()
         self.last_evaluate_block = 0
-
+        self.loop.run_until_complete(self._mark_for_reprocess())
         # self.loop.create_task(self._calculate_campaigns_umax())
         # self.loop.create_task(self._evaluate_miners())
 
@@ -283,6 +284,12 @@ class CoreValidator(BaseValidatorNeuron):
             current_block, hotkey, data_to_process
         )
         await self.order_queue_service.update_queue_status(result)
+
+    async def _mark_for_reprocess(self):
+        ids = await self.order_queue_service.get_all_ids()
+        await self.order_queue_service.update_queue_status(
+            {id_: OrderQueueStatus.PENDING for id_ in ids}
+        )
         
 
 

@@ -101,16 +101,9 @@ class BitAdsServiceImpl(BitAdsService):
                 if not existed_data:
                     result[item.id] = OrderQueueStatus.VISIT_NOT_FOUND
                     continue
-                sale_amount = round(
-                    sum(float(i.price) for i in item.order_info.items), self.ndigits
-                )
+                sale_amount = float(item.order_info.total_amount)
                 refund_amount = (
-                    round(
-                        sum(float(i.price) for i in item.refund_info.items),
-                        self.ndigits,
-                    )
-                    if item.refund_info
-                    else 0
+                    float(item.refund_info.total_amount) if item.refund_info else 0.0
                 )
                 sale_amount -= refund_amount
                 sales = len(item.order_info.items)

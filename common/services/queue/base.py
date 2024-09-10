@@ -17,3 +17,7 @@ class OrderQueueService(ABC):
     @abstractmethod
     async def update_queue_status(self, id_to_status: Dict[str, OrderQueueStatus]) -> None:
         pass
+
+    @abstractmethod
+    async def get_all_ids(self) -> List[str]:
+        pass

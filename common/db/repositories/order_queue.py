@@ -71,3 +71,10 @@ def update_status(session: Session, id_: str, status: OrderQueueStatus):
     entity = session.get(OrderQueue, id_)
     entity.status = status
     entity.last_processing_date = datetime.utcnow()
+
+
+def get_all_ids(session: Session) -> List[str]:
+    # Query the database for all `id` values in the `order_queue` table
+    result = session.query(OrderQueue.id).all()
+    # Extract the ids from the query result (which is a list of tuples)
+    return [row[0] for row in result]
