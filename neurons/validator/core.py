@@ -77,7 +77,7 @@ class CoreValidator(BaseValidatorNeuron):
         self.miner_ratings = dict()
         self.active_campaigns: List[Campaign] = list()
         self.last_evaluate_block = 0
-        self.loop.run_until_complete(self._mark_for_reprocess())
+        # self.loop.run_until_complete(self._mark_for_reprocess())
         # self.loop.create_task(self._calculate_campaigns_umax())
         # self.loop.create_task(self._evaluate_miners())
 
@@ -170,13 +170,10 @@ class CoreValidator(BaseValidatorNeuron):
 
         await self.bitads_service.add_by_visits(visits)
         if hasattr(self, "settings"):
-            await self.bitads_service.update_sale_status_if_needed(
-                datetime.utcnow()
-                - timedelta(
-                    seconds=self.settings.cpa_blocks
-                    * const.BLOCK_DURATION.total_seconds()
-                )
+            sale_to = datetime.utcnow() - timedelta(
+                seconds=self.settings.cpa_blocks * const.BLOCK_DURATION.total_seconds()
             )
+            await self.bitads_service.update_sale_status_if_needed(sale_to)
         else:
             bt.logging.info(
                 "There is no settings now, but it's not a problem. "
@@ -290,8 +287,6 @@ class CoreValidator(BaseValidatorNeuron):
         await self.order_queue_service.update_queue_status(
             {id_: OrderQueueStatus.PENDING for id_ in ids}
         )
-        
-
 
 
 # The main function parses the configuration and runs the validator.

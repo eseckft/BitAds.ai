@@ -107,6 +107,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         campaigns = self._get_active_campaigns(cpa_from_block, to_block)
         if not campaigns:
             raise ValueError("No active campaigns found")
+        # region Non CPA-part
         regular_from_block = to_block - Environ.CALCULATE_UMAX_BLOCKS
         campaign_to_umax = {
             c.id: c.umax
@@ -120,25 +121,29 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
             to_block=to_block,
         )
         miner_scores = self._calculate_miner_scores(aggregated_data, campaign_to_umax)
+        # endregion
+        # region CPA-part
         cpa_campaign_ids = [c.id for c in campaigns if CampaignType.CPA == c.type]
         now = datetime.utcnow()
         sale_from = now - timedelta(
+            seconds=self.settings.mr_blocks * const.BLOCK_DURATION.total_seconds()
+        )
+        sale_to = now - timedelta(
             seconds=self.settings.cpa_blocks * const.BLOCK_DURATION.total_seconds()
         )
         cpa_aggregated_data = self._get_aggregated_data(
             *cpa_campaign_ids,
             sale_from=sale_from,
-            sale_to=now,
-        )
-        reputation_from = now - timedelta(
-            seconds=self.settings.mr_blocks * const.BLOCK_DURATION.total_seconds()
-        )
+            sale_to=sale_to,
+        )  # TODO: include only visits between sale_to and now
+        reputation_from = sale_from
         miners_reputation = self._get_miners_reputation(
             *cpa_campaign_ids, sale_from=reputation_from, sale_to=now
         )
         cpa_miner_scores = self._calculate_cpa_miner_scores(
             cpa_aggregated_data, cpa_campaign_ids, miners_reputation
         )
+        # endregion
 
         scores = utils.combine_dicts_with_avg(miner_scores, cpa_miner_scores)
 
