@@ -36,4 +36,6 @@ class OrderQueueServiceImpl(OrderQueueService):
             return order_queue.get_data_for_processing(session, limit)
 
     async def update_queue_status(self, id_to_status: Dict[str, OrderQueueStatus]) -> None:
-        pass
+        with self.database_manager.get_session("active") as session:
+            for id_, status in id_to_status.items():
+                order_queue.update_status(session, id_, status)

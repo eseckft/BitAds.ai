@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, List
 
 from sqlalchemy import select
@@ -64,3 +65,9 @@ def get_data_for_processing(
 
     # Return as Pydantic models
     return [OrderQueueSchema.model_validate(row) for row in rows]
+
+
+def update_status(session: Session, id_: str, status: OrderQueueStatus):
+    entity = session.get(OrderQueue, id_)
+    entity.status = status
+    entity.last_processing_date = datetime.utcnow()

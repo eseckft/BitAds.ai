@@ -3,7 +3,7 @@ from datetime import datetime
 from common import utils
 from common.miner.schemas import VisitorSchema
 from common.schemas.completed_visit import CompletedVisitSchema
-from common.schemas.shopify import SaleData
+from common.schemas.shopify import SaleData, OrderDetails
 from common.validator.schemas import ValidatorTrackingData, Action
 
 
@@ -46,15 +46,19 @@ def to_bitads_extra_data(sale_data: SaleData):
 
 
 def to_extra_amounts(sale_data: SaleData, ndigits: int = 5):
-    modifier = 1 if sale_data.type == Action.sale else -1
+    return order_details_to_extra_amounts(sale_data.order_details, sale_data.type, ndigits)
+
+
+def order_details_to_extra_amounts(
+    order_details: OrderDetails, action: Action, ndigits: int = 5
+):
+    modifier = 1 if action == Action.sale else -1
     sales_amount = round(
-        sum(float(i.price) for i in sale_data.order_details.items), ndigits
+        sum(float(i.price) for i in order_details.items), ndigits
     )
     return {
         "sale_amount": sales_amount * modifier,
-        "sales"
-        if sale_data.type == Action.sale
-        else "refund": len(sale_data.order_details.items),
+        "sales" if action == Action.sale else "refund": len(order_details.items),
     }
 
 

@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import List, Set
+from typing import List, Set, Dict
 
 from common import converters
 from common.db.database import DatabaseManager
@@ -8,7 +8,7 @@ from common.db.repositories import bitads_data
 from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
 from common.schemas.completed_visit import CompletedVisitSchema
-from common.schemas.sales import SalesStatus
+from common.schemas.sales import SalesStatus, OrderQueueSchema, OrderQueueStatus
 from common.schemas.shopify import SaleData
 from common.services.bitads.base import BitAdsService
 from common.validator.schemas import ValidatorTrackingData
@@ -18,8 +18,9 @@ log = logging.getLogger(__name__)
 
 
 class BitAdsServiceImpl(BitAdsService):
-    def __init__(self, database_manager: DatabaseManager):
+    def __init__(self, database_manager: DatabaseManager, ndigits: int = 5):
         self.database_manager = database_manager
+        self.ndigits = ndigits
 
     async def add_or_update_validator_bitads_data(
         self, validator_data: ValidatorTrackingData, sale_data: SaleData
@@ -89,3 +90,48 @@ class BitAdsServiceImpl(BitAdsService):
         log.debug(f"Completing sales with date less than: {sale_date_from}")
         with self.database_manager.get_session("active") as session:
             bitads_data.complete_sales_less_than_date(session, sale_date_from)
+
+    async def add_by_queue_items(
+        self, validator_block: int, validator_hotkey: str, items: List[OrderQueueSchema]
+    ) -> Dict[str, OrderQueueStatus]:
+        result = {}
+        with self.database_manager.get_session("active") as session:
+            for item in items:
+                existed_data = bitads_data.get_data(session, item.id)
+                if not existed_data:
+                    result[item.id] = OrderQueueStatus.VISIT_NOT_FOUND
+                    continue
+                sale_amount = round(
+                    sum(float(i.price) for i in item.order_info.items), self.ndigits
+                )
+                refund_amount = (
+                    round(
+                        sum(float(i.price) for i in item.refund_info.items),
+                        self.ndigits,
+                    )
+                    if item.refund_info
+                    else 0
+                )
+                sale_amount -= refund_amount
+                sales = len(item.order_info.items)
+                refund = len(item.refund_info.items) if item.refund_info else 0
+
+                new_data = existed_data.model_copy(
+                    update=dict(
+                        sale_date=item.order_info.sale_date,
+                        order_info=item.order_info,
+                        refund_info=item.refund_info,
+                        validator_block=validator_block,
+                        validator_hotkey=validator_hotkey,
+                        sales=sales,
+                        sale_amount=sale_amount,
+                        refund=refund,
+                    )
+                )
+                try:
+                    bitads_data.add_or_update(session, new_data)
+                    result[item.id] = OrderQueueStatus.PROCESSED
+                except Exception:
+                    log.exception(f"Add BitAds data exception on id: {item.id}")
+                    result[item.id] = OrderQueueStatus.ERROR
+        return result

@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Set
+from typing import List, Set, Dict
 
 from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
 from common.schemas.completed_visit import CompletedVisitSchema
+from common.schemas.sales import OrderQueueSchema, OrderQueueStatus
 from common.schemas.shopify import SaleData
 
 from common.validator.schemas import ValidatorTrackingData
@@ -49,4 +50,10 @@ class BitAdsService(ABC):
 
     @abstractmethod
     async def update_sale_status_if_needed(self, sale_date_from: datetime) -> None:
+        pass
+
+    @abstractmethod
+    async def add_by_queue_items(
+        self, validator_block: int, validator_hotkey: str, items: List[OrderQueueSchema]
+    ) -> Dict[str, OrderQueueStatus]:
         pass
