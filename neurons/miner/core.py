@@ -8,7 +8,6 @@ from typing import Type
 
 import bittensor as bt
 
-import common.dependencies
 from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
 from common.helpers.logging import log_startup
@@ -57,10 +56,10 @@ class CoreMiner(BaseMinerNeuron):
         # Create asyncio event loop to manage async tasks.
         self.loop = asyncio.get_event_loop()
 
-        self.bit_ads_client = common.dependencies.create_bitads_client(
+        self.bit_ads_client = common_dependencies.create_bitads_client(
             self.wallet, self.config.bitads.url
         )
-        self.storage = common.dependencies.get_storage(self.neuron_type, self.wallet)
+        self.storage = common_dependencies.get_storage(self.neuron_type, self.wallet)
 
         self.validators = CommonEnviron.VALIDATORS
         self.miners = CommonEnviron.MINERS
