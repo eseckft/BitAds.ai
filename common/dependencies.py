@@ -6,6 +6,7 @@ from fastapi import Depends
 import template
 from common.clients.bitads.base import BitAdsClient
 from common.clients.bitads.impl import SyncBitAdsClient
+
 from common.db.database import Database, DatabaseManager
 from common.environ import Environ
 from common.helpers import const
@@ -13,8 +14,77 @@ from common.services.bitads.base import BitAdsService
 from common.services.bitads.impl import BitAdsServiceImpl
 from common.services.geoip.base import GeoIpService
 from common.services.geoip.impl import GeoIpServiceImpl
+from common.services.queue.base import OrderQueueService
+from common.services.queue.impl import OrderQueueServiceImpl
 from common.services.storage.base import BaseStorage
 from common.services.storage.file import FileStorage
+
+
+def get_main_db(db_url: str) -> Database:
+    """
+    Initializes and returns the main database connection object.
+
+    Args:
+        db_url (str): URL string specifying the database connection details.
+
+    Returns:
+        Database: Initialized Database object connected to the specified DB URL.
+
+    Raises:
+        None
+
+    Notes:
+        This function is used to obtain the main database connection, typically used as a dependency in FastAPI.
+    """
+    return Database(db_url)
+
+
+def get_geo_ip_service() -> GeoIpService:
+    """
+    Creates and returns a GeoIP service instance.
+
+    Returns:
+        GeoIpService: Initialized GeoIpService implementation using Environ.GEO2_LITE_DB_PATH.
+
+    Raises:
+        None
+
+    Notes:
+        This function initializes GeoIpServiceImpl with the path to the GeoIP Lite database.
+    """
+    return GeoIpServiceImpl(Environ.GEO2_LITE_DB_PATH)
+
+
+def get_database_manager(neuron_type: str, subtensor_network: str) -> DatabaseManager:
+    """
+    Creates and returns a DatabaseManager instance configured with the specified neuron type and Subtensor network.
+
+    Args:
+        neuron_type (str): Type or category of the neuron.
+        subtensor_network (str): Subtensor network identifier.
+
+    Returns:
+        DatabaseManager: Initialized DatabaseManager instance configured for the specified neuron type and network.
+
+    Raises:
+        None
+
+    Notes:
+        This function initializes a DatabaseManager instance for managing database connections based on the provided parameters.
+    """
+    return DatabaseManager(neuron_type, subtensor_network)
+
+
+def get_bitads_service(
+    database_manager: Annotated[DatabaseManager, Depends(get_database_manager)]
+) -> BitAdsService:
+    return BitAdsServiceImpl(database_manager)
+
+
+def get_order_queue_service(
+    database_manager: Annotated[DatabaseManager, Depends(get_database_manager)]
+) -> OrderQueueService:
+    return OrderQueueServiceImpl(database_manager)
 
 
 def create_bitads_client(
@@ -43,42 +113,6 @@ def create_bitads_client(
         hot_key=temp_hot_key,
         v=template.__version__,
     )
-
-
-def get_main_db(db_url: str) -> Database:
-    """
-    Initializes and returns the main database connection object.
-
-    Args:
-        db_url (str): URL string specifying the database connection details.
-
-    Returns:
-        Database: Initialized Database object connected to the specified DB URL.
-
-    Raises:
-        None
-
-    Notes:
-        This function is used to obtain the main database connection, typically used as a dependency in FastAPI.
-    """
-    return Database(db_url)
-
-
-
-def get_geo_ip_service() -> GeoIpService:
-    """
-    Creates and returns a GeoIP service instance.
-
-    Returns:
-        GeoIpService: Initialized GeoIpService implementation using Environ.GEO2_LITE_DB_PATH.
-
-    Raises:
-        None
-
-    Notes:
-        This function initializes GeoIpServiceImpl with the path to the GeoIP Lite database.
-    """
-    return GeoIpServiceImpl(Environ.GEO2_LITE_DB_PATH)
 
 
 def get_subtensor(network: str) -> bt.subtensor:
@@ -120,26 +154,6 @@ def get_wallet(name: str, hotkey: str) -> bt.wallet:
     return bt.wallet(name, hotkey)
 
 
-def get_database_manager(neuron_type: str, subtensor_network: str) -> DatabaseManager:
-    """
-    Creates and returns a DatabaseManager instance configured with the specified neuron type and Subtensor network.
-
-    Args:
-        neuron_type (str): Type or category of the neuron.
-        subtensor_network (str): Subtensor network identifier.
-
-    Returns:
-        DatabaseManager: Initialized DatabaseManager instance configured for the specified neuron type and network.
-
-    Raises:
-        None
-
-    Notes:
-        This function initializes a DatabaseManager instance for managing database connections based on the provided parameters.
-    """
-    return DatabaseManager(neuron_type, subtensor_network)
-
-
 def get_storage(neuron_type: str, wallet: bt.wallet) -> BaseStorage:
     """
     Creates and returns a storage service instance based on the neuron type and wallet.
@@ -158,9 +172,3 @@ def get_storage(neuron_type: str, wallet: bt.wallet) -> BaseStorage:
         This function initializes a FileStorage instance with the neuron type and the wallet's hotkey address.
     """
     return FileStorage(neuron_type, wallet.get_hotkey().ss58_address)
-
-
-def get_bitads_service(
-    database_manager: Annotated[DatabaseManager, Depends(get_database_manager)]
-) -> BitAdsService:
-    return BitAdsServiceImpl(database_manager)

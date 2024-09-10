@@ -11,7 +11,6 @@ from fastapi import (
     FastAPI,
     Request,
     Depends,
-    BackgroundTasks,
     Header,
     HTTPException,
     status,
@@ -29,11 +28,11 @@ from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import FormulaParams
 from common.schemas.campaign import CampaignType
 from common.services.geoip.base import GeoIpService
-from proxies.apis.fetch_from_db_test import router as test_router
-from proxies.apis.version import router as version_router
-from proxies.apis.logging import router as logs_router
-from proxies.apis.get_database import router as database_router
 from proxies import __miner_version__
+from proxies.apis.fetch_from_db_test import router as test_router
+from proxies.apis.get_database import router as database_router
+from proxies.apis.logging import router as logs_router
+from proxies.apis.version import router as version_router
 
 
 subtensor = common_dependencies.get_subtensor(CommonEnviron.SUBTENSOR_NETWORK)

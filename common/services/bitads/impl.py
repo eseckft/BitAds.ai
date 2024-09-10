@@ -1,7 +1,6 @@
+import logging
 from datetime import datetime
 from typing import List, Set
-
-import bittensor as bt
 
 from common import converters
 from common.db.database import DatabaseManager
@@ -15,6 +14,9 @@ from common.services.bitads.base import BitAdsService
 from common.validator.schemas import ValidatorTrackingData
 
 
+log = logging.getLogger(__name__)
+
+
 class BitAdsServiceImpl(BitAdsService):
     def __init__(self, database_manager: DatabaseManager):
         self.database_manager = database_manager
@@ -23,12 +25,14 @@ class BitAdsServiceImpl(BitAdsService):
         self, validator_data: ValidatorTrackingData, sale_data: SaleData
     ):
         with self.database_manager.get_session("active") as session:
-            data = validator_data.model_dump() | converters.to_bitads_extra_data(sale_data)
+            data = validator_data.model_dump() | converters.to_bitads_extra_data(
+                sale_data
+            )
             bitads_data.add_or_update(
                 session,
                 BitAdsDataSchema(
                     **data,
-                    country_code=sale_data.order_details.customer_info.address.country_code
+                    country_code=sale_data.order_details.customer_info.address.country_code,
                 ),
             )
 
@@ -75,13 +79,13 @@ class BitAdsServiceImpl(BitAdsService):
         datas = {
             BitAdsDataSchema(
                 **v.model_dump(exclude={"complete_block"}),
-                sales_status=SalesStatus.COMPLETED
+                sales_status=SalesStatus.COMPLETED,
             )
             for v in visits
         }
         await self.add_bitads_data(datas)
 
     async def update_sale_status_if_needed(self, sale_date_from: datetime) -> None:
-        bt.logging.debug(f"Completing sales with date less than: {sale_date_from}")
+        log.debug(f"Completing sales with date less than: {sale_date_from}")
         with self.database_manager.get_session("active") as session:
             bitads_data.complete_sales_less_than_date(session, sale_date_from)

@@ -34,7 +34,9 @@ def insert_or_update(session: Session, ip: str, activity_date: date):
 
 
 def clean_old_data(session: Session, recent_activity_days: int):
-    cutoff_date = datetime.utcnow().date() - timedelta(days=recent_activity_days)
+    cutoff_date = datetime.utcnow().date() - timedelta(
+        days=recent_activity_days
+    )
     session.execute(
         text("DELETE FROM visitor_activity WHERE created_at < :cutoff_date"),
         {"cutoff_date": cutoff_date},
@@ -49,7 +51,9 @@ def get_recent_activity(
 ) -> List[VisitorActivitySchema]:
     recent_activity_count = recent_activity_count
     limit = limit
-    recent_date = datetime.utcnow().date() - timedelta(days=recent_activity_days)
+    recent_date = datetime.utcnow().date() - timedelta(
+        days=recent_activity_days
+    )
     # Include the 'created_at' field with an alias 'date'
     stmt = (
         select(VisitorActivity, VisitorActivity.created_at.label("date"))

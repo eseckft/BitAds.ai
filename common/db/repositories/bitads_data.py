@@ -158,13 +158,19 @@ def get_aggregated_data(
         BitAdsData.campaign_id,
         MinerAssignment.hotkey,
         func.count().label("visits"),
-        func.sum(case((BitAdsData.is_unique, 1), else_=0)).label("visits_unique"),
+        func.sum(case((BitAdsData.is_unique, 1), else_=0)).label(
+            "visits_unique"
+        ),
         func.sum(case((BitAdsData.at, 1), else_=0)).label("at_count"),
-        func.sum(BitAdsData.count_through_rate_click).label("count_through_rate_click"),
+        func.sum(BitAdsData.count_through_rate_click).label(
+            "count_through_rate_click"
+        ),
         func.sum(BitAdsData.refund).label("total_refunds"),
         func.sum(BitAdsData.sales).label("total_sales"),
         func.sum(BitAdsData.sale_amount).label("sales_amount"),
-    ).join(MinerAssignment, BitAdsData.campaign_item == MinerAssignment.unique_id)
+    ).join(
+        MinerAssignment, BitAdsData.campaign_item == MinerAssignment.unique_id
+    )
 
     conditions = []
     if from_date is not None:
@@ -239,7 +245,9 @@ def get_miners_reputation(
     query = session.query(
         MinerAssignment.hotkey,
         func.sum(BitAdsData.sales).label("total_sales"),
-    ).join(MinerAssignment, BitAdsData.campaign_item == MinerAssignment.unique_id)
+    ).join(
+        MinerAssignment, BitAdsData.campaign_item == MinerAssignment.unique_id
+    )
 
     filters = []
     if from_date is not None:

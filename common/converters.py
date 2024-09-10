@@ -36,7 +36,10 @@ def to_completed_visit(
 
 def to_bitads_extra_data(sale_data: SaleData):
     return (
-        dict(order_info=sale_data.order_details, sale_date=sale_data.order_details.sale_date)
+        dict(
+            order_info=sale_data.order_details,
+            sale_date=sale_data.order_details.sale_date,
+        )
         if sale_data.type == Action.sale
         else dict(refund_info=sale_data.order_details)
     )
@@ -44,12 +47,14 @@ def to_bitads_extra_data(sale_data: SaleData):
 
 def to_extra_amounts(sale_data: SaleData, ndigits: int = 5):
     modifier = 1 if sale_data.type == Action.sale else -1
-    sales_amount = round(sum(float(i.price) for i in sale_data.order_details.items), ndigits)
+    sales_amount = round(
+        sum(float(i.price) for i in sale_data.order_details.items), ndigits
+    )
     return {
         "sale_amount": sales_amount * modifier,
         "sales"
         if sale_data.type == Action.sale
-        else "refund": len(sale_data.order_details.items)
+        else "refund": len(sale_data.order_details.items),
     }
 
 
