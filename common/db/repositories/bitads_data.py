@@ -63,28 +63,35 @@ def get_data(session: Session, id_: str) -> Optional[BitAdsDataSchema]:
 
 
 def add_or_update(
-    session: Session, data: BitAdsDataSchema, exclude_fields=("created_at",)
+    session: Session, data: BitAdsDataSchema, exclude_fields=("created_at",), include_none=("refund_info",)
 ):
     """
     Adds or updates tracking data in the database.
 
     Args:
         session (Session): The SQLAlchemy session object.
-        data (ValidatorTrackingData): The tracking data to add or update.
-
+        data (BitAdsDataSchema): The tracking data to add or update.
+        exclude_fields (tuple): Fields to exclude from being updated if they already exist.
+        include_none (tuple): Fields for which None values should be explicitly set.
     """
+    # Try to find the existing entity by its ID
     entity = session.get(BitAdsData, data.id)
 
+    # If the entity exists, update its attributes
     if entity:
-        # Update existing entity's attributes
         for key, value in dict(data).items():
-            if value is None:
-                continue
+            # Skip fields that are excluded from updates (except for None values explicitly listed in `include_none`)
             if key in exclude_fields and getattr(entity, key) is not None:
                 continue
+
+            # Update fields with `None` values only if they are listed in `include_none`
+            if value is None and key not in include_none:
+                continue
+
+            # Set the attribute on the entity
             setattr(entity, key, value)
     else:
-        # Create a new entity
+        # Create a new entity if it doesn't exist
         entity = BitAdsData(**dict(data))
         session.add(entity)
 
