@@ -41,7 +41,7 @@ class ClientInfo(BaseModel):
 
 
 class OrderDetails(BaseModel):
-    total_amount: str = Field(alias="totalAmount")
+    totalAmount: str
     items: FrozenSet[Item]
     customer_info: CustomerInfo = Field(alias="customerInfo")
     client_info: ClientInfo = Field(alias="clientInfo")
