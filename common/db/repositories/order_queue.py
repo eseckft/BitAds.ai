@@ -40,8 +40,8 @@ def update_data(
 
     if order_info:
         entity.order_info = order_info
-    if refund_info:
-        entity.refund_info = refund_info
+
+    entity.refund_info = refund_info
 
     entity.status = OrderQueueStatus.PENDING
 
