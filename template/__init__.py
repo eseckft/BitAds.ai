@@ -26,9 +26,6 @@ __spec_version__ = (
     + (10 * int(version_split[2]))
 )
 
-
-print(__spec_version__)
-print(1725727158 > __spec_version__)
 from . import api
 from . import base
 
