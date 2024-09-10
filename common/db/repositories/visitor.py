@@ -206,7 +206,10 @@ def is_return_in_site(
 
 
 def get_visits_after(
-    session: Session, after: Optional[datetime] = None, limit: int = 500, *exclude_hotkeys
+    session: Session,
+    after: Optional[datetime] = None,
+    limit: int = 500,
+    *exclude_hotkeys
 ) -> Set[VisitorSchema]:
     """
     Retrieves a set of visitor entities from the database created after a specified datetime.

@@ -8,11 +8,10 @@ from urllib.error import URLError
 from urllib.request import urlretrieve
 
 import bittensor as bt
-
 from common import dependencies
+
 from common.environ import Environ as CommonEnviron
 from common.helpers import const
-
 
 bt.logging.on()
 

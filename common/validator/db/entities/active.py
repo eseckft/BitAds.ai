@@ -1,21 +1,13 @@
 from datetime import datetime
+from typing import Dict, Any
 from typing import Optional
 
-from sqlalchemy import (
-    String,
-    Enum,
-    DateTime,
-    Integer,
-    Boolean,
-    Float,
-    text,
-    PickleType
-)
+from sqlalchemy import String, Enum, DateTime, Integer, Boolean, Float, text, PickleType
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
-from typing import Dict, Any
+
 from common.schemas.campaign import CampaignType
 from common.schemas.device import Device
-from common.schemas.sales import SalesStatus
+from common.schemas.sales import SalesStatus, OrderQueueStatus
 from common.schemas.visit import VisitStatus
 
 Base = declarative_base()
@@ -69,9 +61,7 @@ class TrackingData(Base):
     status: Mapped[VisitStatus] = mapped_column(
         Enum(VisitStatus), default=VisitStatus.new
     )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,
@@ -80,9 +70,7 @@ class TrackingData(Base):
     )
     refund: Mapped[int] = mapped_column(Integer, server_default=text("0"))
     sales: Mapped[int] = mapped_column(Integer, server_default=text("0"))
-    sale_amount: Mapped[float] = mapped_column(
-        Float, server_default=text("0.0")
-    )
+    sale_amount: Mapped[float] = mapped_column(Float, server_default=text("0.0"))
 
 
 class MinerPing(Base):
@@ -98,9 +86,7 @@ class MinerPing(Base):
 
     __tablename__ = "miner_pings"
 
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     hot_key: Mapped[str] = mapped_column(String, nullable=False)
     block: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
@@ -199,3 +185,21 @@ class MinerAssignment(Base):
 
     unique_id: Mapped[str] = mapped_column(String, primary_key=True)
     hotkey: Mapped[str]
+
+
+class OrderQueue(Base):
+    __tablename__ = "order_queue"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    order_info: Mapped[Dict[str, Any]] = mapped_column(PickleType)
+    refund_info: Mapped[Dict[str, Any]] = mapped_column(PickleType, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    last_processing_date: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow
+    )
+    status: Mapped[OrderQueueStatus] = mapped_column(
+        Enum(OrderQueueStatus), default=OrderQueueStatus.PENDING
+    )
