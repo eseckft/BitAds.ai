@@ -67,6 +67,9 @@ class CoreValidator(BaseValidatorNeuron):
         self.bitads_service = common_dependencies.get_bitads_service(
             self.database_manager
         )
+        self.order_queue_service = dependencies.get_order_queue_service(
+            self.database_manager
+        )
         self.miners = CommonEnviron.MINERS
         self.validators = CommonEnviron.VALIDATORS
         self.evaluate_miners_blocks = Environ.EVALUATE_MINERS_BLOCK_N
@@ -88,6 +91,7 @@ class CoreValidator(BaseValidatorNeuron):
         """
         await self.forward_ping()
         await self.__forward_bitads_data()
+        await self._try_process_order_queue()
         await self.forward_recent_activity()
         await self._try_evaluate_miners()
 
@@ -246,29 +250,6 @@ class CoreValidator(BaseValidatorNeuron):
     async def _send_load_data(self):
         self.bitads_client.send_system_load(utils.get_load_average_json())
 
-    async def _calculate_campaigns_umax(self):
-        while True:
-            try:
-                current_block = self.subtensor.get_current_block()
-                if current_block % 100 == Environ.CALCULATE_UMAX_BLOCK_N:
-                    from_block = current_block - Environ.CALCULATE_UMAX_BLOCKS
-                    bt.logging.info(
-                        f"Start calculate and set campaign UMax from "
-                        f"block {from_block} to block {current_block}"
-                    )
-                    await self.validator_service.calculate_and_set_campaign_umax(
-                        from_block, current_block
-                    )
-                    bt.logging.info("End calculate and set campaign UMax")
-            except:
-                bt.logging.exception("Calculate campaigns umax exception")
-            await asyncio.sleep(1)
-
-    async def _evaluate_miners(self):
-        while True:
-            await self._try_evaluate_miners()
-            await asyncio.sleep(1)
-
     async def _try_evaluate_miners(self):
         try:
             current_block = self.subtensor.get_current_block()
@@ -291,6 +272,11 @@ class CoreValidator(BaseValidatorNeuron):
             bt.logging.warning(*ex.args)
         except:
             bt.logging.exception("Evaluate miners exception")
+
+    async def _try_process_order_queue(self):
+        data_to_process = await self.order_queue_service.get_data_to_process()
+        
+
 
 
 # The main function parses the configuration and runs the validator.

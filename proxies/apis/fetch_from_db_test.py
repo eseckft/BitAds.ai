@@ -22,6 +22,20 @@ def deserialize(value: Any) -> Any:
     except Exception as e:
         return f"Error: {str(e)}"
 
+def deserialize(value: Any) -> Any:
+    """Attempt to deserialize pickled data or handle other binary formats."""
+    try:
+        # Check if the value is bytes (common for pickled data)
+        if isinstance(value, bytes):
+            try:
+                return pickle.loads(value)
+            except Exception:
+                return f"Failed to deserialize pickled data"
+        return value
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 @router.get("/fetch_from_db")
 async def fetch_from_db(
     db: Literal["main", "history", "active"], table: str, request: Request

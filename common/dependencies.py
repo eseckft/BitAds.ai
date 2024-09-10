@@ -14,8 +14,6 @@ from common.services.bitads.base import BitAdsService
 from common.services.bitads.impl import BitAdsServiceImpl
 from common.services.geoip.base import GeoIpService
 from common.services.geoip.impl import GeoIpServiceImpl
-from common.services.queue.base import OrderQueueService
-from common.services.queue.impl import OrderQueueServiceImpl
 from common.services.storage.base import BaseStorage
 from common.services.storage.file import FileStorage
 
@@ -79,12 +77,6 @@ def get_bitads_service(
     database_manager: Annotated[DatabaseManager, Depends(get_database_manager)]
 ) -> BitAdsService:
     return BitAdsServiceImpl(database_manager)
-
-
-def get_order_queue_service(
-    database_manager: Annotated[DatabaseManager, Depends(get_database_manager)]
-) -> OrderQueueService:
-    return OrderQueueServiceImpl(database_manager)
 
 
 def create_bitads_client(
