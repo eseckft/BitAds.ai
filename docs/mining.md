@@ -31,14 +31,22 @@ environment. The required Python version is 3.11+.
    Ensure that Python 3.11+ is installed on your system. You can download it from
    the [official Python website](https://www.python.org/downloads/).
 
-2. **Create a Virtual Environment**:
+2. **Cloning the repo:**
+
+   ```bash
+   git clone https://github.com/eseckft/BitAds.ai.git
+   
+   cd BitAds.ai
+   ```
+
+3. **Create a Virtual Environment**:
    Open a terminal and navigate to your project directory. Run the following command to create a virtual environment:
 
    ```bash
    python3 -m venv venv
    ```
 
-3. **Activate the Virtual Environment**:
+4. **Activate the Virtual Environment**:
     - On Windows:
 
       ```bash
@@ -58,12 +66,6 @@ addresses:
 
 ```bash
 wget https://git.io/GeoLite2-Country.mmdb
-```
-
-### Git Clone the repository
-
-```bash
-git clone https://github.com/eseckft/BitAds.ai.git
 ```
 
 ### Installing Dependencies
