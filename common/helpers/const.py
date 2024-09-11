@@ -53,3 +53,5 @@ ROOT_DIR = "./bitads_campaigns"
 TRACKING_DATA_DELTA = timedelta(seconds=20)
 
 VERSION_KEY = 1725727158
+
+REWARD_SALE_PERIOD = timedelta(days=30)

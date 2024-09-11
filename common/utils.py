@@ -8,6 +8,7 @@ from functools import wraps
 from typing import Optional, Dict
 
 import bittensor as bt
+from common.helpers import const
 
 from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import SystemLoad
@@ -141,3 +142,7 @@ def combine_dicts_with_avg(*dicts: Dict[str, float]) -> Dict[str, float]:
         combined_dict[key] /= count_dict[key]
 
     return combined_dict
+
+
+def blocks_to_timedelta(blocks: int) -> timedelta:
+    return timedelta(seconds=blocks * const.BLOCK_DURATION.total_seconds())

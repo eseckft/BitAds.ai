@@ -18,13 +18,15 @@
 
 # TODO(developer): Change this value when updating your code base.
 # Define the version of the template module.
-__version__ = "3.1.5"
+__version__ = "3.1.6"
 version_split = __version__.split(".")
 __spec_version__ = (
-    (1000000000 * int(version_split[0]))
-    + (100 * int(version_split[1]))
-    + (10 * int(version_split[2]))
+    (100000 * int(version_split[0]))
+    + (10000 * int(version_split[1]))
+    + (1000 * int(version_split[2]))
 )
+
+print(__spec_version__)
 
 from . import api
 from . import base

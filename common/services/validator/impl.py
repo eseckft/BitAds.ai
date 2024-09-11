@@ -125,18 +125,14 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         # region CPA-part
         cpa_campaign_ids = [c.id for c in campaigns if CampaignType.CPA == c.type]
         now = datetime.utcnow()
-        sale_from = now - timedelta(
-            seconds=self.settings.mr_blocks * const.BLOCK_DURATION.total_seconds()
-        )
-        sale_to = now - timedelta(
-            seconds=self.settings.cpa_blocks * const.BLOCK_DURATION.total_seconds()
-        )
+        sale_from = now - const.REWARD_SALE_PERIOD
+        sale_to = now - utils.blocks_to_timedelta(self.settings.cpa_blocks)
         cpa_aggregated_data = self._get_aggregated_data(
             *cpa_campaign_ids,
             sale_from=sale_from,
             sale_to=sale_to,
-        )  # TODO: include only visits between sale_to and now
-        reputation_from = sale_from
+        )
+        reputation_from = now - utils.blocks_to_timedelta(self.settings.mr_blocks)
         miners_reputation = self._get_miners_reputation(
             *cpa_campaign_ids, sale_from=reputation_from, sale_to=now
         )
