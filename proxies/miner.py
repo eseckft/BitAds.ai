@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI):
     subtensor.close()
 
 
-app = FastAPI(version=__miner_version__, lifespan=lifespan, debug=True)
+app = FastAPI(version="0.2.18", lifespan=lifespan, debug=True)
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
 app.include_router(version_router)
