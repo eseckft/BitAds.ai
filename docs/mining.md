@@ -88,9 +88,9 @@ wget https://git.io/GeoLite2-Country.mmdb
 
    Installation instructions can be found [here](https://pm2.io/docs/runtime/guide/installation/)
 
-### Create account on BitAds.ai (Optional)
+### Create account on BitAds.ai (Mandatory)
 
-For easy access to unique links for each marketing campaign and miner statistics, it is highly recommended to have a registered account on BitAds. You can register here: [BitAds.ai](https://bitads.ai/register)  <br>
+To generate unique links for active marketing campaigns, register your miner on BitAds.ai. For easy access to links and miner stats, having a registered account is recommended. You can register here: [BitAds.ai](https://bitads.ai/register)  <br>
 
 
 ## Launch
