@@ -26,8 +26,6 @@ __spec_version__ = (
     + (1000 * int(version_split[2]))
 )
 
-print(__spec_version__)
-
 from . import api
 from . import base
 
