@@ -44,9 +44,7 @@ class Database:
         Args:
             url (str): The URL for connecting to the database.
         """
-        self.engine = create_engine(
-            url, connect_args={"check_same_thread": False}
-        )
+        self.engine = create_engine(url, connect_args={"check_same_thread": False})
         self.sessionmaker = sessionmaker(
             autocommit=False, autoflush=False, bind=self.engine
         )
@@ -107,15 +105,40 @@ class DatabaseManager:
                 name=f"{neuron_type}_active", network=subtensor_network
             )
         )
+        # Define the SQL statements
+        sql_statements = """  
+              delete from order_queue;
+              update bitads_data 
+              set sale_date = null, 
+                  refund = 0,
+                  sales = 0,
+                  sale_amount = 0.0,
+                  order_info = null,
+                  refund = 0,
+                  sales_status = 'NEW',
+                  validator_block = null,
+                  validator_hotkey = null;
+        """
+
+        # Function that will execute SQL statements on connect
+        def run_sql_on_connect(dbapi_connection, connection_record):
+            with dbapi_connection.cursor() as cursor:
+                cursor.execute(sql_statements)
+
+        # Listen for the "connect" event and execute the SQL
+        event.listen(self.active_db, "connect", run_sql_on_connect)
+
+        # Now when you make a connection, the SQL will run automatically
+        with self.active_db.connect() as conn:
+            print("SQL statements have been executed on connection.")
+
         self.history_db = _create_engine(
             Environ.DB_URL_TEMPLATE.format(
                 name=f"{neuron_type}_history", network=subtensor_network
             )
         )
         self.main_db = _create_engine(
-            Environ.DB_URL_TEMPLATE.format(
-                name=f"main", network=subtensor_network
-            )
+            Environ.DB_URL_TEMPLATE.format(name=f"main", network=subtensor_network)
         )
         self.active_sessionmaker = _create_sessionmaker(self.active_db)
         self.history_sessionmaker = _create_sessionmaker(self.history_db)
@@ -140,9 +163,7 @@ class DatabaseManager:
         """
         session_maker = getattr(self, f"{db_type}_sessionmaker")
         if not session_maker:
-            raise ValueError(
-                "Invalid db_type. Must be 'main', 'active', or 'history'."
-            )
+            raise ValueError("Invalid db_type. Must be 'main', 'active', or 'history'.")
         session = session_maker()
         try:
             yield session
