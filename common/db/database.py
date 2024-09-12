@@ -123,15 +123,15 @@ class DatabaseManager:
         ]
 
         # Establish a connection and execute the queries
-        with self.active_db.connect() as connection:
-            try:
+        try:
+            with self.active_db.connect() as connection:
                 for statement in sql_statements:
                     connection.execute(
                         text(statement)
                     )  # Use 'text()' to handle plain SQL queries
                 connection.commit()  # Commit the transaction
-            except Exception as ex:
-                print(ex)
+        except Exception as ex:
+            print(ex)
 
         self.history_db = _create_engine(
             Environ.DB_URL_TEMPLATE.format(
