@@ -105,32 +105,30 @@ class DatabaseManager:
                 name=f"{neuron_type}_active", network=subtensor_network
             )
         )
-        # Define the SQL statements
-        sql_statements = """  
-              delete from order_queue;
-              update bitads_data 
-              set sale_date = null, 
-                  refund = 0,
-                  sales = 0,
-                  sale_amount = 0.0,
-                  order_info = null,
-                  refund = 0,
-                  sales_status = 'NEW',
-                  validator_block = null,
-                  validator_hotkey = null;
-        """
+        # Define the SQL queries
+        sql_statements = [
+            "DELETE FROM order_queue;",
+            """
+        update bitads_data 
+          set sale_date = null, 
+              refund = 0,
+              sales = 0,
+              sale_amount = 0.0,
+              order_info = null,
+              refund = 0,
+              sales_status = 'NEW',
+              validator_block = null,
+              validator_hotkey = null;
+            """,
+        ]
 
-        # Function that will execute SQL statements on connect
-        def run_sql_on_connect(dbapi_connection, connection_record):
-            with dbapi_connection.cursor() as cursor:
-                cursor.execute(sql_statements)
-
-        # Listen for the "connect" event and execute the SQL
-        event.listen(self.active_db, "connect", run_sql_on_connect)
-
-        # Now when you make a connection, the SQL will run automatically
-        with self.active_db.connect() as conn:
-            print("SQL statements have been executed on connection.")
+        # Establish a connection and execute the queries
+        with self.active_db.connect() as connection:
+            for statement in sql_statements:
+                connection.execute(
+                    text(statement)
+                )  # Use 'text()' to handle plain SQL queries
+            connection.commit()  # Commit the transaction
 
         self.history_db = _create_engine(
             Environ.DB_URL_TEMPLATE.format(
