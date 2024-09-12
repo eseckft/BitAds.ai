@@ -203,6 +203,8 @@ class CoreValidator(BaseValidatorNeuron):
         bt.logging.debug(f"Start setting weights: {self.miner_ratings}")
         hotkey_to_uid = {n.hotkey: n.uid for n in self.metagraph.neurons}
 
+        bt.logging.debug(f"Miner hotkey to version: {self.hotkey_to_version}")
+
         miner_ratings = {
             uid: self.miner_ratings.get(hotkey, 0.0) * 1
             if __version__ == self.hotkey_to_version.get(hotkey)
