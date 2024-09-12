@@ -27,6 +27,7 @@ from sqlalchemy.orm import sessionmaker, Session
 
 from common.environ import Environ
 import bittensor as bt
+from sqlalchemy import text
 
 
 class Database:
@@ -130,8 +131,8 @@ class DatabaseManager:
                     connection.execute(
                         text(statement)
                     )  # Use 'text()' to handle plain SQL queries
-                connection.commit()  # Commit the transaction
-        except Exception:
+                    connection.commit()  # Commit the transaction
+        except Exception as ex:
             bt.logging.exception("Error on sql")
 
         self.history_db = _create_engine(
