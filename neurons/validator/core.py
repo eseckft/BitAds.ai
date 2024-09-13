@@ -77,6 +77,7 @@ class CoreValidator(BaseValidatorNeuron):
         self.miner_ratings = dict()
         self.active_campaigns: List[Campaign] = list()
         self.last_evaluate_block = 0
+        self.offset = None
         # self.loop.run_until_complete(self._mark_for_reprocess())
         # self.loop.create_task(self._calculate_campaigns_umax())
         # self.loop.create_task(self._evaluate_miners())
@@ -145,9 +146,7 @@ class CoreValidator(BaseValidatorNeuron):
 
     async def __forward_bitads_data(self, timeout: float = 6.0):
         bt.logging.info("Start sync bitads process")
-        offset = await self.bitads_service.get_last_update_bitads_data(
-            self.wallet.get_hotkey().ss58_address
-        )
+        offset = self.offset
         bt.logging.debug(
             f"Sync visits with offset: {offset} with miners: {self.miners}"
         )
@@ -168,7 +167,20 @@ class CoreValidator(BaseValidatorNeuron):
             f"Received visits from miners with ids: {[v.id for v in visits]}"
         )
 
+        # Update the offset with the minimum of max created_at values from responses
+        max_created_at_per_response = [
+            max(v.created_at for v in synapse.visits)
+            for synapse in responses.values()
+            if synapse.visits
+        ]
+
+        if max_created_at_per_response:
+            new_offset = min(max_created_at_per_response)
+            self.offset = new_offset
+            bt.logging.debug(f"Updated offset: {self.offset}")
+
         await self.bitads_service.add_by_visits(visits)
+
         if hasattr(self, "settings"):
             sale_to = datetime.utcnow() - timedelta(
                 seconds=self.settings.cpa_blocks * const.BLOCK_DURATION.total_seconds()
@@ -177,8 +189,9 @@ class CoreValidator(BaseValidatorNeuron):
         else:
             bt.logging.info(
                 "There is no settings now, but it's not a problem. "
-                "We are update sale status when settings appears"
+                "We will update sale status when settings appear"
             )
+
         bt.logging.info("End sync bitads process")
 
     def sync(self):
