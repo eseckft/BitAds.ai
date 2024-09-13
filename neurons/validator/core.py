@@ -33,7 +33,7 @@ from neurons.protocol import (
 from template.base.validator import BaseValidatorNeuron
 from template.utils.config import add_blacklist_args
 from template.validator.forward import forward_each_axon
-from template import __version__, __spec_version__
+from template import __spec_version__
 
 
 class CoreValidator(BaseValidatorNeuron):
@@ -77,7 +77,6 @@ class CoreValidator(BaseValidatorNeuron):
         self.miner_ratings = dict()
         self.active_campaigns: List[Campaign] = list()
         self.last_evaluate_block = 0
-        self.hotkey_to_version = {}
         # self.loop.run_until_complete(self._mark_for_reprocess())
         # self.loop.create_task(self._calculate_campaigns_umax())
         # self.loop.create_task(self._evaluate_miners())
@@ -125,9 +124,6 @@ class CoreValidator(BaseValidatorNeuron):
         responses = await forward_each_axon(
             self, Ping(active_campaigns=self.active_campaigns), *self.miners
         )
-        self.hotkey_to_version = {
-            hotkey: response.script_version for hotkey, response in responses.items()
-        }
         await self.validator_service.add_miner_ping(
             current_block,
             {
@@ -203,15 +199,10 @@ class CoreValidator(BaseValidatorNeuron):
         bt.logging.debug(f"Start setting weights: {self.miner_ratings}")
         hotkey_to_uid = {n.hotkey: n.uid for n in self.metagraph.neurons}
 
-        bt.logging.debug(f"Miner hotkey to version: {self.hotkey_to_version}")
-
         miner_ratings = {
-            uid: self.miner_ratings.get(hotkey, 0.0) * 1
-            if __version__ == self.hotkey_to_version.get(hotkey)
-            else 0
+            uid: self.miner_ratings.get(hotkey, 0.0)
             for hotkey, uid in hotkey_to_uid.items()
         }
-
         bt.logging.debug(f"UID to rating: {miner_ratings}")
 
         result, msg = self.subtensor.set_weights(

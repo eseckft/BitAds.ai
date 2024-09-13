@@ -47,7 +47,6 @@ class BaseSynapse(bt.Synapse):
 class Ping(BaseSynapse):
     active_campaigns: List[Campaign] = []
     submitted_tasks: Optional[List[GetMinerUniqueIdResponse]] = []
-    script_version: Optional[str] = None
     result: Optional[bool] = False
 
 

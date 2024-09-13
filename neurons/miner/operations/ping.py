@@ -7,7 +7,6 @@ from common.helpers.logging import LogLevel, green
 from common.services.storage.base import BaseStorage
 from neurons.base.operations import BaseOperation
 from neurons.protocol import Ping
-from template import __version__
 
 
 class PingOperation(BaseOperation[Ping]):
@@ -58,7 +57,6 @@ class PingOperation(BaseOperation[Ping]):
 
             self.storage.remove_campaign(campaign.product_unique_id)
         synapse.result = True
-        synapse.script_version = __version__
         return synapse
 
     async def blacklist(self, synapse: Ping) -> Tuple[bool, str]:
