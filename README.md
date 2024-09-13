@@ -18,7 +18,7 @@ BitAds addresses these challenges by focusing on actual sales rather than clicks
 
 :link:**Usefull Links:** <br>
 
-- Subnet Video Presentation: Link <br>
+- Video Presentation: [Subnet Spotlight :: SN16 :: BitAds](https://www.youtube.com/watch?v=zIIYMY-rpTw) <br>
 - Overview: https://bit.ly/BitAdsOverview <br>
 - Workflow: https://bit.ly/BitAdsWorkflow <br>
 - Whitepaper: https://bitads.ai/whitepaper <br>
