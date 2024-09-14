@@ -45,6 +45,8 @@ export WALLET_NAME=$wallet_name
 export WALLET_HOTKEY=$wallet_hotkey
 export NEURON_TYPE=miner
 
+wget -O GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb
+
 python3 -m pip install -r requirements.txt
 # python3 -m pip install --upgrade bittensor
 python3 -m pip install -e .
