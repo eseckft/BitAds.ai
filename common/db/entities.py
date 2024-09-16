@@ -8,6 +8,7 @@ from typing import Optional
 from sqlalchemy import DateTime, Enum, String, Integer, text, Float
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 
+from common.schemas.campaign import CampaignType
 from common.schemas.device import Device
 
 Base = declarative_base()
@@ -65,12 +66,25 @@ class CompletedVisit(Base):
     validator_block: Mapped[int]
     complete_block: Mapped[int]
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     refund: Mapped[int] = mapped_column(Integer, server_default=text("0"))
     sales: Mapped[int] = mapped_column(Integer, server_default=text("0"))
-    sale_amount: Mapped[float] = mapped_column(
-        Float, server_default=text("0.0")
-    )
+    sale_amount: Mapped[float] = mapped_column(Float, server_default=text("0.0"))
+
+
+class HotkeyToBlock(Base):
+    __tablename__ = "hotkey_to_block"
+
+    hotkey: Mapped[str] = mapped_column(primary_key=True)
+    last_block: Mapped[int]
+
+
+class CampaignEntity(Base):
+    __tablename__ = "campaign"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    type: Mapped[CampaignType] = mapped_column(Enum(CampaignType))
+    product_unique_id: Mapped[str]
+    status: Mapped[Optional[int]]
+    product_link: Mapped[Optional[str]]

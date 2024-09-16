@@ -2,6 +2,7 @@
 BitAds schemas
 """
 from datetime import datetime
+from enum import IntEnum
 from typing import Optional, List, Set, Dict
 
 from pydantic import BaseModel, Field, ConfigDict
@@ -82,7 +83,12 @@ class Campaign(BaseModel):
     id: str
     type: CampaignType = CampaignType.REGULAR
 
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="ignore", from_attributes=True)
+
+
+class CampaignStatus(IntEnum):
+    DEACTIVATED = 0
+    ACTIVATED = 1
 
 
 class PingResponse(BaseResponse):

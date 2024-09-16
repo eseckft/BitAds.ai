@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Set
+from typing import Set, Tuple
 
 from common.db.database import DatabaseManager
-from common.db.repositories import recent_activity, user_agent_activity
+from common.db.repositories import recent_activity, user_agent_activity, hotkey_to_block
 from common.db.repositories.visitor import (
     add_visitor,
     get_visits_after,
@@ -59,9 +59,7 @@ class MinerServiceImpl(SettingsContainerImpl, MinerService):
             add_visitor(session, visitor, return_in_site_from, unique_deadline)
 
             current_date = current_datetime.date()
-            recent_activity.insert_or_update(
-                session, visitor.ip_address, current_date
-            )
+            recent_activity.insert_or_update(session, visitor.ip_address, current_date)
             user_agent_activity.insert_or_update(
                 session, visitor.user_agent, current_date
             )
@@ -103,4 +101,13 @@ class MinerServiceImpl(SettingsContainerImpl, MinerService):
             for td in visits:
                 add_or_update(session, td)
 
+    async def get_hotkey_and_block(self) -> Tuple[str, int]:
+        with self.database_manager.get_session("main") as session:
+            result = hotkey_to_block.get_hotkey_to_block(session)
+            if not result:
+                raise ValueError("Hotkey to block not found")
+            return result
 
+    async def set_hotkey_and_block(self, hotkey: str, block: int) -> None:
+        with self.database_manager.get_session("main") as session:
+            hotkey_to_block.set_hotkey_and_block(session, hotkey, block)
