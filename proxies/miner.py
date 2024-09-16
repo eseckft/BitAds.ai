@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.3.0", lifespan=lifespan)
+app = FastAPI(version="0.3.1", lifespan=lifespan)
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
 app.include_router(version_router)
@@ -78,7 +78,7 @@ async def fetch_request_data_and_redirect(
         filter(lambda c: c.product_unique_id == campaign_id, campaigns), None
     )
     if not campaign:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise KeyError  # In case when miner neuron not fetched campaigns
     id_ = str(uuid.uuid4())
     ip = request.client.host
     ipaddr_info = geoip_service.get_ip_info(ip)
