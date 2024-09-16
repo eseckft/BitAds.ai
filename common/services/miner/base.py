@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Set
+from typing import Set, Tuple
 
 from common.miner.schemas import VisitorSchema
 from common.services.settings.base import SettingsContainer
@@ -70,4 +70,8 @@ class MinerService(SettingsContainer, ABC):
         Args:
             visits (Set[VisitorSchema]): The set of visitor records to add.
         """
+        pass
+
+    @abstractmethod
+    async def get_hotkey_and_block(self) -> Tuple[str, int]:
         pass

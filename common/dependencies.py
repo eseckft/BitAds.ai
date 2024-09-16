@@ -12,6 +12,8 @@ from common.environ import Environ
 from common.helpers import const
 from common.services.bitads.base import BitAdsService
 from common.services.bitads.impl import BitAdsServiceImpl
+from common.services.campaign.base import CampaignService
+from common.services.campaign.impl import CampaignServiceImpl
 from common.services.geoip.base import GeoIpService
 from common.services.geoip.impl import GeoIpServiceImpl
 from common.services.storage.base import BaseStorage
@@ -99,10 +101,32 @@ def create_bitads_client(
         The function uses the wallet's hotkey address obtained via `wallet.get_hotkey().ss58_address`.
         It initializes a SyncBitAdsClient with the provided base URL, hotkey, and template version.
     """
-    temp_hot_key = wallet.get_hotkey().ss58_address
+    return create_bitads_client_from_hotkey(wallet.get_hotkey().ss58_address, base_url)
+
+
+def create_bitads_client_from_hotkey(
+    hotkey: str, base_url: str = const.API_BITADS_DOMAIN
+) -> BitAdsClient:
+    """
+    Creates a BitAds client instance configured with the provided wallet and base URL.
+
+    Args:
+        wallet (bt.wallet): Wallet object used to obtain the hotkey for authentication.
+        base_url (str, optional): Base URL of the BitAds API. Defaults to const.API_BITADS_DOMAIN.
+
+    Returns:
+        BitAdsClient: Initialized BitAds client instance.
+
+    Raises:
+        None
+
+    Notes:
+        The function uses the wallet's hotkey address obtained via `wallet.get_hotkey().ss58_address`.
+        It initializes a SyncBitAdsClient with the provided base URL, hotkey, and template version.
+    """
     return SyncBitAdsClient(
         base_url,
-        hot_key=temp_hot_key,
+        hot_key=hotkey,
         v=template.__version__,
     )
 
@@ -164,3 +188,7 @@ def get_storage(neuron_type: str, wallet: bt.wallet) -> BaseStorage:
         This function initializes a FileStorage instance with the neuron type and the wallet's hotkey address.
     """
     return FileStorage(neuron_type, wallet.get_hotkey().ss58_address)
+
+
+def get_campaign_service(database_manager: DatabaseManager) -> CampaignService:
+    return CampaignServiceImpl(database_manager)
