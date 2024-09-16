@@ -75,3 +75,7 @@ class MinerService(SettingsContainer, ABC):
     @abstractmethod
     async def get_hotkey_and_block(self) -> Tuple[str, int]:
         pass
+
+    @abstractmethod
+    async def set_hotkey_and_block(self, hotkey: str, block: int) -> None:
+        pass

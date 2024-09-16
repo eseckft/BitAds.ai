@@ -68,6 +68,9 @@ class CoreMiner(BaseMinerNeuron):
             self.neuron_type, self.subtensor.network
         )
         self.miner_service = dependencies.get_miner_service(self.database_manager)
+        self.campaign_service = common_dependencies.get_campaign_service(
+            self.database_manager
+        )
         self.recent_activity_service = dependencies.get_recent_activity_service(
             self.database_manager
         )
@@ -90,6 +93,7 @@ class CoreMiner(BaseMinerNeuron):
 
     def sync(self):
         super().sync()
+        self.loop.run_until_complete(self._set_hotkey_and_block())
         self.loop.run_until_complete(self._ping_bitads())
         self.loop.run_until_complete(self.__sync_visits())
         self.loop.run_until_complete(self._send_load_data())
@@ -102,6 +106,7 @@ class CoreMiner(BaseMinerNeuron):
         if response and response.result:
             self.validators = response.validators
             self.miners = response.miners
+            await self.campaign_service.set_campaigns(response.campaigns)
         bt.logging.info("End ping BitAds")
 
     @execute_periodically(Environ.CLEAR_RECENT_ACTIVITY_PERIOD)
@@ -109,15 +114,6 @@ class CoreMiner(BaseMinerNeuron):
         bt.logging.info("Start clear recent activity")
         await self.recent_activity_service.clear_old_recent_activity()
         bt.logging.info("End clear recent activity")
-
-    async def _sync_visits(self, delay: float = 12.0):
-        while True:
-            try:
-                await self.__sync_visits()
-            except:
-                bt.logging.exception("Sync error")
-            finally:
-                await asyncio.sleep(delay)
 
     async def __sync_visits(self, timeout: float = 11.0):
         bt.logging.info("Start sync process")
@@ -141,6 +137,11 @@ class CoreMiner(BaseMinerNeuron):
         bt.logging.info("Start send load data to BitAds")
         self.bit_ads_client.send_system_load(utils.get_load_average_json())
         bt.logging.info("End send load data to BitAds")
+
+    async def _set_hotkey_and_block(self):
+        current_block = self.subtensor.get_current_block()
+        hotkey = self.wallet.get_hotkey().ss58_address
+        await self.miner_service.set_hotkey_and_block(hotkey, current_block)
 
     def save_state(self):
         """

@@ -83,7 +83,7 @@ class Campaign(BaseModel):
     id: str
     type: CampaignType = CampaignType.REGULAR
 
-    model_config = ConfigDict(extra="allow", from_attributes=True)
+    model_config = ConfigDict(extra="ignore", from_attributes=True)
 
 
 class CampaignStatus(IntEnum):

@@ -107,3 +107,7 @@ class MinerServiceImpl(SettingsContainerImpl, MinerService):
             if not result:
                 raise ValueError("Hotkey to block not found")
             return result
+
+    async def set_hotkey_and_block(self, hotkey: str, block: int) -> None:
+        with self.database_manager.get_session("main") as session:
+            hotkey_to_block.set_hotkey_and_block(session, hotkey, block)

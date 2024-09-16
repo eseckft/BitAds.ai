@@ -100,7 +100,7 @@ async def fetch_request_data_and_redirect(
     await miner_service.add_visit(visitor)
     log.info(f"Saved visit: {visitor.id}")
     url = (
-        f"{campaign.product_unique_id}?visit_hash={id_}"
+        f"{campaign.product_link}?visit_hash={id_}"
         if campaign.type == CampaignType.CPA
         else f"https://v.bitads.ai/campaigns/{campaign_id}?id={id_}"
     )

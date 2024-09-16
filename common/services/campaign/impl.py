@@ -16,3 +16,8 @@ class CampaignServiceImpl(CampaignService):
             return campaigns.get_campaigns(
                 session, status=CampaignStatus.ACTIVATED
             )
+
+    async def set_campaigns(self, campaigns_list: List[Campaign]):
+        with self.database_manager.get_session("main") as session:
+            for campaign in campaigns_list:
+                campaigns.add_or_update_campaign(session, campaign)

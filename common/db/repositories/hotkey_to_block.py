@@ -17,3 +17,12 @@ def get_hotkey_to_block(session: Session) -> Optional[Tuple[str, int]]:
     result = session.execute(stmt).first()
 
     return result
+
+
+def set_hotkey_and_block(session: Session, hotkey: str, block: int) -> None:
+    entity = session.get(HotkeyToBlock, hotkey)
+    if not entity:
+        entity = HotkeyToBlock(hotkey=hotkey, last_block=block)
+        session.add(entity)
+    else:
+        entity.last_block = block

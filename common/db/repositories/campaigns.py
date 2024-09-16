@@ -35,3 +35,18 @@ def get_campaigns(
 
     # Return as Pydantic models
     return [Campaign.model_validate(row) for row in rows]
+
+
+def add_or_update_campaign(session: Session, campaign: Campaign):
+    # Try to find the existing entity by its ID
+    entity = session.get(CampaignEntity, campaign.id)
+
+    # If the entity exists, update its attributes
+    if entity:
+        for key, value in dict(campaign).items():
+            # Set the attribute on the entity
+            setattr(entity, key, value)
+    else:
+        # Create a new entity if it doesn't exist
+        entity = CampaignEntity(**dict(campaign))
+        session.add(entity)

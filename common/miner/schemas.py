@@ -48,7 +48,7 @@ class VisitorSchema(BaseModel):
     at: bool
     device: Optional[Device] = None
     is_unique: Optional[bool] = None
-    return_in_site: Optional[bool] = None
+    return_in_site: bool = False
     status: Optional[VisitStatus] = None
     created_at: Optional[datetime] = None
 
