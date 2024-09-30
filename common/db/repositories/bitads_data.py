@@ -129,7 +129,6 @@ def complete_sales_less_than_date(
         .filter(
             and_(
                 BitAdsData.sale_date < sales_to,
-                BitAdsData.refund == 0,
                 BitAdsData.sales_status == SalesStatus.NEW,
             )
         )
