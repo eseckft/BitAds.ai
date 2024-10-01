@@ -14,7 +14,7 @@ permission issues.**
     - [Creating a Virtual Environment](#creating-a-virtual-environment)
     - [Country Detection](#country-detection)
     - [Git Clone the repositroy](#git-clone-the-repository)
-    - [Create account on BitAds.ai (Mandatory)](#create-account-on-bitadsai-mandatory)
+    - [Create account on BitAds.ai (Optional)](#create-account-on-bitadsai-optional)
     - [Installing Dependencies](#installing-dependencies) 
 2. [Launch](#launch)
     - [Running the Validator with Auto-Update](#running-the-validator-with-auto-update)
