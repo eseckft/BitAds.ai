@@ -88,3 +88,17 @@ class CampaignEntity(Base):
     product_unique_id: Mapped[str]
     status: Mapped[Optional[int]]
     product_link: Mapped[Optional[str]]
+
+
+class TwoFactorCodes(Base):
+    __tablename__ = "two_factor_codes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow
+    )
+    ip_address: Mapped[str]
+    user_agent: Mapped[Optional[str]]
+    hotkey: Mapped[str]
+    code: Mapped[str]
+

@@ -28,6 +28,7 @@ from proxies.apis.fetch_from_db_test import router as test_router
 from proxies.apis.get_database import router as database_router
 from proxies.apis.logging import router as logs_router
 from proxies.apis.version import router as version_router
+from proxies.apis.two_factor import router as two_factor_router
 
 
 database_manager = common_dependencies.get_database_manager(
@@ -35,22 +36,25 @@ database_manager = common_dependencies.get_database_manager(
 )
 campaign_service = common_dependencies.get_campaign_service(database_manager)
 miner_service = dependencies.get_miner_service(database_manager)
+two_factor_service = common_dependencies.get_two_factor_service(database_manager)
 
 
 # noinspection PyUnresolvedReferences
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.database_manager = database_manager
+    app.state.two_factor_service = two_factor_service
     yield
 
 
-app = FastAPI(version="0.3.1", lifespan=lifespan)
+app = FastAPI(version="0.4.0", lifespan=lifespan)
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
 app.include_router(version_router)
 app.include_router(test_router)
 app.include_router(logs_router)
 app.include_router(database_router)
+app.include_router(two_factor_router)
 
 
 log = logging.getLogger(__name__)

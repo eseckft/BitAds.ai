@@ -3,9 +3,15 @@ BitAds schemas
 """
 from datetime import datetime
 from enum import IntEnum
-from typing import Optional, List, Set, Dict
+from typing import Optional, List, Set, Dict, Any
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import (
+    BaseModel,
+    Field,
+    ConfigDict,
+    IPvAnyAddress,
+    field_validator,
+)
 
 from common.miner.schemas import VisitorActivitySchema
 from common.schemas.campaign import CampaignType
@@ -268,3 +274,20 @@ class BitAdsDataSchema(BaseModel):
     return_in_site: Optional[bool] = None
 
     model_config = ConfigDict(from_attributes=True, frozen=True, use_enum_values=True)
+
+
+class TwoFactorRequest(BaseModel):
+    ip_address: IPvAnyAddress
+    user_agent: Optional[str] = None
+    hotkey: str
+    code: str
+
+
+class TwoFactorSchema(BaseModel):
+    created_at: Optional[datetime] = None
+    ip_address: str
+    user_agent: Optional[str] = None
+    hotkey: str
+    code: str
+
+    model_config = ConfigDict(from_attributes=True)
