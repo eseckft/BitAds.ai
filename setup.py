@@ -74,6 +74,11 @@ setup(
     license="MIT",
     python_requires=">=3.8",
     install_requires=requirements,
+    entry_points={
+        "console_scripts": [
+            "bacli=bitads_cli.cli:main",
+        ],
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",

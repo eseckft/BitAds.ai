@@ -20,7 +20,7 @@ Context Managers:
 """
 
 from contextlib import contextmanager
-from typing import Literal, Generator
+from typing import Literal, Generator, Optional
 
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -44,9 +44,7 @@ class Database:
         Args:
             url (str): The URL for connecting to the database.
         """
-        self.engine = create_engine(
-            url, connect_args={"check_same_thread": False}
-        )
+        self.engine = create_engine(url, connect_args={"check_same_thread": False})
         self.sessionmaker = sessionmaker(
             autocommit=False, autoflush=False, bind=self.engine
         )
@@ -91,7 +89,9 @@ class DatabaseManager:
         main_sessionmaker (sessionmaker): SQLAlchemy session maker for 'main' database.
     """
 
-    def __init__(self, neuron_type: str, subtensor_network: str):
+    def __init__(
+        self, neuron_type: Optional[str] = None, subtensor_network: Optional[str] = None
+    ):
         """
         Initializes the DatabaseManager instance.
 
@@ -102,23 +102,22 @@ class DatabaseManager:
         subtensor_network = (
             "finney" if "test" != subtensor_network else subtensor_network
         )
-        self.active_db = _create_engine(
-            Environ.DB_URL_TEMPLATE.format(
-                name=f"{neuron_type}_active", network=subtensor_network
+        if neuron_type:
+            self.active_db = _create_engine(
+                Environ.DB_URL_TEMPLATE.format(
+                    name=f"{neuron_type}_active", network=subtensor_network
+                )
             )
-        )
-        self.history_db = _create_engine(
-            Environ.DB_URL_TEMPLATE.format(
-                name=f"{neuron_type}_history", network=subtensor_network
+            self.history_db = _create_engine(
+                Environ.DB_URL_TEMPLATE.format(
+                    name=f"{neuron_type}_history", network=subtensor_network
+                )
             )
-        )
+            self.active_sessionmaker = _create_sessionmaker(self.active_db)
+            self.history_sessionmaker = _create_sessionmaker(self.history_db)
         self.main_db = _create_engine(
-            Environ.DB_URL_TEMPLATE.format(
-                name=f"main", network=subtensor_network
-            )
+            Environ.DB_URL_TEMPLATE.format(name=f"main", network=subtensor_network)
         )
-        self.active_sessionmaker = _create_sessionmaker(self.active_db)
-        self.history_sessionmaker = _create_sessionmaker(self.history_db)
         self.main_sessionmaker = _create_sessionmaker(self.main_db)
 
     @contextmanager
@@ -140,9 +139,7 @@ class DatabaseManager:
         """
         session_maker = getattr(self, f"{db_type}_sessionmaker")
         if not session_maker:
-            raise ValueError(
-                "Invalid db_type. Must be 'main', 'active', or 'history'."
-            )
+            raise ValueError("Invalid db_type. Must be 'main', 'active', or 'history'.")
         session = session_maker()
         try:
             yield session

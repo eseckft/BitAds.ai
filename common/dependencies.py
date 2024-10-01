@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 import bittensor as bt
 from fastapi import Depends
@@ -57,7 +57,10 @@ def get_geo_ip_service() -> GeoIpService:
     return GeoIpServiceImpl(Environ.GEO2_LITE_DB_PATH)
 
 
-def get_database_manager(neuron_type: str, subtensor_network: str) -> DatabaseManager:
+def get_database_manager(
+        neuron_type: Optional[str] = None,
+        subtensor_network: Optional[str] = None,
+) -> DatabaseManager:
     """
     Creates and returns a DatabaseManager instance configured with the specified neuron type and Subtensor network.
 
