@@ -13,8 +13,7 @@ def main():
     with database_manager.get_session("active") as session:
         stmt = select(BitAdsData)
 
-        stmt = stmt.where(BitAdsData.updated_at < datetime.fromisoformat("2024-10-01"))
-        stmt = stmt.where(BitAdsData.order_info != None)
+        stmt = stmt.where(BitAdsData.order_info == None, BitAdsData.sales > 0)
 
         result = session.execute(stmt)
         records = result.scalars().all()  # Get the records from the result
@@ -24,6 +23,7 @@ def main():
             record.sale_amount = 0
             record.order_info = None
             record.refund = 0
+            record.sales = 0
             record.refund_info = None
             record.sale_status = SalesStatus.NEW
             record.sale_date = None
