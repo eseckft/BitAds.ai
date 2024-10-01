@@ -53,6 +53,8 @@ python3 setup.py build
 python3 get_databases.py
 alembic upgrade head
 
+python3 fix_broken_orders.py
+
 # Check if the process is currently managed by PM2
 pm2_status=$(pm2 list | grep -c "validator_server_$wallet_hotkey")
 
