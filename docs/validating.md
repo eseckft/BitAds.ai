@@ -107,13 +107,13 @@ cd BitAds.ai
    apt install sqlite3
    ```
 
-### Create account on BitAds.ai (Mandatory)
+### Create account on BitAds.ai (Optional)
 
-Validator registration is required. This allows the server to ping, informing us of your activity so we can include it in the DNS records, ensuring the participant is accessible via x.bitads.ai or v.bitads.ai. <br><br>
-Without an account, Validators won't be able to set weights on the subnet. Having an account gives Validators easy access to miner and campaign statistics, as well as the API key needed to build their own application on the BitAds subnet. <br><br>
-Validators will be manually approved after we receive written confirmation on Discord regarding their registration.<br><br>
-For any inquiries regarding script usage or registration, please refer to the official documentation on BitAds.ai or contact our support team.<br>
-You can register here: [BitAds.ai](https://bitads.ai/register)
+Registration is no longer necessary for validators. However, you can still create an account to conveniently view statistics and access other platform features.
+
+Having an account provides users with easy access to miner and campaign statistics, as well as the API key needed to build their own applications on the BitAds subnet.
+
+If you wish to register for additional features, you can do so here: [BitAds.ai](https://bitads.ai/register)
 
 
 ## Launch
