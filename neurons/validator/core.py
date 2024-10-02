@@ -227,8 +227,6 @@ class CoreValidator(BaseValidatorNeuron):
             netuid=self.config.netuid,
             uids=list(miner_ratings.keys()),
             weights=list(miner_ratings.values()),
-            wait_for_finalization=True,
-            wait_for_inclusion=False,
             version_key=__spec_version__,
         )
         self.update_scores(
