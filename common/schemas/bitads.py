@@ -93,6 +93,12 @@ class Campaign(BaseModel):
     id: str
     type: CampaignType = CampaignType.REGULAR
 
+    validator_id: Optional[int] = None
+    country_of_registration: Optional[str] = None
+    company_registration_number: Optional[str] = None
+    countries_approved_for_product_sales: Optional[str] = None
+    updated_at: Optional[datetime] = None
+
     model_config = ConfigDict(extra="ignore", from_attributes=True)
 
 

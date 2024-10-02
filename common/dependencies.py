@@ -16,8 +16,6 @@ from common.services.campaign.base import CampaignService
 from common.services.campaign.impl import CampaignServiceImpl
 from common.services.geoip.base import GeoIpService
 from common.services.geoip.impl import GeoIpServiceImpl
-from common.services.storage.base import BaseStorage
-from common.services.storage.file import FileStorage
 from common.services.two_factor.base import TwoFactorService
 from common.services.two_factor.impl import TwoFactorServiceImpl
 from common.services.unique_link.base import MinerUniqueLinkService
@@ -175,26 +173,6 @@ def get_wallet(name: str, hotkey: str) -> bt.wallet:
         This function initializes a wallet object using the BitTensor library with the provided parameters.
     """
     return bt.wallet(name, hotkey)
-
-
-def get_storage(neuron_type: str, wallet: bt.wallet) -> BaseStorage:
-    """
-    Creates and returns a storage service instance based on the neuron type and wallet.
-
-    Args:
-        neuron_type (str): Type or category of the neuron.
-        wallet (bt.wallet): Wallet object used for obtaining the hotkey.
-
-    Returns:
-        BaseStorage: Initialized storage service instance.
-
-    Raises:
-        None
-
-    Notes:
-        This function initializes a FileStorage instance with the neuron type and the wallet's hotkey address.
-    """
-    return FileStorage(neuron_type, wallet.get_hotkey().ss58_address)
 
 
 def get_campaign_service(database_manager: DatabaseManager) -> CampaignService:

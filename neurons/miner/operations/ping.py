@@ -9,7 +9,6 @@ from common.schemas.bitads import (
     UniqueIdData,
     MinerUniqueLinkSchema,
 )
-from common.services.storage.base import BaseStorage
 from common.services.unique_link.base import MinerUniqueLinkService
 from neurons.base.operations import BaseOperation
 from neurons.protocol import Ping

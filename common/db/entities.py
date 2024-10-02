@@ -93,6 +93,11 @@ class CampaignEntity(Base):
     date_approved: Mapped[Optional[datetime]]
     product_name: Mapped[Optional[str]]
     store_name: Mapped[Optional[str]]
+    validator_id: Mapped[Optional[int]]
+    country_of_registration: Mapped[Optional[str]]
+    company_registration_number: Mapped[Optional[str]]
+    countries_approved_for_product_sales: Mapped[Optional[str]]
+    updated_at: Mapped[Optional[datetime]]
 
 
 class TwoFactorCodes(Base):
