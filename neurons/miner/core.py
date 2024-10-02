@@ -154,7 +154,7 @@ class CoreMiner(BaseMinerNeuron):
 
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
-    bt.logging.set_debug()
+    bt.logging.on()
     log_startup("Miner")
     with dependencies.get_core_miner() as miner:
         while True:

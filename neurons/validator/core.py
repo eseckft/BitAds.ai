@@ -147,7 +147,9 @@ class CoreValidator(BaseValidatorNeuron):
     async def __forward_bitads_data(self, timeout: float = 6.0):
         bt.logging.info("Start sync bitads process")
 
-        offset = self.offset
+        offset = await self.bitads_service.get_last_update_bitads_data(
+            self.wallet.get_hotkey().ss58_address
+        ) if not self.offset else self.offset
 
         bt.logging.debug(
             f"Sync visits with offset: {offset} with miners: {self.miners}"
@@ -304,7 +306,7 @@ class CoreValidator(BaseValidatorNeuron):
 
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
-    bt.logging.set_debug()
+    bt.logging.on()
     log_startup("Validator")
     with dependencies.get_core_validator() as validator:
         while True:
