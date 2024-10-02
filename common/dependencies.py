@@ -20,6 +20,8 @@ from common.services.storage.base import BaseStorage
 from common.services.storage.file import FileStorage
 from common.services.two_factor.base import TwoFactorService
 from common.services.two_factor.impl import TwoFactorServiceImpl
+from common.services.unique_link.base import MinerUniqueLinkService
+from common.services.unique_link.impl import MinerUniqueLinkServiceImpl
 
 
 def get_main_db(db_url: str) -> Database:
@@ -201,3 +203,7 @@ def get_campaign_service(database_manager: DatabaseManager) -> CampaignService:
 
 def get_two_factor_service(database_manager: DatabaseManager) -> TwoFactorService:
     return TwoFactorServiceImpl(database_manager)
+
+
+def get_miner_unique_link_service(database_manager: DatabaseManager) -> MinerUniqueLinkService:
+    return MinerUniqueLinkServiceImpl(database_manager)

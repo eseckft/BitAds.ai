@@ -88,10 +88,11 @@ wget https://git.io/GeoLite2-Country.mmdb
 
    Installation instructions can be found [here](https://pm2.io/docs/runtime/guide/installation/)
 
-### Create account on BitAds.ai (Mandatory)
+### Create account on BitAds.ai (Optional)
 
-To generate unique links for active marketing campaigns, register your miner on BitAds.ai. For easy access to links and miner stats, having a registered account is recommended. You can register here: [BitAds.ai](https://bitads.ai/register)  <br>
+You do not need to register on BitAds.ai to generate unique links for active marketing campaigns, as the `bacli` offers a practical and straightforward way to access these links without registration. However, registering an account can enhance your experience by providing additional features and insights into your miner’s statistics. You can register here: [BitAds.ai](https://bitads.ai/register)
 
+After starting your miner process in PM2 and allowing sufficient time for unique links to be generated (up to half an hour), you can use the console command `bacli campaigns active` to retrieve your miner’s unique links for active campaigns.
 
 ## Launch
 

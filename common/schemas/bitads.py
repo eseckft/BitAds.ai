@@ -71,9 +71,12 @@ class Campaign(BaseModel):
 
     # in_progress: Optional[int] = None
     # product_title: Optional[str] = None
-    # created_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    date_started: Optional[datetime] = None
+    date_approved: Optional[datetime] = None
     # is_aggregate: Optional[int] = None
     product_unique_id: str
+    product_name: Optional[str] = None
     # validator_id: Optional[int] = None
     status: Optional[int] = None
     # product_button_link: Optional[str] = None
@@ -85,6 +88,7 @@ class Campaign(BaseModel):
     # product_button_text: Optional[str] = None
     # product_images: Optional[str] = None
     # product_theme: Optional[str] = None
+    store_name: Optional[str] = None
     product_link: Optional[str] = None
     id: str
     type: CampaignType = CampaignType.REGULAR
@@ -289,5 +293,15 @@ class TwoFactorSchema(BaseModel):
     user_agent: Optional[str] = None
     hotkey: str
     code: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MinerUniqueLinkSchema(BaseModel):
+    id: str
+    created_at: Optional[datetime] = None
+    campaign_id: str
+    hotkey: str
+    link: str
 
     model_config = ConfigDict(from_attributes=True)

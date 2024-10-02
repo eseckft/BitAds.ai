@@ -59,7 +59,6 @@ class CoreMiner(BaseMinerNeuron):
         self.bit_ads_client = common_dependencies.create_bitads_client(
             self.wallet, self.config.bitads.url
         )
-        self.storage = common_dependencies.get_storage(self.neuron_type, self.wallet)
 
         self.validators = CommonEnviron.VALIDATORS
         self.miners = CommonEnviron.MINERS
@@ -72,6 +71,9 @@ class CoreMiner(BaseMinerNeuron):
             self.database_manager
         )
         self.recent_activity_service = dependencies.get_recent_activity_service(
+            self.database_manager
+        )
+        self.unique_link_service = common_dependencies.get_miner_unique_link_service(
             self.database_manager
         )
 

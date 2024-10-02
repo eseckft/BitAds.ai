@@ -3,7 +3,6 @@ from typing import List
 from common.db.database import DatabaseManager
 from common.db.repositories import campaigns
 from common.schemas.bitads import Campaign, CampaignStatus
-from common.schemas.campaign import CampaignType
 from common.services.campaign.base import CampaignService
 
 
