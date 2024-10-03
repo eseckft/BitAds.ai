@@ -129,7 +129,10 @@ class CoreMiner(BaseMinerNeuron):
             timeout=timeout,
         )
         visits = {visit for synapse in responses.values() for visit in synapse.visits}
-        await self.miner_service.add_visits(visits)
+        try:
+            await self.miner_service.add_visits(visits)
+        except:
+            bt.logging.exception("Unable to add visits")
         bt.logging.info("End sync process")
 
     @execute_periodically(timedelta(minutes=15))
