@@ -266,7 +266,7 @@ class CoreValidator(BaseValidatorNeuron):
         try:
             current_block = self.subtensor.get_current_block()
             if (current_block % self.evaluate_miners_blocks == 0) or (
-                self.last_evaluate_block and
+                # self.last_evaluate_block and
                 current_block - self.last_evaluate_block
                 >= self.evaluate_miners_blocks
             ):
