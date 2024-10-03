@@ -46,6 +46,7 @@ def read_requirements(path):
 
 
 requirements = read_requirements("requirements.txt")
+bacli_requirements = read_requirements("bacli_requirements.txt")
 here = path.abspath(path.dirname(__file__))
 
 with open(path.join(here, "README.md"), encoding="utf-8") as f:
@@ -73,7 +74,7 @@ setup(
     author_email="",
     license="MIT",
     python_requires=">=3.8",
-    install_requires=requirements,
+    install_requires=requirements + bacli_requirements,
     entry_points={
         "console_scripts": [
             "bacli=bitads_cli.cli:main",

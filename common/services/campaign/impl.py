@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from common.db.database import DatabaseManager
 from common.db.repositories import campaigns
@@ -12,11 +12,13 @@ class CampaignServiceImpl(CampaignService):
 
     async def get_active_campaigns(self) -> List[Campaign]:
         with self.database_manager.get_session("main") as session:
-            return campaigns.get_campaigns(
-                session, status=CampaignStatus.ACTIVATED
-            )
+            return campaigns.get_campaigns(session, status=CampaignStatus.ACTIVATED)
 
     async def set_campaigns(self, campaigns_list: List[Campaign]):
         with self.database_manager.get_session("main") as session:
             for campaign in campaigns_list:
                 campaigns.add_or_update_campaign(session, campaign)
+
+    async def get_campaign_by_id(self, id_: str) -> Optional[Campaign]:
+        with self.database_manager.get_session("main") as session:
+            return campaigns.get_by_product_unique_id(session, id_)
