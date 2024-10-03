@@ -10,6 +10,8 @@ database_manager = dependencies.get_database_manager("validator", "finney")
 
 
 def main():
+    return
+
     with database_manager.get_session("active") as session:
         stmt = select(BitAdsData)
 
