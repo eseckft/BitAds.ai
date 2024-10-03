@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from common import dependencies
 from common.schemas.sales import SalesStatus
-from common.validator.db.entities.active import BitAdsData
+from common.validator.db.entities.active import BitAdsData, OrderQueue
 
 database_manager = dependencies.get_database_manager("validator", "finney")
 
@@ -13,11 +13,13 @@ def main():
     with database_manager.get_session("active") as session:
         stmt = select(BitAdsData)
 
-        stmt = stmt.where(BitAdsData.updated_at < datetime.fromisoformat("2024-10-01 15:00:00"))
+        # stmt = stmt.where(BitAdsData.updated_at < datetime.fromisoformat("2024-10-01 15:00:00"))
         stmt = stmt.where(BitAdsData.order_info != None)
 
         result = session.execute(stmt)
         records = result.scalars().all()  # Get the records from the result
+
+        session.execute(delete(OrderQueue))
 
         # Iterate over each record and update the fields
         for record in records:
