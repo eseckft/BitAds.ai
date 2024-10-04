@@ -239,7 +239,7 @@ class CoreValidator(BaseValidatorNeuron):
         else:
             bt.logging.error("set_weights failed", msg)
 
-    @execute_periodically(Environ.PING_PERIOD)
+    @execute_periodically(const.PING_PERIOD)
     async def _ping_bitads(self):
         bt.logging.info("Start ping BitAds")
         response = self.bitads_client.subnet_ping()

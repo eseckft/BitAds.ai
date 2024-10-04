@@ -55,3 +55,5 @@ TRACKING_DATA_DELTA = timedelta(seconds=20)
 VERSION_KEY = 1725727158
 
 REWARD_SALE_PERIOD = timedelta(days=30)
+
+PING_PERIOD: timedelta = timedelta(minutes=30)

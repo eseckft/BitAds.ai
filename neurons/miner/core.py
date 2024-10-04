@@ -7,6 +7,7 @@ from datetime import timedelta
 from typing import Type
 
 import bittensor as bt
+from common.helpers import const
 
 from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
@@ -92,7 +93,7 @@ class CoreMiner(BaseMinerNeuron):
         except Exception as e:
             bt.logging.exception(f"Error during sync: {str(e)}")
 
-    @execute_periodically(Environ.PING_PERIOD)
+    @execute_periodically(const.PING_PERIOD)
     async def _ping_bitads(self):
         try:
             bt.logging.info("Start ping BitAds")
