@@ -87,7 +87,7 @@ def get_bitads_service(
 
 
 def create_bitads_client(
-    wallet: bt.wallet, base_url: str = const.API_BITADS_DOMAIN
+    wallet: bt.wallet, base_url: str = const.API_BITADS_DOMAIN, neuron_type: str = None
 ) -> BitAdsClient:
     """
     Creates a BitAds client instance configured with the provided wallet and base URL.
@@ -106,11 +106,11 @@ def create_bitads_client(
         The function uses the wallet's hotkey address obtained via `wallet.get_hotkey().ss58_address`.
         It initializes a SyncBitAdsClient with the provided base URL, hotkey, and template version.
     """
-    return create_bitads_client_from_hotkey(wallet.get_hotkey().ss58_address, base_url)
+    return create_bitads_client_from_hotkey(wallet.get_hotkey().ss58_address, base_url, neuron_type)
 
 
 def create_bitads_client_from_hotkey(
-    hotkey: str, base_url: str = const.API_BITADS_DOMAIN
+    hotkey: str, base_url: str = const.API_BITADS_DOMAIN, neuron_type: str = None
 ) -> BitAdsClient:
     """
     Creates a BitAds client instance configured with the provided wallet and base URL.
@@ -133,6 +133,7 @@ def create_bitads_client_from_hotkey(
         base_url,
         hot_key=hotkey,
         v=template.__version__,
+        neuron_type=neuron_type
     )
 
 
@@ -183,5 +184,7 @@ def get_two_factor_service(database_manager: DatabaseManager) -> TwoFactorServic
     return TwoFactorServiceImpl(database_manager)
 
 
-def get_miner_unique_link_service(database_manager: DatabaseManager) -> MinerUniqueLinkService:
+def get_miner_unique_link_service(
+    database_manager: DatabaseManager,
+) -> MinerUniqueLinkService:
     return MinerUniqueLinkServiceImpl(database_manager)

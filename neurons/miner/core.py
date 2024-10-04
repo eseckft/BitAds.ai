@@ -57,7 +57,7 @@ class CoreMiner(BaseMinerNeuron):
         self.loop = asyncio.get_event_loop()
 
         self.bit_ads_client = common_dependencies.create_bitads_client(
-            self.wallet, self.config.bitads.url
+            self.wallet, self.config.bitads.url, self.neuron_type
         )
 
         self.validators = CommonEnviron.VALIDATORS
