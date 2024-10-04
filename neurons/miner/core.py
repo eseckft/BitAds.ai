@@ -43,17 +43,8 @@ from template.validator.forward import forward_each_axon
 
 
 class CoreMiner(BaseMinerNeuron):
-    """
-    Your miner neuron class. You should use this class to define your miner's behavior. In particular, you should replace the forward function with your own logic. You may also want to override the blacklist and priority functions according to your needs.
-
-    This class inherits from the BaseMinerNeuron class, which in turn inherits from BaseNeuron. The BaseNeuron class takes care of routine tasks such as setting up wallet, subtensor, metagraph, logging directory, parsing config, etc. You can override any of the methods in BaseNeuron if you need to customize the behavior.
-
-    This class provides reasonable default behavior for a miner such as blacklisting unrecognized hotkeys, prioritizing requests based on stake, and forwarding requests to the forward function. If you need to define custom
-    """
-
     def __init__(self, config=None):
         super(CoreMiner, self).__init__(config=config)
-        # Create asyncio event loop to manage async tasks.
         self.loop = asyncio.get_event_loop()
 
         self.bit_ads_client = common_dependencies.create_bitads_client(
@@ -75,7 +66,6 @@ class CoreMiner(BaseMinerNeuron):
             self.database_manager
         )
 
-        # Dendrite lets us send messages to other nodes (axons) in the network.
         if self.config.mock:
             self.dendrite = MockDendrite(wallet=self.wallet)
         else:
@@ -92,59 +82,77 @@ class CoreMiner(BaseMinerNeuron):
             self.axon.attach(operation.forward, operation.blacklist, operation.priority)
 
     def sync(self):
-        super().sync()
-        self.loop.run_until_complete(self._set_hotkey_and_block())
-        self.loop.run_until_complete(self._ping_bitads())
-        self.loop.run_until_complete(self.__sync_visits())
-        self.loop.run_until_complete(self._send_load_data())
-        self.loop.run_until_complete(self._clear_recent_activity())
+        try:
+            super().sync()
+            self.loop.run_until_complete(self._set_hotkey_and_block())
+            self.loop.run_until_complete(self._ping_bitads())
+            self.loop.run_until_complete(self.__sync_visits())
+            self.loop.run_until_complete(self._send_load_data())
+            self.loop.run_until_complete(self._clear_recent_activity())
+        except Exception as e:
+            bt.logging.exception(f"Error during sync: {str(e)}")
 
     @execute_periodically(Environ.PING_PERIOD)
     async def _ping_bitads(self):
-        bt.logging.info("Start ping BitAds")
-        response = self.bit_ads_client.subnet_ping()
-        if response and response.result:
-            self.validators = response.validators
-            self.miners = response.miners
-            await self.campaign_service.set_campaigns(response.campaigns)
-        bt.logging.info("End ping BitAds")
+        try:
+            bt.logging.info("Start ping BitAds")
+            response = self.bit_ads_client.subnet_ping()
+            if response and response.result:
+                self.validators = response.validators
+                self.miners = response.miners
+                await self.campaign_service.set_campaigns(response.campaigns)
+            bt.logging.info("End ping BitAds")
+        except Exception as e:
+            bt.logging.exception(f"Error in _ping_bitads: {str(e)}")
 
     @execute_periodically(Environ.CLEAR_RECENT_ACTIVITY_PERIOD)
     async def _clear_recent_activity(self):
-        bt.logging.info("Start clear recent activity")
-        await self.recent_activity_service.clear_old_recent_activity()
-        bt.logging.info("End clear recent activity")
+        try:
+            bt.logging.info("Start clear recent activity")
+            await self.recent_activity_service.clear_old_recent_activity()
+            bt.logging.info("End clear recent activity")
+        except Exception as e:
+            bt.logging.exception(f"Error in _clear_recent_activity: {str(e)}")
 
     async def __sync_visits(self, timeout: float = 11.0):
-        bt.logging.info("Start sync process")
-        offset = await self.miner_service.get_last_update_visit(
-            self.wallet.get_hotkey().ss58_address
-        )
-        bt.logging.debug(f"Sync visits with offset: {offset}")
-        bt.logging.debug(f"Sync visits with miners: {self.miners}")
-        responses = await forward_each_axon(
-            self,
-            SyncVisits(offset=offset),
-            *self.miners,
-            timeout=timeout,
-        )
-        visits = {visit for synapse in responses.values() for visit in synapse.visits}
         try:
-            await self.miner_service.add_visits(visits)
-        except:
-            bt.logging.exception("Unable to add visits")
-        bt.logging.info("End sync process")
+            bt.logging.info("Start sync process")
+            offset = await self.miner_service.get_last_update_visit(
+                self.wallet.get_hotkey().ss58_address
+            )
+            bt.logging.debug(f"Sync visits with offset: {offset}")
+            bt.logging.debug(f"Sync visits with miners: {self.miners}")
+            responses = await forward_each_axon(
+                self,
+                SyncVisits(offset=offset),
+                *self.miners,
+                timeout=timeout,
+            )
+            visits = {visit for synapse in responses.values() for visit in synapse.visits}
+            try:
+                await self.miner_service.add_visits(visits)
+            except Exception as e:
+                bt.logging.exception(f"Unable to add visits: {str(e)}")
+            bt.logging.info("End sync process")
+        except Exception as e:
+            bt.logging.exception(f"Error in __sync_visits: {str(e)}")
 
     @execute_periodically(timedelta(minutes=15))
     async def _send_load_data(self):
-        bt.logging.info("Start send load data to BitAds")
-        self.bit_ads_client.send_system_load(utils.get_load_average_json())
-        bt.logging.info("End send load data to BitAds")
+        try:
+            bt.logging.info("Start send load data to BitAds")
+            self.bit_ads_client.send_system_load(utils.get_load_average_json())
+            bt.logging.info("End send load data to BitAds")
+        except Exception as e:
+            bt.logging.exception(f"Error in _send_load_data: {str(e)}")
 
     async def _set_hotkey_and_block(self):
-        current_block = self.subtensor.get_current_block()
-        hotkey = self.wallet.get_hotkey().ss58_address
-        await self.miner_service.set_hotkey_and_block(hotkey, current_block)
+        try:
+            current_block = self.subtensor.get_current_block()
+            hotkey = self.wallet.get_hotkey().ss58_address
+            await self.miner_service.set_hotkey_and_block(hotkey, current_block)
+        except Exception as e:
+            bt.logging.exception(f"Error in _set_hotkey_and_block: {str(e)}")
 
     def save_state(self):
         """
@@ -155,7 +163,6 @@ class CoreMiner(BaseMinerNeuron):
         return op_type(**self.__dict__)
 
 
-# This is the main function, which runs the miner.
 if __name__ == "__main__":
     bt.logging.on()
     log_startup("Miner")
@@ -165,3 +172,5 @@ if __name__ == "__main__":
                 time.sleep(5)
             except KeyboardInterrupt:
                 break
+            except Exception as e:
+                bt.logging.exception(f"Error in main loop: {str(e)}")
