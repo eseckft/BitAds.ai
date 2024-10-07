@@ -147,9 +147,9 @@ class CoreValidator(BaseValidatorNeuron):
     async def __forward_bitads_data(self, timeout: float = 6.0):
         bt.logging.info("Start sync bitads process")
 
-        offset = (
-            datetime.fromisoformat("2024-09-28") if not self.offset else self.offset
-        )
+        offset = await self.bitads_service.get_last_update_bitads_data(
+            self.wallet.get_hotkey().ss58_address
+        ) if not self.offset else self.offset
 
         bt.logging.debug(
             f"Sync visits with offset: {offset} with miners: {self.miners}"
@@ -228,7 +228,6 @@ class CoreValidator(BaseValidatorNeuron):
             uids=list(miner_ratings.keys()),
             weights=list(miner_ratings.values()),
             version_key=__spec_version__,
-            wait_for_finalization=True
         )
         self.update_scores(
             torch.FloatTensor(list(miner_ratings.values())).to(self.device),
