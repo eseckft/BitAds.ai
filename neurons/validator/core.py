@@ -128,9 +128,9 @@ class CoreValidator(BaseValidatorNeuron):
         await self.validator_service.add_miner_ping(
             current_block,
             {
-                t.data.miner_unique_id: hotkey
+                t.data.miner_unique_id: (hotkey, r.active_campaigns[i].product_unique_id)
                 for hotkey, r in responses.items()
-                for t in r.submitted_tasks
+                for i, t in enumerate(r.submitted_tasks)
             },
         )
         bt.logging.info("End ping miners")

@@ -266,6 +266,7 @@ def get_miners_reputation(
         filters.append(BitAdsData.sale_date <= to_date)
     if campaign_ids:
         filters.append(BitAdsData.campaign_id.in_(campaign_ids))
+        filters.append(MinerAssignment.campaign_id.in_(campaign_ids))
 
     if filters:
         query = query.where(and_(*filters))

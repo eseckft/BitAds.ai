@@ -92,6 +92,7 @@ class Campaign(BaseModel):
     product_link: Optional[str] = None
     id: str
     type: CampaignType = CampaignType.REGULAR
+    cpa_blocks: Optional[int] = Field(7200, alias="CPABlocks")
 
     validator_id: Optional[int] = None
     country_of_registration: Optional[str] = None

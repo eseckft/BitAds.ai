@@ -1,6 +1,8 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Set, List
+from functools import reduce
+from operator import add
+from typing import Dict, Optional, Set, List, Tuple
 
 from common import formula, utils
 from common.db.database import DatabaseManager
@@ -126,20 +128,26 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         cpa_campaign_ids = [c.id for c in campaigns if CampaignType.CPA == c.type]
         now = datetime.utcnow()
         sale_from = now - const.REWARD_SALE_PERIOD
-        sale_to = now - utils.blocks_to_timedelta(self.settings.cpa_blocks)
-        cpa_aggregated_data = self._get_aggregated_data(
-            *cpa_campaign_ids,
-            sale_from=sale_from,
-            sale_to=sale_to,
-        )
         reputation_from = now - utils.blocks_to_timedelta(self.settings.mr_blocks)
-        miners_reputation = self._get_miners_reputation(
-            *cpa_campaign_ids, sale_from=reputation_from, sale_to=now
-        )
-        cpa_miner_scores = self._calculate_cpa_miner_scores(
-            cpa_aggregated_data, cpa_campaign_ids, miners_reputation
-        )
+        scores = []
+        for campaign_id in cpa_campaign_ids:
+            sale_to = now - utils.blocks_to_timedelta(self.settings.cpa_blocks)
+            cpa_aggregated_data = self._get_aggregated_data(
+                campaign_id,
+                sale_from=sale_from,
+                sale_to=sale_to,
+            )
+            miners_reputation = self._get_miners_reputation(
+                campaign_id, sale_from=reputation_from, sale_to=now
+            )
+            scores.append(
+                self._calculate_cpa_miner_scores(
+                    cpa_aggregated_data, cpa_campaign_ids, miners_reputation
+                )
+            )
         # endregion
+
+        cpa_miner_scores = dict(reduce(add, (Counter(dict(x)) for x in scores)))
 
         scores = utils.combine_dicts_with_avg(miner_scores, cpa_miner_scores)
 
@@ -353,13 +361,14 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
                 completed_visit.add_visitor(main_session, cv)
 
     async def add_miner_ping(
-        self, current_block: int, unique_id_to_hotkey: Dict[str, str]
+        self, current_block: int, unique_id_to_hotkey: Dict[str, Tuple[str, str]]
     ):
         with self.database_manager.get_session("active") as session:
-            for unique_id, hotkey in unique_id_to_hotkey.items():
+            for unique_id, hotkey_campaign in unique_id_to_hotkey.items():
+                hotkey, campaign_id = hotkey_campaign
                 miner_ping.add_miner_ping(session, hotkey, current_block)
                 miner_assignment.create_or_update_miner_assignment(
-                    session, unique_id, hotkey
+                    session, unique_id, hotkey, campaign_id
                 )
 
     def _calculate_miner_scores(
