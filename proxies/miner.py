@@ -63,7 +63,7 @@ async def internal_exception_handler(request: Request, exc: Exception):
 
 
 @app.get("/visitors/{id}")
-async def get_visit_by_id(id: str) -> VisitorSchema:
+async def get_visit_by_id(id: str) -> Optional[VisitorSchema]:
     return await miner_service.get_visit_by_id(id)
 
 

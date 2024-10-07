@@ -86,7 +86,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.3.9",
+    version="0.3.10",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -143,6 +143,12 @@ async def get_tracking_data(
     return await bitads_service.get_bitads_data_between(
         updated_from, updated_to, page_number, page_size
     )
+
+
+@app.get("/tracking_data/{id}")
+async def get_visit_by_id(id: str) -> Optional[BitAdsDataSchema]:
+    result = await bitads_service.get_data_by_ids({id})
+    return next(iter(result), None)
 
 
 @app.get("/is_axon_exists")
