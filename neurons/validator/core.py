@@ -53,12 +53,13 @@ class CoreValidator(BaseValidatorNeuron):
     def __init__(self, config=None):
         super(CoreValidator, self).__init__(config=config)
 
-        bt.logging.info("load_state()")
-        self.load_state()
-
         self.bitads_client = common_dependencies.create_bitads_client(
             self.wallet, self.config.bitads.url, self.neuron_type
         )
+
+        bt.logging.info("load_state()")
+        self.load_state()
+
         self.database_manager = common_dependencies.get_database_manager(
             self.neuron_type, self.subtensor.network
         )
@@ -128,7 +129,10 @@ class CoreValidator(BaseValidatorNeuron):
         await self.validator_service.add_miner_ping(
             current_block,
             {
-                t.data.miner_unique_id: (hotkey, r.active_campaigns[i].product_unique_id)
+                t.data.miner_unique_id: (
+                    hotkey,
+                    r.active_campaigns[i].product_unique_id,
+                )
                 for hotkey, r in responses.items()
                 for i, t in enumerate(r.submitted_tasks)
             },
@@ -147,9 +151,13 @@ class CoreValidator(BaseValidatorNeuron):
     async def __forward_bitads_data(self, timeout: float = 6.0):
         bt.logging.info("Start sync bitads process")
 
-        offset = await self.bitads_service.get_last_update_bitads_data(
-            self.wallet.get_hotkey().ss58_address
-        ) if not self.offset else self.offset
+        offset = (
+            await self.bitads_service.get_last_update_bitads_data(
+                self.wallet.get_hotkey().ss58_address
+            )
+            if not self.offset
+            else self.offset
+        )
 
         bt.logging.debug(
             f"Sync visits with offset: {offset} with miners: {self.miners}"
@@ -206,6 +214,7 @@ class CoreValidator(BaseValidatorNeuron):
                 LogLevel.LOCAL,
             )
             return
+        self.loop.run_until_complete(self._ping_bitads())
         self.loop.run_until_complete(self._send_load_data())
 
     def should_set_weights(self) -> bool:
