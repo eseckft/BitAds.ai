@@ -206,7 +206,6 @@ class CoreValidator(BaseValidatorNeuron):
                 LogLevel.LOCAL,
             )
             return
-        self.loop.run_until_complete(self._ping_bitads())
         self.loop.run_until_complete(self._send_load_data())
 
     def should_set_weights(self) -> bool:
@@ -302,6 +301,9 @@ class CoreValidator(BaseValidatorNeuron):
         await self.order_queue_service.update_queue_status(
             {id_: OrderQueueStatus.PENDING for id_ in ids}
         )
+
+    def load_state(self):
+        self.loop.run_until_complete(self._ping_bitads())
 
 
 # The main function parses the configuration and runs the validator.
