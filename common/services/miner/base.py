@@ -79,3 +79,7 @@ class MinerService(SettingsContainer, ABC):
     @abstractmethod
     async def set_hotkey_and_block(self, hotkey: str, block: int) -> None:
         pass
+
+    @abstractmethod
+    async def get_visit_by_id(self, id_: str) -> VisitorSchema:
+        pass

@@ -137,6 +137,12 @@ async def get_tracking_data(
     )
 
 
+@app.get("/tracking_data/{id}")
+async def get_visit_by_id(id: str) -> Optional[BitAdsDataSchema]:
+    result = await bitads_service.get_data_by_ids({id})
+    return next(iter(result), None)
+
+
 @app.get("/is_axon_exists")
 async def is_axon_exists(
     hotkey: str, ip_address: Optional[str] = None, coldkey: Optional[str] = None

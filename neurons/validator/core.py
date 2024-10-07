@@ -227,8 +227,6 @@ class CoreValidator(BaseValidatorNeuron):
             netuid=self.config.netuid,
             uids=list(miner_ratings.keys()),
             weights=list(miner_ratings.values()),
-            wait_for_finalization=True,
-            wait_for_inclusion=False,
             version_key=__spec_version__,
         )
         self.update_scores(
@@ -241,7 +239,7 @@ class CoreValidator(BaseValidatorNeuron):
         else:
             bt.logging.error("set_weights failed", msg)
 
-    @execute_periodically(Environ.PING_PERIOD)
+    @execute_periodically(const.PING_PERIOD)
     async def _ping_bitads(self):
         bt.logging.info("Start ping BitAds")
         response = self.bitads_client.subnet_ping()
@@ -308,7 +306,7 @@ class CoreValidator(BaseValidatorNeuron):
 
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
-    bt.logging.set_debug()
+    bt.logging.on()
     log_startup("Validator")
     with dependencies.get_core_validator() as validator:
         while True:

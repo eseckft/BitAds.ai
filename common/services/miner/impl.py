@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Set, Tuple
+from typing import Set, Tuple, Optional
 
 from common.db.database import DatabaseManager
 from common.db.repositories import recent_activity, user_agent_activity, hotkey_to_block
@@ -8,6 +8,7 @@ from common.db.repositories.visitor import (
     get_visits_after,
     get_max_date_excluding_hotkey,
     add_or_update,
+    get_visitor,
 )
 from common.miner.schemas import VisitorSchema
 from common.services.miner.base import MinerService
@@ -111,3 +112,7 @@ class MinerServiceImpl(SettingsContainerImpl, MinerService):
     async def set_hotkey_and_block(self, hotkey: str, block: int) -> None:
         with self.database_manager.get_session("main") as session:
             hotkey_to_block.set_hotkey_and_block(session, hotkey, block)
+
+    async def get_visit_by_id(self, id_: str) -> Optional[VisitorSchema]:
+        with self.database_manager.get_session("active") as session:
+            return get_visitor(session, id_)

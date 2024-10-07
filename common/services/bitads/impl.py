@@ -58,7 +58,7 @@ class BitAdsServiceImpl(BitAdsService):
     async def add_by_visits(self, visits: Set[VisitorSchema]) -> None:
         with self.database_manager.get_session("active") as session:
             for visit in visits:
-                bitads_data.add_or_update(
+                bitads_data.add_data(
                     session, BitAdsDataSchema(**visit.model_dump())
                 )
 

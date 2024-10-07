@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import List, Optional, Dict
 
-from sqlalchemy import select, func, and_, case
+from sqlalchemy import select, func, and_, case, desc
 from sqlalchemy.orm import Session
 
 from common.schemas.aggregated import AggregationSchema, AggregatedData
@@ -39,7 +39,7 @@ def get_data_between(
     if updated_to:
         stmt = stmt.where(BitAdsData.updated_at < updated_to)
 
-    stmt = stmt.limit(limit).offset(offset).order_by(BitAdsData.updated_at)
+    stmt = stmt.limit(limit).offset(offset).order_by(desc(BitAdsData.updated_at))
 
     result = session.execute(stmt)
     return [BitAdsDataSchema.model_validate(r) for r in result.scalars().all()]
@@ -63,7 +63,10 @@ def get_data(session: Session, id_: str) -> Optional[BitAdsDataSchema]:
 
 
 def add_or_update(
-    session: Session, data: BitAdsDataSchema, exclude_fields=("created_at",), include_none=("refund_info",)
+    session: Session,
+    data: BitAdsDataSchema,
+    exclude_fields=("created_at",),
+    include_none=("refund_info",),
 ):
     """
     Adds or updates tracking data in the database.
@@ -94,6 +97,15 @@ def add_or_update(
         # Create a new entity if it doesn't exist
         entity = BitAdsData(**dict(data))
         session.add(entity)
+
+
+def add_data(session: Session, data: BitAdsDataSchema) -> None:
+    entity = session.get(BitAdsData, data.id)
+    if entity:
+        return
+
+    entity = BitAdsData(**dict(data))
+    session.add(entity)
 
 
 def get_max_date_excluding_hotkey(
@@ -164,19 +176,13 @@ def get_aggregated_data(
         BitAdsData.campaign_id,
         MinerAssignment.hotkey,
         func.count().label("visits"),
-        func.sum(case((BitAdsData.is_unique, 1), else_=0)).label(
-            "visits_unique"
-        ),
+        func.sum(case((BitAdsData.is_unique, 1), else_=0)).label("visits_unique"),
         func.sum(case((BitAdsData.at, 1), else_=0)).label("at_count"),
-        func.sum(BitAdsData.count_through_rate_click).label(
-            "count_through_rate_click"
-        ),
+        func.sum(BitAdsData.count_through_rate_click).label("count_through_rate_click"),
         func.sum(BitAdsData.refund).label("total_refunds"),
         func.sum(BitAdsData.sales).label("total_sales"),
         func.sum(BitAdsData.sale_amount).label("sales_amount"),
-    ).join(
-        MinerAssignment, BitAdsData.campaign_item == MinerAssignment.unique_id
-    )
+    ).join(MinerAssignment, BitAdsData.campaign_item == MinerAssignment.unique_id)
 
     conditions = []
     if from_date is not None:
@@ -251,9 +257,7 @@ def get_miners_reputation(
     query = session.query(
         MinerAssignment.hotkey,
         func.sum(BitAdsData.sales).label("total_sales"),
-    ).join(
-        MinerAssignment, BitAdsData.campaign_item == MinerAssignment.unique_id
-    )
+    ).join(MinerAssignment, BitAdsData.campaign_item == MinerAssignment.unique_id)
 
     filters = []
     if from_date is not None:

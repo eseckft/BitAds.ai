@@ -48,6 +48,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(version="0.4.0", lifespan=lifespan)
+
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
 app.include_router(version_router)
@@ -64,6 +65,11 @@ log = logging.getLogger(__name__)
 async def internal_exception_handler(request: Request, exc: Exception):
     log.error(exc, exc_info=True)
     return RedirectResponse(request.url)
+
+
+@app.get("/visitors/{id}")
+async def get_visit_by_id(id: str) -> Optional[VisitorSchema]:
+    return await miner_service.get_visit_by_id(id)
 
 
 @app.get("/{campaign_id}/{campaign_item}")
