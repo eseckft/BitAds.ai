@@ -142,12 +142,13 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
             )
             scores.append(
                 self._calculate_cpa_miner_scores(
-                    cpa_aggregated_data, cpa_campaign_ids, miners_reputation
+                    cpa_aggregated_data, [campaign_id], miners_reputation
                 )
             )
         # endregion
 
         cpa_miner_scores = dict(reduce(add, (Counter(dict(x)) for x in scores)))
+        cpa_miner_scores = {k: v / len(scores) for k, v in cpa_miner_scores.items()}
 
         scores = utils.combine_dicts_with_avg(miner_scores, cpa_miner_scores)
 

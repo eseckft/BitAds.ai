@@ -195,6 +195,7 @@ def get_aggregated_data(
         conditions.append(BitAdsData.complete_block <= to_block)
     if campaign_ids:
         conditions.append(BitAdsData.campaign_id.in_(campaign_ids))
+        conditions.append(MinerAssignment.campaign_id.in_(campaign_ids))
 
     if conditions:
         query = query.where(and_(*conditions))
