@@ -57,9 +57,6 @@ class CoreValidator(BaseValidatorNeuron):
             self.wallet, self.config.bitads.url, self.neuron_type
         )
 
-        bt.logging.info("load_state()")
-        self.load_state()
-
         self.database_manager = common_dependencies.get_database_manager(
             self.neuron_type, self.subtensor.network
         )
@@ -79,9 +76,9 @@ class CoreValidator(BaseValidatorNeuron):
         self.active_campaigns: List[Campaign] = list()
         self.last_evaluate_block = 0
         self.offset = None
-        # self.loop.run_until_complete(self._mark_for_reprocess())
-        # self.loop.create_task(self._calculate_campaigns_umax())
-        # self.loop.create_task(self._evaluate_miners())
+
+        bt.logging.info("load_state()")
+        self.load_state()
 
     async def forward(self, _: bt.Synapse = None):
         """
