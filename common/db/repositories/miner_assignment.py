@@ -14,3 +14,4 @@ def create_or_update_miner_assignment(
     else:
         # If found, update the hotkey
         miner_assignment.hotkey = hotkey
+        miner_assignment.campaign_id = campaign_id
