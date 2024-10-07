@@ -53,12 +53,10 @@ class CoreValidator(BaseValidatorNeuron):
     def __init__(self, config=None):
         super(CoreValidator, self).__init__(config=config)
 
-        bt.logging.info("load_state()")
-        self.load_state()
-
         self.bitads_client = common_dependencies.create_bitads_client(
             self.wallet, self.config.bitads.url
         )
+
         self.database_manager = common_dependencies.get_database_manager(
             self.neuron_type, self.subtensor.network
         )
@@ -78,9 +76,9 @@ class CoreValidator(BaseValidatorNeuron):
         self.active_campaigns: List[Campaign] = list()
         self.last_evaluate_block = 0
         self.offset = None
-        # self.loop.run_until_complete(self._mark_for_reprocess())
-        # self.loop.create_task(self._calculate_campaigns_umax())
-        # self.loop.create_task(self._evaluate_miners())
+
+        bt.logging.info("load_state()")
+        self.load_state()
 
     async def forward(self, _: bt.Synapse = None):
         """
@@ -147,9 +145,7 @@ class CoreValidator(BaseValidatorNeuron):
     async def __forward_bitads_data(self, timeout: float = 6.0):
         bt.logging.info("Start sync bitads process")
 
-        offset = await self.bitads_service.get_last_update_bitads_data(
-            self.wallet.get_hotkey().ss58_address
-        ) if not self.offset else self.offset
+        offset = datetime.fromisoformat("2024-10-01")
 
         bt.logging.debug(
             f"Sync visits with offset: {offset} with miners: {self.miners}"
@@ -302,6 +298,9 @@ class CoreValidator(BaseValidatorNeuron):
         await self.order_queue_service.update_queue_status(
             {id_: OrderQueueStatus.PENDING for id_ in ids}
         )
+
+    def load_state(self):
+        self.loop.run_until_complete(self._ping_bitads())
 
 
 # The main function parses the configuration and runs the validator.
