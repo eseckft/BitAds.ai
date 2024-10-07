@@ -228,6 +228,7 @@ class CoreValidator(BaseValidatorNeuron):
             uids=list(miner_ratings.keys()),
             weights=list(miner_ratings.values()),
             version_key=__spec_version__,
+            wait_for_finalization=True
         )
         self.update_scores(
             torch.FloatTensor(list(miner_ratings.values())).to(self.device),
