@@ -92,6 +92,7 @@ def add_or_update(session: Session, data: VisitorSchema) -> None:
         entity = Visitor(**data.model_dump())
         entity.status = VisitStatus.new
         session.add(entity)
+        session.commit()
 
 
 def get_visitor(session: Session, id_: str) -> Optional[VisitorSchema]:
