@@ -1,0 +1,53 @@
+services:
+  # Service to run initialization tasks
+  init:
+    build: .
+    volumes:
+      - ~/.bittensor:/root/.bittensor  # Ensure access to the .bittensor directory
+      - ./databases:/app/databases  # Shared volume for databases
+    environment:
+      - SUBTENSOR_NETWORK
+      - WALLET_NAME
+      - WALLET_HOTKEY
+      - AXON_PORT
+      - NEURON_TYPE
+    command: >
+      sh -c "python validate_setup.py && python get_databases.py"  # Run validation and database setup
+    # Optional: You can add health checks or other configurations if needed
+
+  # Service to run migrations and the core application
+  core:
+    build: .
+    volumes:
+      - ~/.bittensor:/root/.bittensor
+      - ./databases:/app/databases
+    environment:
+      - SUBTENSOR_NETWORK
+      - WALLET_NAME
+      - WALLET_HOTKEY
+      - AXON_PORT
+      - NEURON_TYPE
+    command: >
+      sh -c "python3 neurons/$NEURON_TYPE/core.py --subtensor.network $SUBTENSOR_NETWORK --wallet.name $WALLET_NAME --wallet.hotkey $WALLET_HOTKEY --axon.port $AXON_PORT"
+    ports:
+      - $AXON_PORT:$AXON_PORT
+    depends_on:
+      init:
+        condition: service_completed_successfully  # Only start if init is successful
+    restart: unless-stopped  # Automatically restart unless stopped by the user
+
+  # Service to run the proxy
+  proxy:
+    build: .
+    volumes:
+      - ./databases:/app/databases
+    environment:
+      - SUBTENSOR_NETWORK
+      - NEURON_TYPE
+    command: python3 proxies/miner.py
+    ports:
+      - 443:443
+    depends_on:
+      init:
+        condition: service_completed_successfully  # Only start if init is successful
+    restart: unless-stopped  # Automatically restart unless stopped by the user
