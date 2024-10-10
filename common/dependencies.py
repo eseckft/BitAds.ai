@@ -3,7 +3,7 @@ from typing import Annotated
 import bittensor as bt
 from fastapi import Depends
 
-import template
+import neurons
 from common.clients.bitads.base import BitAdsClient
 from common.clients.bitads.impl import SyncBitAdsClient
 
@@ -127,7 +127,7 @@ def create_bitads_client_from_hotkey(
     return SyncBitAdsClient(
         base_url,
         hot_key=hotkey,
-        v=template.__version__,
+        v=neurons.__version__,
     )
 
 

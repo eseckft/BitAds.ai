@@ -4,7 +4,7 @@ import json
 
 from common.environ import Environ
 from common.validator import dependencies
-from template import __spec_version__ as version_key
+from neurons import __spec_version__ as version_key
 import bittensor as bt
 
 database_manager = dependencies.get_database_manager(

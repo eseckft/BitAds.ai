@@ -189,6 +189,11 @@ btcli subnet register --netuid 16 --wallet.name <name> --wallet.hotkey <name>
 - [Mining](docs/mining.md)
 - [Validating](docs/validating.md)
 
+<h3>Or Dockerized variants (recommended): </h3>
+
+- [Mining](docs/mining-dockerized.md)
+- [Validating](docs/validating-dockerized.md)
+
 # How to Mine TAO on Subnet 16
 1. Create a Bittensor wallet (coldkey & hotkey).
 2. Register your hotkey to the Subnet 16.
