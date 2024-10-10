@@ -193,21 +193,30 @@ To generate unique links for active marketing campaigns, register your miner on 
 
 To run the miner using Docker Compose, follow these steps:
 
-1. **Build and Start the Containers**:
+1. **Move Database Files**:  
+   Before starting Docker, ensure that all existing database files are moved into the `databases` directory. Run the following command to create the directory and move the files:
+
+   ```bash
+   mkdir -p databases && mv *.db databases/
+   ```
+
+   This command checks if the `databases` directory exists (creating it if it doesn't) and moves all `.db` files into that directory to keep docker volumes capability.
+
+2. **Build and Start the Containers**:
 
    ```bash
    docker compose up --build
    ```
 
-   This command builds the Docker image (if necessary) and runs the containers for the miner services.
+   This command builds the Docker image (if necessary) and runs the containers for the validator services.
 
-2. **Stop the Containers**:
+3. **Stop the Containers**:
 
    ```bash
    docker compose down
    ```
 
-This will stop and remove the containers while preserving data.
+   This will stop and remove the containers while preserving data.
 
 ---
 
