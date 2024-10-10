@@ -53,7 +53,7 @@ async def main():
     )
 
     bit_ads_client = dependencies.create_bitads_client(
-        wallet, const.BITADS_API_URLS[CommonEnviron.SUBTENSOR_NETWORK]
+        wallet, const.BITADS_API_URLS[CommonEnviron.SUBTENSOR_NETWORK], CommonEnviron.NEURON_TYPE
     )
     response = bit_ads_client.subnet_ping()
     neurons: Optional[Set[str]] = getattr(

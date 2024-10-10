@@ -57,7 +57,7 @@ class CoreValidator(BaseValidatorNeuron):
         self.load_state()
 
         self.bitads_client = common_dependencies.create_bitads_client(
-            self.wallet, self.config.bitads.url
+            self.wallet, self.config.bitads.url, self.neuron_type
         )
         self.database_manager = common_dependencies.get_database_manager(
             self.neuron_type, self.subtensor.network
