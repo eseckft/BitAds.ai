@@ -27,8 +27,9 @@ services:
       - WALLET_HOTKEY
       - AXON_PORT
       - NEURON_TYPE
+      - SUBTENSOR_CHAIN_ENDPOINT
     command: >
-      sh -c "python3 neurons/$NEURON_TYPE/core.py --subtensor.network $SUBTENSOR_NETWORK --wallet.name $WALLET_NAME --wallet.hotkey $WALLET_HOTKEY --axon.port $AXON_PORT"
+      sh -c "python3 neurons/$NEURON_TYPE/core.py --subtensor.network $SUBTENSOR_NETWORK --wallet.name $WALLET_NAME --wallet.hotkey $WALLET_HOTKEY --axon.port $AXON_PORT --subtensor.chain_endpoint $SUBTENSOR_CHAIN_ENDPOINT"
     ports:
       - $AXON_PORT:$AXON_PORT
     depends_on:
@@ -41,12 +42,13 @@ services:
     build: .
     volumes:
       - ./databases:/app/databases
+      - ./.env:/app/.env  # Mount the .env file to the specified path in the container
     environment:
       - SUBTENSOR_NETWORK
       - NEURON_TYPE
-    command: python3 proxies/miner.py
+    command: python3 proxies/${NEURON_TYPE}.py
     ports:
-      - 443:443
+      - 443:443  # Do not change this port
     depends_on:
       init:
         condition: service_completed_successfully  # Only start if init is successful
