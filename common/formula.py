@@ -75,7 +75,7 @@ def process_cpa(
     Wsales: float,
     Wcr: float,
     Wmr: float,
-    ndigits: int = 5,
+    ndigits: int = 5,  # ignored
     miner_hotkey: str = None
 ) -> float:
     """
@@ -120,6 +120,6 @@ def process_cpa(
     RATING = ((Wsales * SALESnorm) + (Wcr * CRnorm) + (Wmr * MRnorm)) * RF
 
     # Ensure the Miner Score is within the range [0, 1] and rounded to 5 decimal places
-    RATING = round(min(RATING, 1.0), ndigits)
+    RATING = min(RATING, 1.0)
 
     return RATING

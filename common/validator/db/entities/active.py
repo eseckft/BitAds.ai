@@ -129,6 +129,7 @@ class Campaign(Base):
     type: Mapped[CampaignType] = mapped_column(
         Enum(CampaignType), nullable=False, server_default=text("REGULAR")
     )
+    cpa_blocks: Mapped[Optional[int]]
 
 
 class BitAdsData(Base):
@@ -185,6 +186,7 @@ class MinerAssignment(Base):
 
     unique_id: Mapped[str] = mapped_column(String, primary_key=True)
     hotkey: Mapped[str]
+    campaign_id: Mapped[Optional[str]]
 
 
 class OrderQueue(Base):

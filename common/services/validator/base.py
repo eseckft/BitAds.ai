@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Dict, Set, List, Optional
+from typing import Dict, Set, List, Optional, Tuple
 
 from common.schemas.bitads import Campaign, BitAdsDataSchema
 from common.schemas.completed_visit import CompletedVisitSchema
@@ -173,6 +173,6 @@ class ValidatorService(SettingsContainer, ABC):
 
     @abstractmethod
     async def add_miner_ping(
-        self, current_block: int, unique_id_to_hotkey: Dict[str, str]
+        self, current_block: int, unique_id_to_hotkey: Dict[str, Tuple[str, str]]
     ):
         pass

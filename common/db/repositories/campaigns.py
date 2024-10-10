@@ -50,3 +50,15 @@ def add_or_update_campaign(session: Session, campaign: Campaign):
         # Create a new entity if it doesn't exist
         entity = CampaignEntity(**dict(campaign))
         session.add(entity)
+
+
+def get_by_product_unique_id(
+    session: Session, product_unique_id: str
+) -> Optional[Campaign]:
+    # Query the database to find the campaign by its product_unique_id
+    entity = (
+        session.query(CampaignEntity).filter_by(product_unique_id=product_unique_id).first()
+    )
+
+    # Validate the result using Pydantic's model validation
+    return Campaign.model_validate(entity) if entity else None
