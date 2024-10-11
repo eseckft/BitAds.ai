@@ -116,6 +116,48 @@ Having an account provides users with easy access to miner and campaign statisti
 If you wish to register for additional features, you can do so here: [BitAds.ai](https://bitads.ai/register)
 
 
+#### Receiving 2FA Codes
+
+Once the full application setup is complete and the proxy is operational (you should see the following log message:
+
+```
+Uvicorn running on https://0.0.0.0:443 (Press CTRL+C to quit)
+```
+
+), you can retrieve your 2FA codes for registration by running the following command:
+
+```bash
+bacli 2fa list
+```
+
+**If you encounter the error `command not found: bacli`:**
+
+1. **Ensure the Virtual Environment is Activated**:
+
+   Make sure that your virtual environment is active. If not, activate it using:
+
+   - On Windows:
+
+     ```bash
+     .\venv\Scripts\activate
+     ```
+
+   - On macOS and Linux:
+
+     ```bash
+     source venv/bin/activate
+     ```
+
+2. **Install the Package Locally**:
+
+   Run the following command to install the necessary package:
+
+   ```bash
+   pip install .
+   ```
+
+   After successful installation, retry the `bacli 2fa list` command.
+
 ## Launch
 
 ### Generating a Self-Signed SSL Certificate
