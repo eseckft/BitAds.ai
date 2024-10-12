@@ -145,7 +145,7 @@ class CoreValidator(BaseValidatorNeuron):
     async def __forward_bitads_data(self, timeout: float = 6.0):
         bt.logging.info("Start sync bitads process")
 
-        offset = datetime.fromisoformat("2024-10-01")
+        offset = datetime.fromisoformat("2024-10-01") if not self.offset else self.offset
 
         bt.logging.debug(
             f"Sync visits with offset: {offset} with miners: {self.miners}"
