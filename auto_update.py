@@ -3,6 +3,10 @@ import subprocess
 import requests
 import json
 
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 # Constants for file paths
 LOCAL_CORE_VERSION_FILE = "tmp/local_core_version.txt"
 PROXY_VERSION_URL = "https://localhost/version"
@@ -89,12 +93,22 @@ def main():
     # Step 2: Update Git repository
     updated = update_git_repo()
 
+    if not updated:
+        return
+
+    wallet_name = os.getenv("WALLET_NAME")
+    wallet_hotkey = os.getenv("WALLET_HOTKEY")
+    neuron_type = os.getenv("NEURON_TYPE")
+    run_command(
+        f"./build_project.sh --wallet.name {wallet_name} --wallet.hotkey {wallet_hotkey} --neuron.type {neuron_type}"
+    )
+
     # Step 3: Fetch core service version from PM2
     running_core_version = get_running_process_version()
     local_core_version = get_local_core_version()
 
     # Step 4: Restart core service if necessary
-    if updated or running_core_version != local_core_version:
+    if running_core_version != local_core_version:
         print(
             f"Core service version mismatch or update detected. Restarting core service..."
         )
