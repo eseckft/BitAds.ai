@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides detailed instructions for deploying, launching, and reinitializing the validator project. It includes key steps like setting up the environment, running scripts, and using the PM2 ecosystem file for auto-update. **Important: Ensure that port 443 is open and available for secure HTTPS communication with the validator. All validator commands should be run from the `sudo su -` environment to avoid permission issues.**
+This document provides detailed instructions for deploying, launching, and reinitializing the validator project. It includes key steps like setting up the environment, running scripts, and using the PM2 ecosystem file for auto-update. **Important: Ensure that port 443 is open and available for secure HTTPS communication with the validator. All validator commands should be run from the `sudo -s` environment to avoid permission issues.**
 
 ## Table of Contents
 
@@ -54,7 +54,7 @@ After cloning the repository, create and activate a Python virtual environment t
    After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
 
    ```bash
-   sudo su -
+   sudo -s
    ```
 
 ---
@@ -71,25 +71,32 @@ Once in the root environment and still within the project directory, execute the
 You need to provide your wallet name and hotkey, along with the `subtensor.network` as parameters when running the script. Here’s the command:
 
 ```bash
-./build_project --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network>
+source ./build_project --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network> --subtensor.chain_endpoint wss://entrypoint-finney.opentensor.ai:443
 ```
 
 #### Parameters:
 - `--wallet.name <wallet_name>`: The name of your wallet.
 - `--wallet.hotkey <wallet_hotkey>`: The hotkey name associated with your wallet.
 - `--subtensor.network <network>`: The Subtensor network to connect to (e.g., `finney`, `test`, etc.).
+- `--subtensor.chain_endpoint <chain_endpoint>` (optional): The Subtensor chain endpoint to connect to. If not specified, it defaults to `wss://entrypoint-finney.opentensor.ai:443`.
 
 For example:
 
 ```bash
-./build_project.sh --wallet.name default --wallet.hotkey default --subtensor.network finney
+source ./build_project --wallet.name default --wallet.hotkey default --subtensor.network finney
 ```
 
 The script handles all necessary setup steps, so you don't need to manually install dependencies, set up databases, or generate SSL certificates.
 
 Once the build script completes, the system will be ready for the next steps in launching the validator using the PM2 ecosystem file.
 
----
+### Create account on BitAds.ai (Mandatory)
+
+Validator registration is required. This allows the server to ping, informing us of your activity so we can include it in the DNS records, ensuring the participant is accessible via x.bitads.ai or v.bitads.ai. <br><br>
+Without an account, Validators won't be able to set weights on the subnet. Having an account gives Validators easy access to miner and campaign statistics, as well as the API key needed to build their own application on the BitAds subnet. <br><br>
+Validators will be manually approved after we receive written confirmation on Discord regarding their registration.<br><br>
+For any inquiries regarding script usage or registration, please refer to the official documentation on BitAds.ai or contact our support team.<br>
+You can register here: [BitAds.ai](https://bitads.ai/register)
 
 ## Launch
 
@@ -121,17 +128,17 @@ For more information on PM2 ecosystem configuration, you can refer to the [PM2 d
    ```
 
 2. **Handling Updates**:
-   The PM2 ecosystem file ensures that the validator automatically handles updates. No additional steps are required to manage updates manually.
+   If you need to change wallet parameters or the chain endpoint, it's best to rebuild the project with the new parameters instead of using environment variable commands. You can run the build script again with the updated parameters, and then start or reload the PM2 process:
 
-3. **Restarting Processes**:
-   If necessary, manually restart the validator processes using `pm2`:
+   For example, if you need to change the wallet:
 
    ```bash
-   pm2 restart validator_server_<wallet_hotkey>
-   pm2 restart validator_proxy_server_<wallet_hotkey>
+   pm2 del validator-ecosystem.config.js  # stop previous processes (if env still active, else use pm2 list and del each process of previously running validator)
+   source ./build_project --wallet.name new_wallet_name --wallet.hotkey new_wallet_hotkey --subtensor.network finney
+   pm2 startOrReload validator-ecosystem.config.js
    ```
 
-4. **Logging and Debugging**:
+3. **Logging and Debugging**:
    To check logs for issues or errors:
 
    ```bash
@@ -145,3 +152,5 @@ For more information on PM2 ecosystem configuration, you can refer to the [PM2 d
 ## Reinitialization
 
 If you encounter critical issues during operation, refer to the [reinitialization process](reinitialization.md) instructions for troubleshooting and restarting the validator setup.
+
+**Note:** Currently, the auto-update script supports only one running instance of the validator on the server; in the future, it will be able to run multiple instances.

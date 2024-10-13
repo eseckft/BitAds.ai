@@ -72,6 +72,7 @@ fi
 wget -O GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb -q
 
 # Install Python dependencies
+pip3 install --upgrade pip
 python3 -m pip install -r requirements.txt
 python3 -m pip install -e .
 python3 setup.py install_lib
