@@ -31,12 +31,12 @@ module.exports = {
         WALLET_HOTKEY: process.env.WALLET_HOTKEY || "default",
         WALLET_NAME: process.env.WALLET_NAME || "default",
         SUBTENSOR_NETWORK: process.env.SUBTENSOR_NETWORK || "finney",
-        SUBTENSOR_CHAIN_ENDPOINT: process.env.SUBTENSOR_CHAIN_ENDPOINT || "wss://entrypoint-finney.opentensor.ai:443"
-      }
+        SUBTENSOR_CHAIN_ENDPOINT: process.env.SUBTENSOR_CHAIN_ENDPOINT || "wss://entrypoint-finney.opentensor.ai:443",
+      },
     },
     {
       name: "auto_update",
-      script: "auto_update.sh",
+      script: "auto_update.py",
       interpreter: "python3",
       cron_restart: "*/1 * * * *",
       autorestart: false,
@@ -44,7 +44,8 @@ module.exports = {
         WALLET_HOTKEY: process.env.WALLET_HOTKEY || "default",
         WALLET_NAME: process.env.WALLET_NAME || "default",
         SUBTENSOR_NETWORK: process.env.SUBTENSOR_NETWORK || "finney",
-        SUBTENSOR_CHAIN_ENDPOINT: process.env.SUBTENSOR_CHAIN_ENDPOINT || "wss://entrypoint-finney.opentensor.ai:443"
+        SUBTENSOR_CHAIN_ENDPOINT: process.env.SUBTENSOR_CHAIN_ENDPOINT || "wss://entrypoint-finney.opentensor.ai:443",
+        NEURON_TYPE: "validator"
       }
     }
   ]
