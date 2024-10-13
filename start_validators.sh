@@ -3,6 +3,8 @@
 # Default value for restart_proxy
 restart_proxy=false
 subtensor_network=finney
+log_file=~/.bittensor/miners/bittensor.log
+prefix="Auto-update script |"
 
 # Store the remaining arguments in an array
 args=("$@")
@@ -36,7 +38,7 @@ set -- "${args[@]}"
 
 # Check if wallet hotkey is empty
 if [ -z "$wallet_hotkey" ]; then
-    echo "Error: Wallet hotkey not provided. Exiting..."
+    echo "$prefix Error: Wallet hotkey not provided. Exiting..." | tee -a "$log_file"
     exit 1
 fi
 
@@ -45,7 +47,9 @@ export WALLET_NAME=$wallet_name
 export WALLET_HOTKEY=$wallet_hotkey
 export NEURON_TYPE=validator
 
+echo "$prefix Installing dependencies..." | tee -a "$log_file"
 python3 -m pip install -r requirements.txt
+
 # python3 -m pip install --upgrade bittensor
 python3 -m pip install -e .
 python3 setup.py install_lib
@@ -59,27 +63,25 @@ pm2_status=$(pm2 list | grep -c "validator_server_$wallet_hotkey")
 if [ $pm2_status -gt 0 ]; then
     # If the process is running, delete it
     pm2 delete validator_server_$wallet_hotkey
-    echo "Process deleted from PM2."
+    echo "$prefix Process deleted from PM2." | tee -a "$log_file"
 else
-    echo "Process is not currently managed by PM2."
+    echo "$prefix Process is not currently managed by PM2." | tee -a "$log_file"
 fi
 
-
 if [ "$restart_proxy" = true ]; then
-    echo "Restarting proxy..."
+    echo "$prefix Restarting proxy..." | tee -a "$log_file"
     # Add commands to restart the proxy here
     pm2_status=$(pm2 list | grep -c "validator_proxy_server_$wallet_hotkey")
 
     if [ $pm2_status -gt 0 ]; then
         # If the process is running, delete it
         pm2 delete validator_proxy_server_$wallet_hotkey
-        echo "Process deleted from PM2."
+        echo "$prefix Proxy process deleted from PM2." | tee -a "$log_file"
     else
-        echo "Process is not currently managed by PM2."
+        echo "$prefix Proxy process is not currently managed by PM2." | tee -a "$log_file"
     fi
 
-    pm2 start --name validator_proxy_server_$wallet_hotkey proxies/validator.py --interpreter python3 -- $@
+    pm2 start --name validator_proxy_server_$wallet_hotkey proxies/validator.py --interpreter python3 -- $@ | tee -a "$log_file"
 fi
 
-pm2 start --name validator_server_$wallet_hotkey neurons/validator/core.py --interpreter python3 -- $@
-
+pm2 start --name validator_server_$wallet_hotkey neurons/validator/core.py --interpreter python3 -- $@ | tee -a "$log_file"
