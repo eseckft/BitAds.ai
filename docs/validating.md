@@ -71,7 +71,7 @@ Once in the root environment and still within the project directory, execute the
 You need to provide your wallet name and hotkey, along with the `subtensor.network` as parameters when running the script. Here’s the command:
 
 ```bash
-source ./build_project --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network> --subtensor.chain_endpoint wss://entrypoint-finney.opentensor.ai:443
+source ./build_project.sh --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network> --subtensor.chain_endpoint wss://entrypoint-finney.opentensor.ai:443
 ```
 
 #### Parameters:
@@ -83,7 +83,7 @@ source ./build_project --wallet.name <wallet_name> --wallet.hotkey <wallet_hotke
 For example:
 
 ```bash
-source ./build_project --wallet.name default --wallet.hotkey default --subtensor.network finney
+source ./build_project.sh --wallet.name default --wallet.hotkey default --subtensor.network finney
 ```
 
 The script handles all necessary setup steps, so you don't need to manually install dependencies, set up databases, or generate SSL certificates.
@@ -134,7 +134,7 @@ For more information on PM2 ecosystem configuration, you can refer to the [PM2 d
 
    ```bash
    pm2 del validator-ecosystem.config.js  # stop previous processes (if env still active, else use pm2 list and del each process of previously running validator)
-   source ./build_project --wallet.name new_wallet_name --wallet.hotkey new_wallet_hotkey --subtensor.network finney
+   source ./build_project.sh --wallet.name new_wallet_name --wallet.hotkey new_wallet_hotkey --subtensor.network finney
    pm2 startOrReload validator-ecosystem.config.js
    ```
 
