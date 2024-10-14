@@ -36,11 +36,12 @@ def run_command(command):
 
 def read_file(file_path):
     """Read and return the content of a file, or None if an error occurs."""
+    if not os.path.exists(file_path):
+        logging.warning(f"File not found: {file_path}")
+        return None
     try:
         with open(file_path, "r") as file:
             return file.read().strip()
-    except FileNotFoundError:
-        logging.error(f"File not found: {file_path}")
     except IOError as e:
         logging.error(f"Error reading file {file_path}: {e}")
     return None
@@ -130,6 +131,11 @@ def main():
 
     # Step 3: Fetch core service version
     running_core_version = read_file(LOCAL_CORE_VERSION_FILE)
+    if running_core_version is None:
+        logging.info(
+            "No previous core service version found. This seems to be the first run."
+        )
+
     local_core_version = get_local_core_version()
 
     # Step 4: Build project if the repository is updated
