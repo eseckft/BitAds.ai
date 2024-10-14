@@ -58,6 +58,19 @@ export WALLET_NAME=$wallet_name
 export WALLET_HOTKEY=$wallet_hotkey
 export NEURON_TYPE=$neuron_type
 
+# Write the variables to .env file
+echo "Writing environment variables to .env file..."
+cat <<EOF > .env
+# Environment variables
+SUBTENSOR_NETWORK=$subtensor_network
+SUBTENSOR_CHAIN_ENDPOINT=$subtensor_chain_endpoint
+WALLET_HOTKEY=$wallet_hotkey
+WALLET_NAME=$wallet_name
+NEURON_TYPE=$neuron_type
+EOF
+
+echo ".env file created successfully."
+
 # Generate a self-signed certificate if it doesn't exist
 if [ ! -f "key.pem" ] || [ ! -f "cert.pem" ]; then
     echo "Generating self-signed SSL certificate..."

@@ -12,7 +12,7 @@ This document provides detailed instructions for deploying, launching, and reini
     - [Running the Build Script](#running-the-build-script)
 2. [Launch](#launch)
     - [Running the Validator using the PM2 Ecosystem File](#running-the-validator-using-the-pm2-ecosystem-file)
-3. [Subsequent Important Steps](#subsequent-important-steps)
+3. [Updating Environment Variables](#updating-environment-variables)
 4. [Reinitialization](#reinitialization)
 
 ## Deployment
@@ -71,7 +71,7 @@ Once in the root environment and still within the project directory, execute the
 You need to provide your wallet name and hotkey, along with the `subtensor.network` as parameters when running the script. Here’s the command:
 
 ```bash
-source ./build_project.sh --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network> --subtensor.chain_endpoint wss://entrypoint-finney.opentensor.ai:443
+./build_project.sh --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network> --subtensor.chain_endpoint wss://entrypoint-finney.opentensor.ai:443
 ```
 
 #### Parameters:
@@ -83,20 +83,22 @@ source ./build_project.sh --wallet.name <wallet_name> --wallet.hotkey <wallet_ho
 For example:
 
 ```bash
-source ./build_project.sh --wallet.name default --wallet.hotkey default --subtensor.network finney
+./build_project.sh --wallet.name default --wallet.hotkey default --subtensor.network finney
 ```
-
-The script handles all necessary setup steps, so you don't need to manually install dependencies, set up databases, or generate SSL certificates.
 
 Once the build script completes, the system will be ready for the next steps in launching the validator using the PM2 ecosystem file.
 
-### Create account on BitAds.ai (Mandatory)
+### Create Account on BitAds.ai (Mandatory)
 
-Validator registration is required. This allows the server to ping, informing us of your activity so we can include it in the DNS records, ensuring the participant is accessible via x.bitads.ai or v.bitads.ai. <br><br>
-Without an account, Validators won't be able to set weights on the subnet. Having an account gives Validators easy access to miner and campaign statistics, as well as the API key needed to build their own application on the BitAds subnet. <br><br>
-Validators will be manually approved after we receive written confirmation on Discord regarding their registration.<br><br>
-For any inquiries regarding script usage or registration, please refer to the official documentation on BitAds.ai or contact our support team.<br>
+Validator registration is required. This allows the server to ping, informing us of your activity so we can include it in the DNS records, ensuring the participant is accessible via x.bitads.ai or v.bitads.ai.  
+Without an account, Validators won't be able to set weights on the subnet. Having an account gives Validators easy access to miner and campaign statistics, as well as the API key needed to build their own application on the BitAds subnet.  
+Validators will be manually approved after we receive written confirmation on Discord regarding their registration.
+
+For any inquiries regarding script usage or registration, please refer to the official documentation on BitAds.ai or contact our support team.
+
 You can register here: [BitAds.ai](https://bitads.ai/register)
+
+---
 
 ## Launch
 
@@ -109,7 +111,7 @@ To run the validator and ensure it automatically updates, you will use the PM2 e
    Run the following command to start the validator process via the PM2 ecosystem file:
 
    ```bash
-   pm2 start validator-ecosystem.config.js
+   export $(cat .env | xargs) && pm2 start validator-ecosystem.config.js
    ```
 
 This ecosystem file contains all the necessary configurations, including auto-update functionality, so there's no need to manually run any separate update command. PM2 will handle process management and updates automatically.
@@ -118,34 +120,34 @@ For more information on PM2 ecosystem configuration, you can refer to the [PM2 d
 
 ---
 
-## Subsequent Important Steps
+## Updating Environment Variables
 
-1. **Monitor the Validator**:
-   Use `pm2` to monitor the status of your validator process:
+If you need to change any environment variables (like wallet information or Subtensor settings), follow these steps:
 
-   ```bash
-   pm2 status
-   ```
-
-2. **Handling Updates**:
-   If you need to change wallet parameters or the chain endpoint, it's best to rebuild the project with the new parameters instead of using environment variable commands. You can run the build script again with the updated parameters, and then start or reload the PM2 process:
-
-   For example, if you need to change the wallet:
+1. **Stop the Validator**:
+   Delete the running validator process to reset the environment:
 
    ```bash
-   pm2 del validator-ecosystem.config.js  # stop previous processes (if env still active, else use pm2 list and del each process of previously running validator)
-   source ./build_project.sh --wallet.name new_wallet_name --wallet.hotkey new_wallet_hotkey --subtensor.network finney
-   pm2 startOrReload validator-ecosystem.config.js
+   export $(cat .env | xargs) && pm2 del validator-ecosystem.config.js
    ```
 
-3. **Logging and Debugging**:
-   To check logs for issues or errors:
+2. **Edit the Environment Variables**:
+   Open the `.env` file using an editor like `nano` or `vim`:
 
    ```bash
-   pm2 logs
+   nano .env
    ```
 
-**Reminder:** Always ensure port 443 is open for secure communication, and run all commands within the `sudo su -` environment.
+   Make your changes and save the file.
+
+3. **Restart the Validator**:
+   After updating the `.env` file, restart the validator:
+
+   ```bash
+   export $(cat .env | xargs) && pm2 start validator-ecosystem.config.js
+   ```
+
+This will apply the new environment variables and ensure the validator runs with updated configurations.
 
 ---
 
