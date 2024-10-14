@@ -61,7 +61,6 @@ export NEURON_TYPE=$neuron_type
 # Write the variables to .env file
 echo "Writing environment variables to .env file..."
 cat <<EOF > .env
-# Environment variables
 SUBTENSOR_NETWORK=$subtensor_network
 SUBTENSOR_CHAIN_ENDPOINT=$subtensor_chain_endpoint
 WALLET_HOTKEY=$wallet_hotkey
