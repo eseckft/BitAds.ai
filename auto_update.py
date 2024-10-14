@@ -2,62 +2,84 @@ import os
 import subprocess
 import requests
 import json
-
+import logging
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Constants for file paths
+# Constants
 LOCAL_CORE_VERSION_FILE = "tmp/local_core_version.txt"
 PROXY_VERSION_URL = "https://localhost/version"
+TMP_DIR = "tmp"
 
-# Create temporary directory if it doesn't exist
-if not os.path.exists("tmp"):
-    os.makedirs("tmp")
+# Ensure temporary directory exists
+os.makedirs(TMP_DIR, exist_ok=True)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,  # Set logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Format of log messages
+)
 
 
 def run_command(command):
     """Run a shell command and return the output."""
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(f"Error running command: {command}\n{result.stderr}")
-    return result.stdout.strip()
+    try:
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        if result.returncode != 0:
+            logging.error(f"Command failed: {command}\n{result.stderr}")
+        return result.stdout.strip()
+    except Exception as e:
+        logging.error(f"Error running command: {e}")
+        return ""
 
 
-def get_running_process_version():
-    """Get the version of a PM2-managed process by its name."""
-    # Use PM2 to fetch environment variables of the running process
-    with open(LOCAL_CORE_VERSION_FILE, "r") as f:
-        return f.read()
+def read_file(file_path):
+    """Read and return the content of a file, or None if an error occurs."""
+    try:
+        with open(file_path, "r") as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        logging.error(f"File not found: {file_path}")
+    except IOError as e:
+        logging.error(f"Error reading file {file_path}: {e}")
+    return None
+
+
+def write_file(file_path, content):
+    """Write content to a file."""
+    try:
+        with open(file_path, "w") as file:
+            file.write(content)
+    except IOError as e:
+        logging.error(f"Error writing to file {file_path}: {e}")
 
 
 def get_local_core_version():
-    """Get the version of the local core service."""
-    print("Checking version in local code for the core service...")
+    """Fetch and save the local core service version."""
+    logging.info("Checking version in local code for the core service...")
     local_core_version = run_command(
         "python -c 'import neurons; print(neurons.__version__)'"
     )
-
-    # Save to file
-    with open(LOCAL_CORE_VERSION_FILE, "w") as f:
-        f.write(local_core_version)
-
+    if local_core_version:
+        write_file(LOCAL_CORE_VERSION_FILE, local_core_version)
     return local_core_version
 
 
 def get_proxy_version():
-    """Get the version of the running and local proxy service."""
-
-    print("Fetching version from the proxy service at https://localhost/version...")
+    """Fetch the version of the running and local proxy service."""
+    logging.info(
+        "Fetching version from the proxy service at https://localhost/version..."
+    )
 
     try:
         response = requests.get(PROXY_VERSION_URL, verify=False)
         running_proxy_version = response.json().get("version")
     except (requests.RequestException, json.JSONDecodeError) as e:
-        print(f"Error fetching running proxy version: {e}")
+        logging.error(f"Error fetching running proxy version: {e}")
         running_proxy_version = None
 
-    print("Checking version in local code for the proxy service...")
+    logging.info("Checking version in local code for the proxy service...")
     local_proxy_version = run_command(
         """python -c '
 import proxies
@@ -66,63 +88,76 @@ neuron_type = os.getenv("NEURON_TYPE")
 print(getattr(proxies, f"__{neuron_type}_version__"))
 '"""
     )
-
     return running_proxy_version, local_proxy_version
 
 
 def restart_pm2_process(process_name):
     """Restart a PM2-managed process."""
-    print(f"Restarting PM2 process: {process_name}...")
+    logging.info(f"Restarting PM2 process: {process_name}...")
     run_command(f"pm2 restart {process_name}")
 
 
 def update_git_repo():
     """Perform a git pull to update the repository if needed."""
-    print("Fetching updates from GitHub...")
+    logging.info("Fetching updates from GitHub...")
     git_pull_output = run_command("git pull")
 
     if "Already up to date." in git_pull_output:
-        print("Local repository is up to date.")
+        logging.info("Local repository is up to date.")
         return False
     else:
-        print("Repository updated from GitHub.")
+        logging.info("Repository updated from GitHub.")
         return True
 
 
+def build_project(wallet_name, wallet_hotkey, neuron_type):
+    """Build the project using the provided wallet and neuron parameters."""
+    logging.info("Building project with updated parameters...")
+    run_command(
+        f"./build_project.sh --wallet.name {wallet_name} "
+        f"--wallet.hotkey {wallet_hotkey} --neuron.type {neuron_type}"
+    )
+
+
 def main():
-    # Step 2: Update Git repository
+    # Step 1: Update Git repository
     updated = update_git_repo()
 
-    if not updated:
-        return
-
+    # Step 2: Load environment variables
     wallet_name = os.getenv("WALLET_NAME")
     wallet_hotkey = os.getenv("WALLET_HOTKEY")
     neuron_type = os.getenv("NEURON_TYPE")
-    run_command(
-        f"./build_project.sh --wallet.name {wallet_name} --wallet.hotkey {wallet_hotkey} --neuron.type {neuron_type}"
-    )
 
-    # Step 3: Fetch core service version from PM2
-    running_core_version = get_running_process_version()
+    # Step 3: Fetch core service version
+    running_core_version = read_file(LOCAL_CORE_VERSION_FILE)
     local_core_version = get_local_core_version()
 
-    # Step 4: Restart core service if necessary
-    if running_core_version != local_core_version:
-        print(
-            f"Core service version mismatch or update detected. Restarting core service..."
-        )
-        restart_pm2_process(f"validator_server_{os.getenv('WALLET_HOTKEY')}")
+    # Step 4: Build project if the repository is updated
+    if updated:
+        build_project(wallet_name, wallet_hotkey, neuron_type)
 
-    # Step 5: Fetch proxy service versions
+    # Step 5: Restart core service if versions differ
+    if updated and running_core_version != local_core_version:
+        logging.info(
+            "Core service version mismatch or update detected. Restarting core service..."
+        )
+        restart_pm2_process(f"validator_server_{wallet_hotkey}")
+
+    # Step 6: Fetch proxy service versions
     running_proxy_version, local_proxy_version = get_proxy_version()
 
-    # Step 6: Restart proxy service if necessary
-    if running_proxy_version and running_proxy_version != local_proxy_version:
-        print(f"Proxy service version mismatch detected. Restarting proxy service...")
-        restart_pm2_process(f"validator_proxy_server_{os.getenv('WALLET_HOTKEY')}")
+    # Step 7: Restart proxy service if versions differ
+    if (
+        updated
+        and running_proxy_version
+        and running_proxy_version != local_proxy_version
+    ):
+        logging.info(
+            "Proxy service version mismatch detected. Restarting proxy service..."
+        )
+        restart_pm2_process(f"validator_proxy_server_{wallet_hotkey}")
     else:
-        print("Proxy service versions are the same. No restart required.")
+        logging.info("Proxy service versions are the same. No restart required.")
 
 
 if __name__ == "__main__":
