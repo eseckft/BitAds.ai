@@ -124,6 +124,11 @@ def main():
     # Step 1: Update Git repository
     updated = update_git_repo()
 
+    if not updated:
+        logging.info("No update received, skipping version checks and rebuilds.")
+        return
+    # Only proceed with version checks and builds if an update was received
+
     # Step 2: Load environment variables
     wallet_name = os.getenv("WALLET_NAME")
     wallet_hotkey = os.getenv("WALLET_HOTKEY")
@@ -138,12 +143,11 @@ def main():
 
     local_core_version = get_local_core_version()
 
-    # Step 4: Build project if the repository is updated
-    if updated:
-        build_project(wallet_name, wallet_hotkey, neuron_type)
+    # Step 4: Build project with updated code
+    build_project(wallet_name, wallet_hotkey, neuron_type)
 
     # Step 5: Restart core service if versions differ
-    if updated and running_core_version != local_core_version:
+    if running_core_version != local_core_version:
         logging.info(
             "Core service version mismatch or update detected. Restarting core service..."
         )
@@ -153,11 +157,7 @@ def main():
     running_proxy_version, local_proxy_version = get_proxy_version()
 
     # Step 7: Restart proxy service if versions differ
-    if (
-        updated
-        and running_proxy_version
-        and running_proxy_version != local_proxy_version
-    ):
+    if running_proxy_version and running_proxy_version != local_proxy_version:
         logging.info(
             "Proxy service version mismatch detected. Restarting proxy service..."
         )
