@@ -16,15 +16,6 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-# TODO(developer): Change this value when updating your code base.
-# Define the version of the template module.
-__version__ = "3.1.16"
-version_split = __version__.split(".")
-__spec_version__ = (
-    (100000 * int(version_split[0]))
-    + (10000 * int(version_split[1]))
-    + (1000 * int(version_split[2]))
-)
 
 from . import api
 from . import base
