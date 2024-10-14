@@ -68,10 +68,10 @@ Once in the root environment and still within the project directory, execute the
 - Setting up SQLite
 - Generating a self-signed SSL certificate if one doesn't already exist
 
-You need to provide your wallet name and hotkey, along with the `subtensor.network` as parameters when running the script. Here’s the command:
+You need to provide your wallet name, hotkey, and the `subtensor.network` as parameters when running the script. Additionally, you can specify the type of neuron (either `miner` or `validator`). Here’s the command:
 
 ```bash
-./build_project.sh --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network> --subtensor.chain_endpoint wss://entrypoint-finney.opentensor.ai:443
+./build_project.sh --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network> --subtensor.chain_endpoint <chain_endpoint> --neuron.type <neuron_type>
 ```
 
 #### Parameters:
@@ -79,11 +79,12 @@ You need to provide your wallet name and hotkey, along with the `subtensor.netwo
 - `--wallet.hotkey <wallet_hotkey>`: The hotkey name associated with your wallet.
 - `--subtensor.network <network>`: The Subtensor network to connect to (e.g., `finney`, `test`, etc.).
 - `--subtensor.chain_endpoint <chain_endpoint>` (optional): The Subtensor chain endpoint to connect to. If not specified, it defaults to `wss://entrypoint-finney.opentensor.ai:443`.
+- `--neuron.type <neuron_type>`: The type of neuron to use, either `miner` or `validator`.
 
 For example:
 
 ```bash
-./build_project.sh --wallet.name default --wallet.hotkey default --subtensor.network finney
+./build_project.sh --wallet.name default --wallet.hotkey default --subtensor.network finney --neuron.type validator
 ```
 
 Once the build script completes, the system will be ready for the next steps in launching the validator using the PM2 ecosystem file.
