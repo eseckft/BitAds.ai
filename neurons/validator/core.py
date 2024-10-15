@@ -69,11 +69,13 @@ class CoreValidator(BaseValidatorNeuron):
         self.order_queue_service = dependencies.get_order_queue_service(
             self.database_manager
         )
+        self.campaigns_serivce = common_dependencies.get_campaign_service(
+            self.database_manager
+        )
         self.miners = CommonEnviron.MINERS
         self.validators = CommonEnviron.VALIDATORS
         self.evaluate_miners_blocks = Environ.EVALUATE_MINERS_BLOCK_N
         self.miner_ratings = dict()
-        self.active_campaigns: List[Campaign] = list()
         self.last_evaluate_block = 0
         self.offset = None
 
@@ -117,11 +119,12 @@ class CoreValidator(BaseValidatorNeuron):
                 f"It's not time to ping miners yet. Current block: {current_block}"
             )
             return
+        active_campaigns = await self.campaigns_serivce.get_active_campaigns()
         bt.logging.info(
-            f"Start ping miners with active campaigns: {[c.id for c in self.active_campaigns]}"
+            f"Start ping miners with active campaigns: {[c.id for c in active_campaigns]}"
         )
         responses = await forward_each_axon(
-            self, Ping(active_campaigns=self.active_campaigns), *self.miners
+            self, Ping(active_campaigns=active_campaigns), *self.miners
         )
         await self.validator_service.add_miner_ping(
             current_block,
@@ -246,13 +249,13 @@ class CoreValidator(BaseValidatorNeuron):
 
         self.miners = response.miners
         self.validators = response.validators
-        self.active_campaigns = response.campaigns or []
+        active_campaigns = response.campaigns or []
         self.settings = FormulaParams.from_settings(response.settings)
         self.validator_service.settings = self.settings
         self.evaluate_miners_blocks = self.settings.evaluate_miners_blocks
         current_block = self.subtensor.get_current_block()
         await self.validator_service.sync_active_campaigns(
-            current_block, self.active_campaigns
+            current_block, active_campaigns
         )
         bt.logging.info("End ping BitAds")
 

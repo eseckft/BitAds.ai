@@ -167,13 +167,13 @@ class FormulaParams(BaseModel):
     total_visits_duration: int = 2
     unique_visits_duration: int = 2
     ctr_clicks_seconds: int = 3
-    sales_max: float = Field(500.0, alias="SALESmax")
-    cr_max: float = Field(0.05, alias="CRmax")
+    sales_max: float = Field(600.0, alias="SALESmax")
+    cr_max: float = Field(2.0, alias="CRmax")
     mr_max: float = Field(100, alias="MRmax")
-    w_sales: float = Field(0.60, alias="Wsales")
-    w_cr: float = Field(0.30, alias="Wcr")
-    w_mr: float = Field(0.10, alias="Wmr")
-    cpa_blocks: int = Field(100800, alias="CPABlocks")
+    w_sales: float = Field(0.9, alias="Wsales")
+    w_cr: float = Field(0.05, alias="Wcr")
+    w_mr: float = Field(0.05, alias="Wmr")
+    cpa_blocks: int = Field(7200, alias="CPABlocks")
     mr_blocks: int = Field(216000, alias="MRBlocks")
     evaluate_miners_blocks: int = Field(100, alias="EvaluateMinersBlocks")
 
