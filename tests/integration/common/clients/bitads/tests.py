@@ -1,7 +1,6 @@
 import unittest
 
 import neurons
-import template
 from common.clients.bitads.impl import SyncBitAdsClient
 from common.schemas.bitads import PingResponse, GetMinerUniqueIdResponse
 import bittensor as bt

@@ -25,7 +25,7 @@ def get_database_name(database: str):
 
 
 def get_database_path(database: str):
-    return "{name}_{network}.db".format(
+    return "databases/{name}_{network}.db".format(
         name=get_database_name(database),
         network="finney"
         if "local" in CommonEnviron.SUBTENSOR_NETWORK

@@ -21,7 +21,7 @@ class Environ:
     """
     MAIN_DB_URL: str = environ.get("MAIN_DB_URL", "sqlite+aiosqlite:///main.db")
     GEO2_LITE_DB_PATH: str = environ.get("GEO2_LITE_DB_PATH", "GeoLite2-Country.mmdb")
-    DB_URL_TEMPLATE: str = environ.get("DB_URL_TEMPLATE", "sqlite:///{name}_{network}.db")
+    DB_URL_TEMPLATE: str = environ.get("DB_URL_TEMPLATE", "sqlite:///databases/{name}_{network}.db")
     SUBTENSOR_NETWORK: str = environ.get("SUBTENSOR_NETWORK", "finney")
     WALLET_NAME: str = environ.get("WALLET_NAME")
     WALLET_HOTKEY: str = environ.get("WALLET_HOTKEY")
