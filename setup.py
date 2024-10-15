@@ -72,7 +72,7 @@ setup(
     include_package_data=True,
     author_email="",
     license="MIT",
-    python_requires=">=3.8",
+    python_requires=">=3.11",
     install_requires=requirements,
     classifiers=[
         "Development Status :: 3 - Alpha",

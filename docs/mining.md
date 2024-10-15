@@ -1,52 +1,42 @@
 # Mining
-
 ## Overview
 
-This document provides detailed instructions for deploying, launching, reinitializing, and performing subsequent
-important steps for the mining project. The steps include setting up the environment, running the miner scripts, and
-using the auto-update feature.
+This document provides detailed instructions for deploying, launching, and reinitializing the miner project. It includes key steps like setting up the environment, running scripts, and using the PM2 ecosystem file for auto-update. **Important: Ensure that port 443 is open and available for secure HTTPS communication with the miner. All miner commands should be run from the `sudo -s` environment to avoid permission issues.**
 
 ## Table of Contents
 
 1. [Deployment](#deployment)
-    - [Creating a Virtual Environment](#creating-a-virtual-environment)
-    - [Country Detection](#country-detection)
-    - [Git Clone the repository](#git-clone-the-repository)
-    - [Installing Dependencies](#installing-dependencies)
-    - [Create account on BitAds.ai (Optional)](#create-account-on-bitadsai-optional)
+    - [Cloning the Repository](#cloning-the-repository)
+    - [Setting up the Virtual Environment](#setting-up-the-virtual-environment)
+    - [Running the Build Script](#running-the-build-script)
 2. [Launch](#launch)
-    - [Running the Miner with Auto-Update](#running-the-miner-with-auto-update)
-    - [Example Command](#example-command)
-3. [Subsequent Important Steps](#subsequent-important-steps)
+    - [Running the miner using the PM2 Ecosystem File](#running-the-miner-using-the-pm2-ecosystem-file)
+3. [Updating Environment Variables](#updating-environment-variables)
 4. [Reinitialization](#reinitialization)
 
 ## Deployment
 
-### Creating a Virtual Environment
+### Cloning the Repository
 
-Creating a virtual environment is an optional but recommended step to manage dependencies and isolate the project
-environment. The required Python version is 3.11+.
+To begin, clone the repository for the miner project:
 
-1. **Install Python 3.11+**:
-   Ensure that Python 3.11+ is installed on your system. You can download it from
-   the [official Python website](https://www.python.org/downloads/).
+```bash
+git clone https://github.com/eseckft/BitAds.ai.git
+cd BitAds.ai
+```
 
-2. **Cloning the repo:**
+### Setting up the Virtual Environment
 
-   ```bash
-   git clone https://github.com/eseckft/BitAds.ai.git
-   
-   cd BitAds.ai
-   ```
+After cloning the repository, create and activate a Python virtual environment to manage dependencies:
 
-3. **Create a Virtual Environment**:
-   Open a terminal and navigate to your project directory. Run the following command to create a virtual environment:
+1. **Create a Virtual Environment**:
+   Run the following command to create a virtual environment:
 
    ```bash
    python3 -m venv venv
    ```
 
-4. **Activate the Virtual Environment**:
+2. **Activate the Virtual Environment**:
     - On Windows:
 
       ```bash
@@ -59,101 +49,104 @@ environment. The required Python version is 3.11+.
       source venv/bin/activate
       ```
 
-### Country Detection
+3. **Switch to Root Environment**:
+   After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
 
-Download the Geo2Lite database, which is required for the project to detect and store the country information of IP
-addresses:
+   ```bash
+   sudo -s
+   ```
+
+---
+
+### Running the Build Script
+
+Once in the root environment and still within the project directory, execute the build script to handle the setup. This script automates several key deployment steps, including:
+
+- Downloading the Geo2Lite database for country detection
+- Installing all necessary Python dependencies
+- Setting up SQLite
+- Generating a self-signed SSL certificate if one doesn't already exist
+
+You need to provide your wallet name, hotkey, and the `subtensor.network` as parameters when running the script. Additionally, you can specify the type of neuron (either `miner` or `validator`). Here’s the command:
 
 ```bash
-wget https://git.io/GeoLite2-Country.mmdb
+./build_project.sh --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network> --subtensor.chain_endpoint <chain_endpoint> --neuron.type <neuron_type>
 ```
 
-### Installing Dependencies
+#### Parameters:
+- `--wallet.name <wallet_name>`: The name of your wallet.
+- `--wallet.hotkey <wallet_hotkey>`: The hotkey name associated with your wallet.
+- `--subtensor.network <network>`: The Subtensor network to connect to (e.g., `finney`, `test`, etc.).
+- `--subtensor.chain_endpoint <chain_endpoint>` (optional): The Subtensor chain endpoint to connect to. If not specified, it defaults to `wss://entrypoint-finney.opentensor.ai:443`.
+- `--neuron.type <neuron_type>`: The type of neuron to use, either `miner` or `miner`.
 
-1. **Upgrade `pip`**:
+For example:
 
-   ```bash
-   python3 -m pip install --upgrade pip
-   ```
+```bash
+./build_project.sh --wallet.name default --wallet.hotkey default --subtensor.network finney --neuron.type miner
+```
 
-2. **Install Required Packages**:
-
-   Run the following commands to install the required dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-   
-3. **Install pm2**
-
-   Installation instructions can be found [here](https://pm2.io/docs/runtime/guide/installation/)
+Once the build script completes, the system will be ready for the next steps in launching the miner using the PM2 ecosystem file.
 
 ### Create account on BitAds.ai (Mandatory)
 
 To generate unique links for active marketing campaigns, register your miner on BitAds.ai. For easy access to links and miner stats, having a registered account is recommended. You can register here: [BitAds.ai](https://bitads.ai/register)  <br>
 
+---
 
 ## Launch
 
-### Running the Miner with Auto-Update
+### Running the Miner using the PM2 Ecosystem File
 
-The `run_miner_auto_update.py` script is used to launch the miner with an auto-update feature. This script ensures that
-the local repository is always up-to-date with the remote repository and restarts the miner if necessary.
+To run the miner and ensure it automatically updates, you will use the PM2 ecosystem configuration file, `miner-ecosystem.config.js`. PM2 will manage the miner process, keeping it running and ensuring it is up-to-date.
 
-### Generating a Self-Signed SSL Certificate
+1. **Start the miner using the Ecosystem File**:
 
-To secure the communication for your miner server, you may need to generate a self-signed SSL certificate. This can be
-done using OpenSSL. Follow the steps below to create the certificate and key files:
-
-```bash
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem \
-    -out cert.pem \
-    -subj "/C=US/ST=State/L=City/O=Bitads/CN=localhost"
-```
-
-### Example Command
-
-To run the miner with auto-update, use the following command:
-
-```bash
-pm2 start run_miner_auto_update.py --interpreter python3 -- --subtensor.network local --wallet.name <name> --wallet.hotkey <name>
-```
-
-- Replace `<name>` with your wallet name and hotkey.
-- This command uses `pm2` to manage the process, ensuring it stays running and is easily restartable.
-
-## Subsequent Important Steps
-
-1. **Monitor the Miner**:
-   Use `pm2` to monitor the status of your miner process. For example:
+   Run the following command to start the miner process via the PM2 ecosystem file:
 
    ```bash
-   pm2 status
+   export $(cat .env | xargs) && pm2 start miner-ecosystem.config.js
    ```
 
-2. **Handling Updates**:
-   The `run_miner_auto_update.py` script automatically handles updates. Ensure that it is running correctly to keep your
-   miner up-to-date.
+This ecosystem file contains all the necessary configurations, including auto-update functionality, so there's no need to manually run any separate update command. PM2 will handle process management and updates automatically.
 
-3. **Restarting Processes**:
-   If necessary, you can manually restart the miner or proxy processes using `pm2`. For example:
+For more information on PM2 ecosystem configuration, you can refer to the [PM2 documentation](https://pm2.keymetrics.io/docs/usage/application-declaration/).
+
+---
+
+## Updating Environment Variables
+
+If you need to change any environment variables (like wallet information or Subtensor settings), follow these steps:
+
+1. **Stop the miner**:
+   Delete the running miner process to reset the environment:
 
    ```bash
-   pm2 restart mining_server_<wallet_hotkey>
-   pm2 restart mining_proxy_server_<wallet_hotkey>
+   export $(cat .env | xargs) && pm2 del miner-ecosystem.config.js
    ```
 
-4. **Logging and Debugging**:
-   Check the logs for any issues or errors:
+2. **Edit the Environment Variables**:
+   Open the `.env` file using an editor like `nano` or `vim`:
 
    ```bash
-   pm2 logs
+   nano .env
    ```
 
-By following these steps, you can successfully deploy, launch, and maintain your mining project. Continually update this
-document as needed to reflect any changes or new procedures.
+   Make your changes and save the file.
+
+3. **Restart the miner**:
+   After updating the `.env` file, restart the miner:
+
+   ```bash
+   export $(cat .env | xargs) && pm2 start miner-ecosystem.config.js
+   ```
+
+This will apply the new environment variables and ensure the miner runs with updated configurations.
+
+---
 
 ## Reinitialization
 
-If you decide that in the process of neurons working something REALLY went wrong,
-that follow the [reinitialization process](reinitialization.md) instruction.
+If you encounter critical issues during operation, refer to the [reinitialization process](reinitialization.md) instructions for troubleshooting and restarting the miner setup.
+
+**Note:** Currently, the auto-update script supports only one running instance of the miner on the server; in the future, it will be able to run multiple instances.

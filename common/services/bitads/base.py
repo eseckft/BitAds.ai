@@ -37,6 +37,10 @@ class BitAdsService(ABC):
         pass
 
     @abstractmethod
+    async def add_by_visit(self, visit: VisitorSchema) -> None:
+        pass
+
+    @abstractmethod
     async def add_bitads_data(self, datas: Set[BitAdsDataSchema]) -> None:
         pass
 

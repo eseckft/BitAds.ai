@@ -6,7 +6,6 @@ from fastapi import Depends
 import neurons
 from common.clients.bitads.base import BitAdsClient
 from common.clients.bitads.impl import SyncBitAdsClient
-
 from common.db.database import Database, DatabaseManager
 from common.environ import Environ
 from common.helpers import const

@@ -12,6 +12,7 @@ from fastapi import FastAPI, Depends, HTTPException, Header, Query, status
 
 from common import dependencies as common_dependencies
 from common.environ import Environ as CommonEnviron
+from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
 from common.schemas.shopify import ShopifyBody, SaleData
 from common.services.queue.exceptions import RefundNotExpectedWithoutOrder
@@ -86,7 +87,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.3.10",
+    version="0.3.13",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -149,6 +150,11 @@ async def get_tracking_data(
 async def get_visit_by_id(id: str) -> Optional[BitAdsDataSchema]:
     result = await bitads_service.get_data_by_ids({id})
     return next(iter(result), None)
+
+
+@app.put("/tracking_data", dependencies=[Depends(validate_hash)])
+async def put_visit(body: VisitorSchema) -> None:
+    await bitads_service.add_by_visit(body)
 
 
 @app.get("/is_axon_exists")
