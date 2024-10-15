@@ -257,6 +257,9 @@ class CoreValidator(BaseValidatorNeuron):
         await self.validator_service.sync_active_campaigns(
             current_block, active_campaigns
         )
+        await self.campaigns_serivce.set_campaigns(
+            active_campaigns
+        )
         bt.logging.info("End ping BitAds")
 
     @execute_periodically(timedelta(minutes=15))
