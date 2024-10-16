@@ -87,7 +87,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.3.13",
+    version="0.3.14",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -143,6 +143,17 @@ async def get_tracking_data(
 ) -> List[BitAdsDataSchema]:
     return await bitads_service.get_bitads_data_between(
         updated_from, updated_to, page_number, page_size
+    )
+
+
+@app.get("/tracking_data/by_campaign_item")
+async def get_bidads_data_by_campaign_item(
+    campaign_item: Annotated[list, Query()],
+    page_number: int = 1,
+    page_size: int = 500,
+) -> List[BitAdsDataSchema]:
+    return await bitads_service.get_by_campaign_items(
+        campaign_item, page_number, page_size
     )
 
 

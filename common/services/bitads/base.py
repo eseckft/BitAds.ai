@@ -61,3 +61,12 @@ class BitAdsService(ABC):
         self, validator_block: int, validator_hotkey: str, items: List[OrderQueueSchema]
     ) -> Dict[str, OrderQueueStatus]:
         pass
+
+    @abstractmethod
+    async def get_by_campaign_items(
+        self,
+        campaign_items: List[str],
+        page_number: int = 1,
+        page_size: int = 500,
+    ) -> List[BitAdsDataSchema]:
+        pass
