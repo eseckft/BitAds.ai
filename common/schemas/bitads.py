@@ -3,9 +3,15 @@ BitAds schemas
 """
 from datetime import datetime
 from enum import IntEnum
-from typing import Optional, List, Set, Dict
+from typing import Optional, List, Set, Dict, Any
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import (
+    BaseModel,
+    Field,
+    ConfigDict,
+    IPvAnyAddress,
+    field_validator,
+)
 
 from common.miner.schemas import VisitorActivitySchema
 from common.schemas.campaign import CampaignType
@@ -65,9 +71,12 @@ class Campaign(BaseModel):
 
     # in_progress: Optional[int] = None
     # product_title: Optional[str] = None
-    # created_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    date_started: Optional[datetime] = None
+    date_approved: Optional[datetime] = None
     # is_aggregate: Optional[int] = None
     product_unique_id: str
+    product_name: Optional[str] = None
     # validator_id: Optional[int] = None
     status: Optional[int] = None
     # product_button_link: Optional[str] = None
@@ -79,9 +88,16 @@ class Campaign(BaseModel):
     # product_button_text: Optional[str] = None
     # product_images: Optional[str] = None
     # product_theme: Optional[str] = None
+    store_name: Optional[str] = None
     product_link: Optional[str] = None
     id: str
     type: CampaignType = CampaignType.REGULAR
+
+    validator_id: Optional[int] = None
+    country_of_registration: Optional[str] = None
+    company_registration_number: Optional[str] = None
+    countries_approved_for_product_sales: Optional[str] = None
+    updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(extra="ignore", from_attributes=True)
 
@@ -268,3 +284,30 @@ class BitAdsDataSchema(BaseModel):
     return_in_site: Optional[bool] = None
 
     model_config = ConfigDict(from_attributes=True, frozen=True, use_enum_values=True)
+
+
+class TwoFactorRequest(BaseModel):
+    ip_address: IPvAnyAddress
+    user_agent: Optional[str] = None
+    hotkey: str
+    code: str
+
+
+class TwoFactorSchema(BaseModel):
+    created_at: Optional[datetime] = None
+    ip_address: str
+    user_agent: Optional[str] = None
+    hotkey: str
+    code: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MinerUniqueLinkSchema(BaseModel):
+    id: str
+    created_at: Optional[datetime] = None
+    campaign_id: str
+    hotkey: str
+    link: str
+
+    model_config = ConfigDict(from_attributes=True)

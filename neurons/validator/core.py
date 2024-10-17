@@ -54,7 +54,7 @@ class CoreValidator(BaseValidatorNeuron):
         super(CoreValidator, self).__init__(config=config)
 
         self.bitads_client = common_dependencies.create_bitads_client(
-            self.wallet, self.config.bitads.url
+            self.wallet, self.config.bitads.url, self.neuron_type
         )
 
         self.database_manager = common_dependencies.get_database_manager(

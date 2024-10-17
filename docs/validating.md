@@ -30,14 +30,20 @@ cd BitAds.ai
 
 After cloning the repository, create and activate a Python virtual environment to manage dependencies:
 
-1. **Create a Virtual Environment**:
+1. **Install Python 3.11+**:
+
+   Ensure that Python 3.11+ is installed on your system. You can download it from
+   the [official Python website](https://www.python.org/downloads/).
+
+
+2. **Create a Virtual Environment**:
    Run the following command to create a virtual environment:
 
    ```bash
    python3 -m venv venv
    ```
 
-2. **Activate the Virtual Environment**:
+3. **Activate the Virtual Environment**:
     - On Windows:
 
       ```bash
@@ -50,7 +56,7 @@ After cloning the repository, create and activate a Python virtual environment t
       source venv/bin/activate
       ```
 
-3. **Switch to Root Environment**:
+4. **Switch to Root Environment**:
    After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
 
    ```bash
@@ -89,17 +95,58 @@ For example:
 
 Once the build script completes, the system will be ready for the next steps in launching the validator using the PM2 ecosystem file.
 
-### Create Account on BitAds.ai (Mandatory)
 
-Validator registration is required. This allows the server to ping, informing us of your activity so we can include it in the DNS records, ensuring the participant is accessible via x.bitads.ai or v.bitads.ai.  
-Without an account, Validators won't be able to set weights on the subnet. Having an account gives Validators easy access to miner and campaign statistics, as well as the API key needed to build their own application on the BitAds subnet.  
-Validators will be manually approved after we receive written confirmation on Discord regarding their registration.
+### Create account on BitAds.ai (Optional)
 
-For any inquiries regarding script usage or registration, please refer to the official documentation on BitAds.ai or contact our support team.
+Registration is no longer necessary for validators. However, you can still create an account to conveniently view statistics and access other platform features.
 
-You can register here: [BitAds.ai](https://bitads.ai/register)
+Having an account provides users with easy access to miner and campaign statistics, as well as the API key needed to build their own applications on the BitAds subnet.
 
----
+If you wish to register for additional features, you can do so here: [BitAds.ai](https://bitads.ai/register)
+
+
+#### Receiving 2FA Codes
+
+Once the full application setup is complete and the proxy is operational (you should see the following log message:
+
+```
+Uvicorn running on https://0.0.0.0:443 (Press CTRL+C to quit)
+```
+
+), you can retrieve your 2FA codes for registration by running the following command:
+
+```bash
+bacli 2fa list
+```
+
+**If you encounter the error `command not found: bacli`:**
+
+1. **Ensure the Virtual Environment is Activated**:
+
+   Make sure that your virtual environment is active. If not, activate it using:
+
+   - On Windows:
+
+     ```bash
+     .\venv\Scripts\activate
+     ```
+
+   - On macOS and Linux:
+
+     ```bash
+     source venv/bin/activate
+     ```
+
+2. **Install the Package Locally**:
+
+   Run the following command to install the necessary package:
+
+   ```bash
+   pip install .
+   ```
+
+   After successful installation, retry the `bacli 2fa list` command.
+
 
 ## Launch
 
