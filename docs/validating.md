@@ -2,43 +2,42 @@
 
 ## Overview
 
-This document provides detailed instructions for deploying, launching, reinitializing, and performing subsequent
-important steps for the validator project. The steps include setting up the environment, running the validator scripts,
-and using the auto-update feature. **Important: Ensure that port 443 is open and available, as it is required for secure
-HTTPS communication with the validator. All validator commands should be run from the `sudo su -` environment to avoid
-permission issues.**
+This document provides detailed instructions for deploying, launching, and reinitializing the validator project. It includes key steps like setting up the environment, running scripts, and using the PM2 ecosystem file for auto-update. **Important: Ensure that port 443 is open and available for secure HTTPS communication with the validator. All validator commands should be run from the `sudo -s` environment to avoid permission issues.**
 
 ## Table of Contents
 
 1. [Deployment](#deployment)
-    - [Creating a Virtual Environment](#creating-a-virtual-environment)
-    - [Country Detection](#country-detection)
-    - [Git Clone the repositroy](#git-clone-the-repository)
-    - [Create account on BitAds.ai (Optional)](#create-account-on-bitadsai-optional)
-    - [Installing Dependencies](#installing-dependencies) 
+    - [Cloning the Repository](#cloning-the-repository)
+    - [Setting up the Virtual Environment](#setting-up-the-virtual-environment)
+    - [Running the Build Script](#running-the-build-script)
 2. [Launch](#launch)
-    - [Running the Validator with Auto-Update](#running-the-validator-with-auto-update)
-    - [Example Command](#example-command)
-3. [Subsequent Important Steps](#subsequent-important-steps)
+    - [Running the Validator using the PM2 Ecosystem File](#running-the-validator-using-the-pm2-ecosystem-file)
+3. [Updating Environment Variables](#updating-environment-variables)
 4. [Reinitialization](#reinitialization)
 
 ## Deployment
 
-### Creating a Virtual Environment
+### Cloning the Repository
 
-Creating a virtual environment is an optional but recommended step to manage dependencies and isolate the project
-environment. The required Python version is 3.11+.
+To begin, clone the repository for the validator project:
 
-**Note:** Ensure that port 443 is open and available. This port is used for secure communication (HTTPS) between your
-validator and external systems, such as the BitAds.ai platform. Without this, the validator won't be able to communicate
-securely.
+```bash
+git clone https://github.com/eseckft/BitAds.ai.git
+cd BitAds.ai
+```
+
+### Setting up the Virtual Environment
+
+After cloning the repository, create and activate a Python virtual environment to manage dependencies:
 
 1. **Install Python 3.11+**:
+
    Ensure that Python 3.11+ is installed on your system. You can download it from
    the [official Python website](https://www.python.org/downloads/).
 
+
 2. **Create a Virtual Environment**:
-   Open a terminal and navigate to your project directory. Run the following command to create a virtual environment:
+   Run the following command to create a virtual environment:
 
    ```bash
    python3 -m venv venv
@@ -57,55 +56,45 @@ securely.
       source venv/bin/activate
       ```
 
-**Important:** After creating the environment, **all subsequent commands should be executed as the root user** to avoid
-permission issues. This can be done by switching to the `sudo su -` environment before proceeding:
-
-```bash
-sudo su -
-```
-
-### Country Detection
-
-Download the Geo2Lite database, which is required for the project to detect and store the country information of IP
-addresses:
-
-```bash
-wget https://git.io/GeoLite2-Country.mmdb
-```
-
-### Git Clone the Repository
-
-```bash
-git clone https://github.com/eseckft/BitAds.ai.git
-cd BitAds.ai
-```
-
-### Installing Dependencies
-
-1. **Upgrade `pip`**:
+4. **Switch to Root Environment**:
+   After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
 
    ```bash
-   python3 -m pip install --upgrade pip
+   sudo -s
    ```
 
-2. **Install Required Packages**:
+---
 
-   Run the following commands to install the required dependencies:
+### Running the Build Script
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Once in the root environment and still within the project directory, execute the build script to handle the setup. This script automates several key deployment steps, including:
 
-3. **Install pm2**
+- Downloading the Geo2Lite database for country detection
+- Installing all necessary Python dependencies
+- Setting up SQLite
+- Generating a self-signed SSL certificate if one doesn't already exist
 
-   Installation instructions can be found [here](https://pm2.io/docs/runtime/guide/installation/)
+You need to provide your wallet name, hotkey, and the `subtensor.network` as parameters when running the script. Additionally, you can specify the type of neuron (either `miner` or `validator`). Here’s the command:
 
-4. **Update/install sqlite3**
+```bash
+./build_project.sh --wallet.name <wallet_name> --wallet.hotkey <wallet_hotkey> --subtensor.network <network> --subtensor.chain_endpoint <chain_endpoint> --neuron.type <neuron_type>
+```
 
-   ```bash
-   apt update
-   apt install sqlite3
-   ```
+#### Parameters:
+- `--wallet.name <wallet_name>`: The name of your wallet.
+- `--wallet.hotkey <wallet_hotkey>`: The hotkey name associated with your wallet.
+- `--subtensor.network <network>`: The Subtensor network to connect to (e.g., `finney`, `test`, etc.).
+- `--subtensor.chain_endpoint <chain_endpoint>` (optional): The Subtensor chain endpoint to connect to. If not specified, it defaults to `wss://entrypoint-finney.opentensor.ai:443`.
+- `--neuron.type <neuron_type>`: The type of neuron to use, either `miner` or `validator`.
+
+For example:
+
+```bash
+./build_project.sh --wallet.name default --wallet.hotkey default --subtensor.network finney --neuron.type validator
+```
+
+Once the build script completes, the system will be ready for the next steps in launching the validator using the PM2 ecosystem file.
+
 
 ### Create account on BitAds.ai (Optional)
 
@@ -158,70 +147,60 @@ bacli 2fa list
 
    After successful installation, retry the `bacli 2fa list` command.
 
+
 ## Launch
 
-### Generating a Self-Signed SSL Certificate
+### Running the Validator using the PM2 Ecosystem File
 
-To secure the communication for your validator server, you may need to generate a self-signed SSL certificate. This can
-be done using OpenSSL. Follow the steps below to create the certificate and key files:
+To run the validator and ensure it automatically updates, you will use the PM2 ecosystem configuration file, `validator-ecosystem.config.js`. PM2 will manage the validator process, keeping it running and ensuring it is up-to-date.
 
-```bash
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem \
-    -out cert.pem \
-    -subj "/C=US/ST=State/L=City/O=Bitads/CN=localhost"
-```
+1. **Start the Validator using the Ecosystem File**:
 
-**Note:** Port 443 must be open and available on your system for secure communication over HTTPS.
+   Run the following command to start the validator process via the PM2 ecosystem file:
 
-### Example Command
+   ```bash
+   export $(cat .env | xargs) && pm2 start validator-ecosystem.config.js
+   ```
 
-To run the validator with auto-update, use the following command:
+This ecosystem file contains all the necessary configurations, including auto-update functionality, so there's no need to manually run any separate update command. PM2 will handle process management and updates automatically.
 
-```bash
-pm2 start run_validator_auto_update.py --interpreter python3 -- --subtensor.network local --wallet.name <name> --wallet.hotkey <name>
-```
-
-- Replace `<name>` with your wallet name and hotkey.
-- This command uses `pm2` to manage the process, ensuring it stays running and is easily restartable.
-
-**Important:** Ensure you are running this command in the `sudo su -` environment to avoid permission issues.
+For more information on PM2 ecosystem configuration, you can refer to the [PM2 documentation](https://pm2.keymetrics.io/docs/usage/application-declaration/).
 
 ---
 
-## Subsequent Important Steps
+## Updating Environment Variables
 
-1. **Monitor the Validator**:
-   Use `pm2` to monitor the status of your validator process. For example:
+If you need to change any environment variables (like wallet information or Subtensor settings), follow these steps:
 
-   ```bash
-   pm2 status
-   ```
-
-2. **Handling Updates**:
-   The `run_validator_auto_update.py` script automatically handles updates. Ensure that it is running correctly to keep
-   your validator up-to-date.
-
-3. **Restarting Processes**:
-   If necessary, you can manually restart the validator or proxy processes using `pm2`. For example:
+1. **Stop the Validator**:
+   Delete the running validator process to reset the environment:
 
    ```bash
-   pm2 restart validator_server_<wallet_hotkey>
-   pm2 restart validator_proxy_server_<wallet_hotkey>
+   export $(cat .env | xargs) && pm2 del validator-ecosystem.config.js
    ```
 
-4. **Logging and Debugging**:
-   Check the logs for any issues or errors:
+2. **Edit the Environment Variables**:
+   Open the `.env` file using an editor like `nano` or `vim`:
 
    ```bash
-   pm2 logs
+   nano .env
    ```
 
-**Reminder:** Always ensure port 443 is open for secure communication, and make sure you're in the `sudo su -`
-environment when running these commands.
+   Make your changes and save the file.
+
+3. **Restart the Validator**:
+   After updating the `.env` file, restart the validator:
+
+   ```bash
+   export $(cat .env | xargs) && pm2 start validator-ecosystem.config.js
+   ```
+
+This will apply the new environment variables and ensure the validator runs with updated configurations.
 
 ---
 
 ## Reinitialization
 
-If you decide that in the process of neurons working something REALLY went wrong, follow
-the [reinitialization process](reinitialization.md) instruction.
+If you encounter critical issues during operation, refer to the [reinitialization process](reinitialization.md) instructions for troubleshooting and restarting the validator setup.
+
+**Note:** Currently, the auto-update script supports only one running instance of the validator on the server; in the future, it will be able to run multiple instances.

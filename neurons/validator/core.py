@@ -33,7 +33,7 @@ from neurons.protocol import (
 from template.base.validator import BaseValidatorNeuron
 from template.utils.config import add_blacklist_args
 from template.validator.forward import forward_each_axon
-from template import __spec_version__
+from neurons import __spec_version__
 
 
 class CoreValidator(BaseValidatorNeuron):
@@ -53,12 +53,10 @@ class CoreValidator(BaseValidatorNeuron):
     def __init__(self, config=None):
         super(CoreValidator, self).__init__(config=config)
 
-        bt.logging.info("load_state()")
-        self.load_state()
-
         self.bitads_client = common_dependencies.create_bitads_client(
             self.wallet, self.config.bitads.url, self.neuron_type
         )
+
         self.database_manager = common_dependencies.get_database_manager(
             self.neuron_type, self.subtensor.network
         )
@@ -71,16 +69,18 @@ class CoreValidator(BaseValidatorNeuron):
         self.order_queue_service = dependencies.get_order_queue_service(
             self.database_manager
         )
+        self.campaigns_serivce = common_dependencies.get_campaign_service(
+            self.database_manager
+        )
         self.miners = CommonEnviron.MINERS
         self.validators = CommonEnviron.VALIDATORS
         self.evaluate_miners_blocks = Environ.EVALUATE_MINERS_BLOCK_N
         self.miner_ratings = dict()
-        self.active_campaigns: List[Campaign] = list()
         self.last_evaluate_block = 0
         self.offset = None
-        # self.loop.run_until_complete(self._mark_for_reprocess())
-        # self.loop.create_task(self._calculate_campaigns_umax())
-        # self.loop.create_task(self._evaluate_miners())
+
+        bt.logging.info("load_state()")
+        self.load_state()
 
     async def forward(self, _: bt.Synapse = None):
         """
@@ -119,11 +119,12 @@ class CoreValidator(BaseValidatorNeuron):
                 f"It's not time to ping miners yet. Current block: {current_block}"
             )
             return
+        active_campaigns = await self.campaigns_serivce.get_active_campaigns()
         bt.logging.info(
-            f"Start ping miners with active campaigns: {[c.id for c in self.active_campaigns]}"
+            f"Start ping miners with active campaigns: {[c.id for c in active_campaigns]}"
         )
         responses = await forward_each_axon(
-            self, Ping(active_campaigns=self.active_campaigns), *self.miners
+            self, Ping(active_campaigns=active_campaigns), *self.miners
         )
         await self.validator_service.add_miner_ping(
             current_block,
@@ -248,13 +249,16 @@ class CoreValidator(BaseValidatorNeuron):
 
         self.miners = response.miners
         self.validators = response.validators
-        self.active_campaigns = response.campaigns or []
+        active_campaigns = response.campaigns or []
         self.settings = FormulaParams.from_settings(response.settings)
         self.validator_service.settings = self.settings
         self.evaluate_miners_blocks = self.settings.evaluate_miners_blocks
         current_block = self.subtensor.get_current_block()
         await self.validator_service.sync_active_campaigns(
-            current_block, self.active_campaigns
+            current_block, active_campaigns
+        )
+        await self.campaigns_serivce.set_campaigns(
+            active_campaigns
         )
         bt.logging.info("End ping BitAds")
 
@@ -302,6 +306,9 @@ class CoreValidator(BaseValidatorNeuron):
         await self.order_queue_service.update_queue_status(
             {id_: OrderQueueStatus.PENDING for id_ in ids}
         )
+
+    def load_state(self):
+        self.loop.run_until_complete(self._ping_bitads())
 
 
 # The main function parses the configuration and runs the validator.

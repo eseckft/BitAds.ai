@@ -58,9 +58,11 @@ class BitAdsServiceImpl(BitAdsService):
     async def add_by_visits(self, visits: Set[VisitorSchema]) -> None:
         with self.database_manager.get_session("active") as session:
             for visit in visits:
-                bitads_data.add_data(
-                    session, BitAdsDataSchema(**visit.model_dump())
-                )
+                bitads_data.add_data(session, BitAdsDataSchema(**visit.model_dump()))
+
+    async def add_by_visit(self, visit: VisitorSchema) -> None:
+        with self.database_manager.get_session("active") as session:
+            bitads_data.add_or_update(session, BitAdsDataSchema(**visit.model_dump()))
 
     async def add_bitads_data(self, datas: Set[BitAdsDataSchema]) -> None:
         with self.database_manager.get_session("active") as session:
@@ -128,3 +130,19 @@ class BitAdsServiceImpl(BitAdsService):
                     log.exception(f"Add BitAds data exception on id: {item.id}")
                     result[item.id] = OrderQueueStatus.ERROR
         return result
+
+    async def get_by_campaign_items(
+        self,
+        campaign_items: List[str],
+        page_number: int = 1,
+        page_size: int = 500,
+    ) -> List[BitAdsDataSchema]:
+        limit = page_size
+        offset = (page_number - 1) * page_size
+        with self.database_manager.get_session("active") as session:
+            return bitads_data.get_bitads_data_by_campaign_items(
+                session,
+                campaign_items,
+                limit,
+                offset
+            )

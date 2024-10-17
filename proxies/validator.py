@@ -11,6 +11,7 @@ from fastapi import FastAPI, Depends, HTTPException, Header, status
 
 from common import dependencies as common_dependencies
 from common.environ import Environ as CommonEnviron
+from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
 from common.schemas.shopify import ShopifyBody, SaleData
 from common.services.queue.exceptions import RefundNotExpectedWithoutOrder
@@ -137,10 +138,26 @@ async def get_tracking_data(
     )
 
 
+@app.get("/tracking_data/by_campaign_item")
+async def get_bidads_data_by_campaign_item(
+    campaign_item: Annotated[list, Query()],
+    page_number: int = 1,
+    page_size: int = 500,
+) -> List[BitAdsDataSchema]:
+    return await bitads_service.get_by_campaign_items(
+        campaign_item, page_number, page_size
+    )
+
+
 @app.get("/tracking_data/{id}")
 async def get_visit_by_id(id: str) -> Optional[BitAdsDataSchema]:
     result = await bitads_service.get_data_by_ids({id})
     return next(iter(result), None)
+
+
+@app.put("/tracking_data", dependencies=[Depends(validate_hash)])
+async def put_visit(body: VisitorSchema) -> None:
+    await bitads_service.add_by_visit(body)
 
 
 @app.get("/is_axon_exists")

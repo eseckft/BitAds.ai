@@ -34,7 +34,7 @@ def get_database_path(database: str):
 
 
 async def main():
-    databases_to_retrieve = {"active", "main", "history"}
+    databases_to_retrieve = {"active", "history"}
 
     socket.setdefaulttimeout(5)
 

@@ -274,3 +274,18 @@ def get_miners_reputation(
 
     # noinspection PyTypeChecker
     return dict(query.all())
+
+
+def get_bitads_data_by_campaign_items(
+    session: Session, campaign_items: List[str], limit: int, offset: int
+):
+    stmt = select(BitAdsData)
+
+    # Include the optional updated_lte filter if provided
+
+    stmt = stmt.where(BitAdsData.campaign_item.in_(campaign_items))
+
+    stmt = stmt.limit(limit).offset(offset).order_by(desc(BitAdsData.created_at))
+
+    result = session.execute(stmt)
+    return [BitAdsDataSchema.model_validate(r) for r in result.scalars().all()]
