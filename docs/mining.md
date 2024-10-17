@@ -96,7 +96,7 @@ Once the build script completes, the system will be ready for the next steps in 
 
 ### Create account on BitAds.ai (Optional)
 
-You do not need to register on BitAds.ai to generate unique links for active marketing campaigns, as the `bacli` offers a practical and straightforward way to access these links without registration. However, registering an account can enhance your experience by providing additional features and insights into your miner’s statistics. You can register here: [BitAds.ai](https://bitads.ai/register)
+You do not need to register on BitAds.ai to generate unique links for active marketing campaigns, as the `bacli` offers a practical and straightforward way to access these links without registration. However, registering an account can enhance your experience by providing additional features and insights into your miner’s statistics. You can register here: [BitAds.ai](https://bitads.ai/sign-up)
 
 After starting your miner process in PM2 and allowing sufficient time for unique links to be generated (up to half an hour), you can use the console command `bacli campaigns links` to retrieve your miner’s unique links for active campaigns.
 
