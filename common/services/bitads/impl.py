@@ -56,8 +56,9 @@ class BitAdsServiceImpl(BitAdsService):
             return bitads_data.get_max_date_excluding_hotkey(session, exclude_hotkey)
 
     async def add_by_visits(self, visits: Set[VisitorSchema]) -> None:
+        unique_visits = {visit.id: visit for visit in visits if visit.id is not None}
         with self.database_manager.get_session("active") as session:
-            for visit in visits:
+            for visit in unique_visits.values():
                 bitads_data.add_data(session, BitAdsDataSchema(**visit.model_dump()))
 
     async def add_by_visit(self, visit: VisitorSchema) -> None:
@@ -141,8 +142,5 @@ class BitAdsServiceImpl(BitAdsService):
         offset = (page_number - 1) * page_size
         with self.database_manager.get_session("active") as session:
             return bitads_data.get_bitads_data_by_campaign_items(
-                session,
-                campaign_items,
-                limit,
-                offset
+                session, campaign_items, limit, offset
             )
