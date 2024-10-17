@@ -131,7 +131,7 @@ def create_bitads_client_from_hotkey(
     return SyncBitAdsClient(
         base_url,
         hot_key=hotkey,
-        neuron_type=neuron_type
+        neuron_type=neuron_type,
         v=neurons.__version__,
     )
 
