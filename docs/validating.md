@@ -102,7 +102,7 @@ Registration is no longer necessary for validators. However, you can still creat
 
 Having an account provides users with easy access to miner and campaign statistics, as well as the API key needed to build their own applications on the BitAds subnet.
 
-If you wish to register for additional features, you can do so here: [BitAds.ai](https://bitads.ai/register)
+If you wish to register for additional features, you can do so here: [BitAds.ai](https://bitads.ai/sign-up)
 
 
 #### Receiving 2FA Codes
