@@ -7,7 +7,7 @@ from typing import Annotated, List, Optional, Dict
 
 import uvicorn
 from common.helpers import const
-from fastapi import FastAPI, Depends, HTTPException, Header, status
+from fastapi import FastAPI, Depends, HTTPException, Header, status, Query
 
 from common import dependencies as common_dependencies
 from common.environ import Environ as CommonEnviron
@@ -89,7 +89,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.4.1",
+    version="0.4.2",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
