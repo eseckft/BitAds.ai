@@ -43,7 +43,14 @@ After cloning the repository, create and activate a Python virtual environment t
    python3 -m venv venv
    ```
 
-3. **Activate the Virtual Environment**:
+3. **Switch to Root Environment**:
+   After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
+
+   ```bash
+   sudo -s
+   ```
+
+4. **Activate the Virtual Environment**:
     - On Windows:
 
       ```bash
@@ -55,13 +62,6 @@ After cloning the repository, create and activate a Python virtual environment t
       ```bash
       source venv/bin/activate
       ```
-
-4. **Switch to Root Environment**:
-   After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
-
-   ```bash
-   sudo -s
-   ```
 
 ---
 
