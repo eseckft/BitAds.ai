@@ -122,7 +122,7 @@ def build_project(wallet_name, wallet_hotkey, neuron_type):
 
 def main():
     # Step 1: Update Git repository
-    updated = update_git_repo()
+    updated = True
 
     if not updated:
         logging.info("No update received, skipping version checks and rebuilds.")
@@ -157,7 +157,7 @@ def main():
     running_proxy_version, local_proxy_version = get_proxy_version()
 
     # Step 7: Restart proxy service if versions differ
-    if running_proxy_version and running_proxy_version != local_proxy_version:
+    if running_proxy_version != local_proxy_version:
         logging.info(
             "Proxy service version mismatch detected. Restarting proxy service..."
         )
