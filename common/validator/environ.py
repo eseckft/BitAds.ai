@@ -31,7 +31,7 @@ class Environ:
     HISTORY_DB_URL: str = environ.get(
         "VALIDATOR_HISTORY_DB_URL", "sqlite+aiosqlite:///validator_history.db"
     )
-    PROXY_PORT: int = int(environ.get("VALIDATOR_PROXY_PORT", 8443))
+    PROXY_PORT: int = int(environ.get("VALIDATOR_PROXY_PORT", 443))
     PING_PERIOD: timedelta = timedelta(
         minutes=int(environ.get("PING_PERIOD", 30))
     )
