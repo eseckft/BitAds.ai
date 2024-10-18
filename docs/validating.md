@@ -150,6 +150,18 @@ bacli 2fa list
 
 ## Launch
 
+To ensure that the `validator_proxy` has started correctly, you can include a step in the documentation that verifies the presence of the log message:
+
+```
+INFO:     Uvicorn running on https://0.0.0.0:443 (Press CTRL+C to quit)
+```
+
+This log indicates that Uvicorn, the ASGI server, is running successfully on port 443. Here's how you can update the documentation to check for this log message:
+
+---
+
+## Launch
+
 ### Running the Validator using the PM2 Ecosystem File
 
 To run the validator and ensure it automatically updates, you will use the PM2 ecosystem configuration file, `validator-ecosystem.config.js`. PM2 will manage the validator process, keeping it running and ensuring it is up-to-date.
@@ -162,7 +174,36 @@ To run the validator and ensure it automatically updates, you will use the PM2 e
    export $(cat .env | xargs) && pm2 start validator-ecosystem.config.js
    ```
 
-This ecosystem file contains all the necessary configurations, including auto-update functionality, so there's no need to manually run any separate update command. PM2 will handle process management and updates automatically.
+   This ecosystem file contains all the necessary configurations, including auto-update functionality, so there's no need to manually run any separate update command. PM2 will handle process management and updates automatically.
+
+2. **Ensure `validator_proxy` is Running Correctly**:
+
+   After starting the validator, it's critical to verify that the `validator_proxy` service has started successfully, as it directly affects the operation of the VTrust mechanism.
+
+   To check the status of `validator_proxy`, run the following command:
+
+   ```bash
+   pm2 status validator_proxy_$WALLET_HOTKEY
+   ```
+
+   Ensure that its status is listed as `online`. If the status is different (e.g., `stopped` or `errored`), troubleshoot immediately to avoid impacting VTrust.
+
+3. **Verify Uvicorn is Running**:
+
+   To further confirm that the `validator_proxy` is functioning correctly, check the logs to see the following message, which indicates that Uvicorn is running on the expected port (443):
+
+   ```bash
+   pm2 logs validator_proxy_$WALLET_HOTKEY
+   ```
+
+   Look for the log entry:
+
+   ```
+   INFO:     Uvicorn running on https://0.0.0.0:443 (Press CTRL+C to quit)
+   ```
+
+   If this log is not present, Uvicorn might not have started correctly, and you should investigate further.
+
 
 For more information on PM2 ecosystem configuration, you can refer to the [PM2 documentation](https://pm2.keymetrics.io/docs/usage/application-declaration/).
 
