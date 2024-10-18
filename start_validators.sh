@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default value for restart_proxy
-restart_proxy=false
+restart_proxy=true
 subtensor_network=finney
 
 # Store the remaining arguments in an array
@@ -19,9 +19,6 @@ while [[ $# -gt 0 ]]; do
             # Move to the value of --wallet.hotkey
             shift
             wallet_name="$1" # Assign the value to wallet_hotkey
-            ;;
-        --restart-proxy)
-            restart_proxy=true
             ;;
         --subtensor.network)
             shift
@@ -47,7 +44,7 @@ export NEURON_TYPE=validator
 
 python3 -m pip install -r requirements.txt
 # python3 -m pip install --upgrade bittensor
-python3 -m pip install -e .
+python3 -m pip install .
 python3 setup.py install_lib
 python3 setup.py build
 python3 get_databases.py
