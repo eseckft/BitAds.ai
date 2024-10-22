@@ -55,7 +55,7 @@ class SaleData(BaseModel):
     order_hash: str
     visit_hash: str
     order_details: Optional[OrderDetails] = None
-    type: Action
+    type: Action = Action.sale
 
     model_config = ConfigDict(extra="ignore")
 
