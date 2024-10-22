@@ -81,13 +81,13 @@ else
 fi
 
 # Download the GeoLite2 database for country detection
-wget -O GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb -q
+#wget -O GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb -q
 
 # Install Python dependencies
-pip3 install --upgrade pip
-python3 -m pip install -r requirements.txt
-python3 -m pip install -e .
+#pip3 install --upgrade pip
+#python3 -m pip install -r requirements.txt
+#python3 -m pip install -e .
 python3 setup.py install_lib
 python3 setup.py build
-python3 get_databases.py
-alembic upgrade head
+#python3 get_databases.py
+#alembic upgrade head
