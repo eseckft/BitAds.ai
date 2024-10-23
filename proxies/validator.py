@@ -89,7 +89,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.4.7",
+    version="0.4.8",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -174,6 +174,11 @@ async def is_axon_exists(
 
     # Once initialized, reuse the metagraph for the request
     return {"exists": check_axon_exists(metagraph, hotkey, ip_address, coldkey)}
+
+
+@app.get("/order_ids")
+async def get_order_ids() -> List[str]:
+    return await order_queue.get_all_ids()
 
 
 if __name__ == "__main__":
