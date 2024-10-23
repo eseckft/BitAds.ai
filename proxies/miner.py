@@ -1,9 +1,11 @@
 import logging
+import os
 import uuid
 from contextlib import asynccontextmanager
 from typing import Annotated, Optional
 
 import uvicorn
+from bittensor.btlogging.defines import DEFAULT_LOG_FILE_NAME
 from fastapi import (
     FastAPI,
     Request,
@@ -29,6 +31,7 @@ from proxies.apis.get_database import router as database_router
 from proxies.apis.logging import router as logs_router
 from proxies.apis.version import router as version_router
 from proxies.apis.two_factor import router as two_factor_router
+import bittensor as bt
 
 
 database_manager = common_dependencies.get_database_manager(
@@ -47,7 +50,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.4.2", lifespan=lifespan)
+app = FastAPI(version="0.4.3", lifespan=lifespan)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
@@ -83,7 +86,16 @@ async def fetch_request_data_and_redirect(
     user_agent: Annotated[str, Header()],
     referer: Annotated[Optional[str], Header()] = None,
 ):
-    log.info(f"Request headers: {request.headers}")
+    config = bt.logging.get_config()
+    try:
+        logging_dir = config.logging.logging_dir
+    except:
+        logging_dir = "~/.bittensor/miners"
+    expanded_dir = os.path.expanduser(logging_dir)
+    logfile = os.path.abspath(os.path.join(expanded_dir, DEFAULT_LOG_FILE_NAME))
+    with open(logfile, "a") as file:
+        file.write(f"Request headers: {request.headers}")
+
     campaigns = await campaign_service.get_active_campaigns()
     campaign: Campaign = next(
         filter(lambda c: c.product_unique_id == campaign_id, campaigns), None
