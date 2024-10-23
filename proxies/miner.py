@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.4.3", lifespan=lifespan)
+app = FastAPI(version="0.4.4", lifespan=lifespan)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
@@ -86,16 +86,6 @@ async def fetch_request_data_and_redirect(
     user_agent: Annotated[str, Header()],
     referer: Annotated[Optional[str], Header()] = None,
 ):
-    config = bt.logging.get_config()
-    try:
-        logging_dir = config.logging.logging_dir
-    except:
-        logging_dir = "~/.bittensor/miners"
-    expanded_dir = os.path.expanduser(logging_dir)
-    logfile = os.path.abspath(os.path.join(expanded_dir, DEFAULT_LOG_FILE_NAME))
-    with open(logfile, "a") as file:
-        file.write(f"Request headers: {request.headers}")
-
     campaigns = await campaign_service.get_active_campaigns()
     campaign: Campaign = next(
         filter(lambda c: c.product_unique_id == campaign_id, campaigns), None
@@ -103,7 +93,7 @@ async def fetch_request_data_and_redirect(
     if not campaign:
         raise KeyError  # In case when miner neuron not fetched campaigns
     id_ = str(uuid.uuid4())
-    ip = request.client.host
+    ip = request.headers.get("X-Forwarded-For", request.client.host)
     ipaddr_info = geoip_service.get_ip_info(ip)
     hotkey, block = await miner_service.get_hotkey_and_block()
     visitor = VisitorSchema(
