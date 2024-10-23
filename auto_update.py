@@ -122,7 +122,7 @@ def build_project(wallet_name, wallet_hotkey, neuron_type):
 
 def main():
     # Step 1: Update Git repository
-    updated = True
+    updated = update_git_repo()
 
     if not updated:
         logging.info("No update received, skipping version checks and rebuilds.")
