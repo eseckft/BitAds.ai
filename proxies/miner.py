@@ -47,7 +47,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.4.1", lifespan=lifespan)
+app = FastAPI(version="0.4.2", lifespan=lifespan)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
@@ -83,6 +83,7 @@ async def fetch_request_data_and_redirect(
     user_agent: Annotated[str, Header()],
     referer: Annotated[Optional[str], Header()] = None,
 ):
+    log.info(f"Request headers: {request.headers}")
     campaigns = await campaign_service.get_active_campaigns()
     campaign: Campaign = next(
         filter(lambda c: c.product_unique_id == campaign_id, campaigns), None
