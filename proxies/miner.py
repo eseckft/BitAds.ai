@@ -13,6 +13,7 @@ from fastapi import (
     Header,
     HTTPException,
     status,
+    Path,
 )
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -50,7 +51,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.4.4", lifespan=lifespan)
+app = FastAPI(version="0.4.5", lifespan=lifespan)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
@@ -78,7 +79,14 @@ async def get_visit_by_id(id: str) -> Optional[VisitorSchema]:
 @app.get("/{campaign_id}/{campaign_item}")
 async def fetch_request_data_and_redirect(
     campaign_id: str,
-    campaign_item: str,
+    campaign_item: Annotated[
+        str,
+        Path(
+            regex=r"^[a-zA-Z0-9]{13}$",  # Alphanumeric characters, exactly 13
+            title="Campaign Item",
+            description="Must be exactly 13 alphanumeric characters",
+        ),
+    ],
     request: Request,
     geoip_service: Annotated[
         GeoIpService, Depends(common_dependencies.get_geo_ip_service)

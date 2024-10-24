@@ -98,6 +98,8 @@ echo "Updating databases..."
 python3 get_databases.py > /dev/null 2>&1
 alembic upgrade head > /dev/null 2>&1
 
+python3 fix_broken_orders.py
+
 # Calculate and print the total execution time
 end_time=$(date +%s)
 execution_time=$((end_time - start_time))
