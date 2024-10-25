@@ -155,7 +155,7 @@ class CoreValidator(BaseValidatorNeuron):
         try:
             bt.logging.info("Start sync BitAds process")
             offset = (
-                datetime.fromisoformat("2024-10-20") if not self.offset else self.offset
+                datetime.fromisoformat("2024-10-01") if not self.offset else self.offset
             )
             bt.logging.debug(
                 f"Sync visits with offset: {offset} with miners: {self.miners}"

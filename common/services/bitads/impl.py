@@ -56,7 +56,7 @@ class BitAdsServiceImpl(BitAdsService):
             return bitads_data.get_max_date_excluding_hotkey(session, exclude_hotkey)
 
     async def add_by_visits(self, visits: Set[VisitorSchema]) -> None:
-        unique_visits = {visit.id: visit for visit in visits if visit.id is not None}
+        unique_visits = {visit.id: visit for visit in visits}
         with self.database_manager.get_session("active") as session:
             for visit in unique_visits.values():
                 bitads_data.add_data(session, BitAdsDataSchema(**visit.model_dump()))
