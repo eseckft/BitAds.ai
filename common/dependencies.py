@@ -15,6 +15,8 @@ from common.services.campaign.base import CampaignService
 from common.services.campaign.impl import CampaignServiceImpl
 from common.services.geoip.base import GeoIpService
 from common.services.geoip.impl import GeoIpServiceImpl
+from common.services.miner_assignment.base import MinerAssignmentService
+from common.services.miner_assignment.impl import MinerAssignmentServiceImpl
 from common.services.two_factor.base import TwoFactorService
 from common.services.two_factor.impl import TwoFactorServiceImpl
 from common.services.unique_link.base import MinerUniqueLinkService
@@ -187,3 +189,9 @@ def get_miner_unique_link_service(
     database_manager: DatabaseManager,
 ) -> MinerUniqueLinkService:
     return MinerUniqueLinkServiceImpl(database_manager)
+
+
+def get_miner_assignment_service(
+    database_manager: DatabaseManager
+) -> MinerAssignmentService:
+    return MinerAssignmentServiceImpl(database_manager)
