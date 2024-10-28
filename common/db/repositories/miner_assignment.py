@@ -1,5 +1,8 @@
+from typing import List
+
 from sqlalchemy.orm import Session
 
+from common.schemas.miner_assignment import MinerAssignmentModel
 from common.validator.db.entities.active import MinerAssignment
 
 
@@ -15,3 +18,15 @@ def create_or_update_miner_assignment(
         # If found, update the hotkey
         miner_assignment.hotkey = hotkey
         miner_assignment.campaign_id = campaign_id
+
+
+def get_assignments(session: Session) -> List[MinerAssignmentModel]:
+    # Query all MinerAssignment records from the database
+    assignments = session.query(MinerAssignment).all()
+
+    # Convert each SQLAlchemy model instance to a Pydantic model instance
+    assignment_models = [
+        MinerAssignmentModel.model_validate(assignment) for assignment in assignments
+    ]
+
+    return assignment_models

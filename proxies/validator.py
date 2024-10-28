@@ -7,11 +7,16 @@ from typing import Annotated, List, Optional, Dict
 
 import uvicorn
 from common.helpers import const
-from fastapi import FastAPI, Depends, HTTPException, Header, status
+from fastapi import FastAPI, Depends, HTTPException, Header, status, Query
 
 from common import dependencies as common_dependencies
 from common.environ import Environ as CommonEnviron
+from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
+from common.schemas.miner_assignment import (
+    MinerAssignmentModel,
+    SetMinerAssignmentsRequest,
+)
 from common.schemas.shopify import ShopifyBody, SaleData
 from common.services.queue.exceptions import RefundNotExpectedWithoutOrder
 from common.validator import dependencies
@@ -30,6 +35,9 @@ database_manager = common_dependencies.get_database_manager(
 bitads_service = common_dependencies.get_bitads_service(database_manager)
 order_queue = dependencies.get_order_queue_service(database_manager)
 two_factor_service = common_dependencies.get_two_factor_service(database_manager)
+miner_assignment_service = common_dependencies.get_miner_assignment_service(
+    database_manager
+)
 metagraph: Optional["bittensor.metagraph"] = None
 subtensor: Optional["bittensor.subtensor"] = None
 
@@ -88,7 +96,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.4.0",
+    version="0.4.10",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -137,10 +145,26 @@ async def get_tracking_data(
     )
 
 
+@app.get("/tracking_data/by_campaign_item")
+async def get_bidads_data_by_campaign_item(
+    campaign_item: Annotated[list, Query()],
+    page_number: int = 1,
+    page_size: int = 500,
+) -> List[BitAdsDataSchema]:
+    return await bitads_service.get_by_campaign_items(
+        campaign_item, page_number, page_size
+    )
+
+
 @app.get("/tracking_data/{id}")
 async def get_visit_by_id(id: str) -> Optional[BitAdsDataSchema]:
     result = await bitads_service.get_data_by_ids({id})
     return next(iter(result), None)
+
+
+@app.put("/tracking_data", dependencies=[Depends(validate_hash)])
+async def put_visit(body: VisitorSchema) -> None:
+    await bitads_service.add_by_visit(body)
 
 
 @app.get("/is_axon_exists")
@@ -157,6 +181,21 @@ async def is_axon_exists(
 
     # Once initialized, reuse the metagraph for the request
     return {"exists": check_axon_exists(metagraph, hotkey, ip_address, coldkey)}
+
+
+@app.get("/order_ids")
+async def get_order_ids() -> List[str]:
+    return await order_queue.get_all_ids()
+
+
+@app.get("/miner_assignments")
+async def get_miner_assignments() -> List[MinerAssignmentModel]:
+    return await miner_assignment_service.get_miner_assignments()
+
+
+@app.put("/miner_assignments", dependencies=[Depends(validate_hash)])
+async def set_miner_assignments(body: SetMinerAssignmentsRequest):
+    await miner_assignment_service.set_miner_assignments(body.assignments)
 
 
 if __name__ == "__main__":

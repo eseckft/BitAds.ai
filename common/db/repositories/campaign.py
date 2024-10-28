@@ -140,10 +140,12 @@ def get_active_campaigns(
     query = session.query(Campaign)
 
     conditions = []
-    if from_block is not None:
-        conditions.append(Campaign.last_active_block > from_block)
-    if to_block is not None:
-        conditions.append(Campaign.last_active_block <= to_block)
+    # if from_block is not None:
+    #     conditions.append(Campaign.last_active_block > from_block)
+    # if to_block is not None:
+    #     conditions.append(Campaign.last_active_block <= to_block)
+
+    conditions.append(Campaign.status == True)
 
     if conditions:
         query = query.where(and_(*conditions))

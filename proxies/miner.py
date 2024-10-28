@@ -1,9 +1,11 @@
 import logging
+import os
 import uuid
 from contextlib import asynccontextmanager
 from typing import Annotated, Optional
 
 import uvicorn
+from bittensor.btlogging.defines import DEFAULT_LOG_FILE_NAME
 from fastapi import (
     FastAPI,
     Request,
@@ -11,6 +13,7 @@ from fastapi import (
     Header,
     HTTPException,
     status,
+    Path,
 )
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -47,7 +50,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.4.0", lifespan=lifespan)
+app = FastAPI(version="0.4.5", lifespan=lifespan)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
@@ -75,7 +78,14 @@ async def get_visit_by_id(id: str) -> Optional[VisitorSchema]:
 @app.get("/{campaign_id}/{campaign_item}")
 async def fetch_request_data_and_redirect(
     campaign_id: str,
-    campaign_item: str,
+    campaign_item: Annotated[
+        str,
+        Path(
+            regex=r"^[a-zA-Z0-9]{13}$",  # Alphanumeric characters, exactly 13
+            title="Campaign Item",
+            description="Must be exactly 13 alphanumeric characters",
+        ),
+    ],
     request: Request,
     geoip_service: Annotated[
         GeoIpService, Depends(common_dependencies.get_geo_ip_service)
@@ -90,7 +100,7 @@ async def fetch_request_data_and_redirect(
     if not campaign:
         raise KeyError  # In case when miner neuron not fetched campaigns
     id_ = str(uuid.uuid4())
-    ip = request.client.host
+    ip = request.headers.get("X-Forwarded-For", request.client.host)
     ipaddr_info = geoip_service.get_ip_info(ip)
     hotkey, block = await miner_service.get_hotkey_and_block()
     visitor = VisitorSchema(

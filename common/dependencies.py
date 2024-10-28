@@ -3,10 +3,9 @@ from typing import Annotated, Optional
 import bittensor as bt
 from fastapi import Depends
 
-import template
+import neurons
 from common.clients.bitads.base import BitAdsClient
 from common.clients.bitads.impl import SyncBitAdsClient
-
 from common.db.database import Database, DatabaseManager
 from common.environ import Environ
 from common.helpers import const
@@ -16,6 +15,8 @@ from common.services.campaign.base import CampaignService
 from common.services.campaign.impl import CampaignServiceImpl
 from common.services.geoip.base import GeoIpService
 from common.services.geoip.impl import GeoIpServiceImpl
+from common.services.miner_assignment.base import MinerAssignmentService
+from common.services.miner_assignment.impl import MinerAssignmentServiceImpl
 from common.services.two_factor.base import TwoFactorService
 from common.services.two_factor.impl import TwoFactorServiceImpl
 from common.services.unique_link.base import MinerUniqueLinkService
@@ -132,8 +133,8 @@ def create_bitads_client_from_hotkey(
     return SyncBitAdsClient(
         base_url,
         hot_key=hotkey,
-        v=template.__version__,
-        neuron_type=neuron_type
+        neuron_type=neuron_type,
+        v=neurons.__version__,
     )
 
 
@@ -188,3 +189,9 @@ def get_miner_unique_link_service(
     database_manager: DatabaseManager,
 ) -> MinerUniqueLinkService:
     return MinerUniqueLinkServiceImpl(database_manager)
+
+
+def get_miner_assignment_service(
+    database_manager: DatabaseManager
+) -> MinerAssignmentService:
+    return MinerAssignmentServiceImpl(database_manager)

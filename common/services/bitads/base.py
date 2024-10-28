@@ -37,6 +37,10 @@ class BitAdsService(ABC):
         pass
 
     @abstractmethod
+    async def add_by_visit(self, visit: VisitorSchema) -> None:
+        pass
+
+    @abstractmethod
     async def add_bitads_data(self, datas: Set[BitAdsDataSchema]) -> None:
         pass
 
@@ -56,4 +60,13 @@ class BitAdsService(ABC):
     async def add_by_queue_items(
         self, validator_block: int, validator_hotkey: str, items: List[OrderQueueSchema]
     ) -> Dict[str, OrderQueueStatus]:
+        pass
+
+    @abstractmethod
+    async def get_by_campaign_items(
+        self,
+        campaign_items: List[str],
+        page_number: int = 1,
+        page_size: int = 500,
+    ) -> List[BitAdsDataSchema]:
         pass

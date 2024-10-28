@@ -1,5 +1,6 @@
 import unittest
 
+import neurons
 import template
 from common.clients.bitads.impl import SyncBitAdsClient
 from common.schemas.bitads import PingResponse, GetMinerUniqueIdResponse
@@ -16,7 +17,7 @@ class TestSyncBitAdsClient(unittest.TestCase):
         self.client = SyncBitAdsClient(
             base_url=self.base_url,
             hot_key="5EUu648PHompCLcn9wr2UKKEN3de3yAPeG9acSQSVfTURPV4",
-            v=template.__version__,
+            v=neurons.__version__,
         )
         # Call the subnet_ping method
         response = self.client.subnet_ping()
@@ -32,7 +33,7 @@ class TestSyncBitAdsClient(unittest.TestCase):
         self.client = SyncBitAdsClient(
             base_url=self.base_url,
             hot_key="5EUu648PHompCLcn9wr2UKKEN3de3yAPeG9acSQSVfTURPV4",
-            v=template.__version__,
+            v=neurons.__version__,
         )
         # Call the subnet_ping method
         response = self.client.subnet_ping()
@@ -46,7 +47,7 @@ class TestSyncBitAdsClient(unittest.TestCase):
 
     def test_get_miner_unique_url(self):
         headers = {
-            "v": template.__version__,
+            "v": neurons.__version__,
             "User-Agent": "PostmanRuntime/7.39.0",
             "hot_key": "5H97Vr4Xo3zYSncTau4heVCiDUPGv8H3WyD7k6VHC4jNDhnY",
         }

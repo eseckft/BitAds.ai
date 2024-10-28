@@ -74,24 +74,9 @@ def add_visitor(
 
 
 def add_or_update(session: Session, data: VisitorSchema) -> None:
-    """
-    Adds a new visitor entity to the database or updates an existing one.
-
-    Args:
-        session (Session): The database session object.
-        data (VisitorSchema): The visitor schema object containing visitor data.
-    """
-    entity = session.get(Visitor, data.id)
-
-    if entity:
-        # Update existing entity's attributes
-        for key, value in data.model_dump().items():
-            setattr(entity, key, value)
-    else:
-        # Create a new entity
-        entity = Visitor(**data.model_dump())
-        entity.status = VisitStatus.new
-        session.add(entity)
+    entity = Visitor(**data.model_dump())
+    entity.status = VisitStatus.new
+    session.merge(entity)
 
 
 def get_visitor(session: Session, id_: str) -> Optional[VisitorSchema]:
