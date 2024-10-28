@@ -51,6 +51,7 @@ def add_or_create_campaign(
     id_: str,
     block: int,
     type_: CampaignType = CampaignType.REGULAR,
+    cpa_blocks: int = 7200
 ) -> None:
     """
     Adds a new campaign to the database or updates an existing one.
@@ -68,9 +69,10 @@ def add_or_create_campaign(
         existing_campaign.last_active_block = block
         existing_campaign.status = True
         existing_campaign.type = type_
+        existing_campaign.cpa_blocks = cpa_blocks
     else:
         new_campaign = Campaign(
-            id=id_, status=True, last_active_block=block, type=type_
+            id=id_, status=True, last_active_block=block, type=type_, cpa_blocks=cpa_blocks
         )
         session.add(new_campaign)
 

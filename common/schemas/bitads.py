@@ -92,13 +92,7 @@ class Campaign(BaseModel):
     product_link: Optional[str] = None
     id: str
     type: CampaignType = CampaignType.REGULAR
-    cpa_blocks: Optional[int] = Field(7200, alias="CPABlocks")
-
-    validator_id: Optional[int] = None
-    country_of_registration: Optional[str] = None
-    company_registration_number: Optional[str] = None
-    countries_approved_for_product_sales: Optional[str] = None
-    updated_at: Optional[datetime] = None
+    product_refund_period_duration: Optional[int] = 1
 
     validator_id: Optional[int] = None
     country_of_registration: Optional[str] = None

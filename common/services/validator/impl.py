@@ -105,7 +105,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         Raises:
             ValueError: If no active campaigns are found within the specified block range.
         """
-        cpa_from_block = to_block - self._params.cpa_blocks
+        cpa_from_block = to_block - utils.timedelta_to_blocks(const.REWARD_SALE_PERIOD)
         campaigns = self._get_active_campaigns(cpa_from_block, to_block)
         if not campaigns:
             raise ValueError("No active campaigns found")
@@ -125,13 +125,13 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         miner_scores = self._calculate_miner_scores(aggregated_data, campaign_to_umax)
         # endregion
         # region CPA-part
-        cpa_campaign_ids = [c.id for c in campaigns if CampaignType.CPA == c.type]
+        cpa_campaign_to_id = {c.id: c for c in campaigns if CampaignType.CPA == c.type}
         now = datetime.utcnow()
         sale_from = now - const.REWARD_SALE_PERIOD
         reputation_from = now - utils.blocks_to_timedelta(self.settings.mr_blocks)
         scores = []
-        for campaign_id in cpa_campaign_ids:
-            sale_to = now - utils.blocks_to_timedelta(self.settings.cpa_blocks)
+        for campaign_id, c in cpa_campaign_to_id.items():
+            sale_to = now - utils.blocks_to_timedelta(c.cpa_blocks)
             cpa_aggregated_data = self._get_aggregated_data(
                 campaign_id,
                 sale_from=sale_from,
@@ -174,11 +174,15 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
                 campaign.update_campaign_status(session, local_campaign_id, status)
             # add new campaigns if needed
             for active_campaign in active_campaigns:
+                cpa_blocks = utils.timedelta_to_blocks(
+                    timedelta(days=active_campaign.product_refund_period_duration)
+                )
                 campaign.add_or_create_campaign(
                     session,
                     active_campaign.product_unique_id,
                     current_block,
                     active_campaign.type,
+                    cpa_blocks
                 )
 
     async def send_action(
