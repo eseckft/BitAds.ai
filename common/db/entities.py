@@ -98,6 +98,7 @@ class CampaignEntity(Base):
     company_registration_number: Mapped[Optional[str]]
     countries_approved_for_product_sales: Mapped[Optional[str]]
     updated_at: Mapped[Optional[datetime]]
+    product_refund_period_duration: Mapped[Optional[int]]
 
 
 class TwoFactorCodes(Base):

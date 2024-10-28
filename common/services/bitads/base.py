@@ -53,7 +53,7 @@ class BitAdsService(ABC):
         pass
 
     @abstractmethod
-    async def update_sale_status_if_needed(self, sale_date_from: datetime) -> None:
+    async def update_sale_status_if_needed(self, campaign_id: str, sale_date_from: datetime) -> None:
         pass
 
     @abstractmethod

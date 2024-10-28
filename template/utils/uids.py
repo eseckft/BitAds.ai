@@ -2,7 +2,6 @@ import random
 from typing import List
 
 import bittensor as bt
-import torch
 
 from template.base.neuron import BaseNeuron
 
@@ -31,7 +30,7 @@ def check_uid_availability(
 
 def get_random_uids(
     self, k: int, exclude: List[int] = None
-) -> torch.LongTensor:
+):
     """Returns k available random uids from the metagraph.
     Args:
         k (int): Number of uids to return.

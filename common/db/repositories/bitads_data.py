@@ -133,6 +133,7 @@ def get_max_date_excluding_hotkey(
 
 def complete_sales_less_than_date(
     session: Session,
+    campaign_id: str,
     sales_to: datetime,
 ) -> None:
     # Query the BitAdsData records where sale_date is less than the provided date and refund is 0
@@ -142,6 +143,7 @@ def complete_sales_less_than_date(
             and_(
                 BitAdsData.sale_date < sales_to,
                 BitAdsData.sales_status == SalesStatus.NEW,
+                BitAdsData.campaign_id == campaign_id
             )
         )
         .all()
