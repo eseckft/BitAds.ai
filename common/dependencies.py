@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 import bittensor as bt
 from fastapi import Depends
@@ -15,8 +15,12 @@ from common.services.campaign.base import CampaignService
 from common.services.campaign.impl import CampaignServiceImpl
 from common.services.geoip.base import GeoIpService
 from common.services.geoip.impl import GeoIpServiceImpl
-from common.services.storage.base import BaseStorage
-from common.services.storage.file import FileStorage
+from common.services.miner_assignment.base import MinerAssignmentService
+from common.services.miner_assignment.impl import MinerAssignmentServiceImpl
+from common.services.two_factor.base import TwoFactorService
+from common.services.two_factor.impl import TwoFactorServiceImpl
+from common.services.unique_link.base import MinerUniqueLinkService
+from common.services.unique_link.impl import MinerUniqueLinkServiceImpl
 
 
 def get_main_db(db_url: str) -> Database:
@@ -54,7 +58,10 @@ def get_geo_ip_service() -> GeoIpService:
     return GeoIpServiceImpl(Environ.GEO2_LITE_DB_PATH)
 
 
-def get_database_manager(neuron_type: str, subtensor_network: str) -> DatabaseManager:
+def get_database_manager(
+        neuron_type: Optional[str] = None,
+        subtensor_network: Optional[str] = None,
+) -> DatabaseManager:
     """
     Creates and returns a DatabaseManager instance configured with the specified neuron type and Subtensor network.
 
@@ -81,7 +88,7 @@ def get_bitads_service(
 
 
 def create_bitads_client(
-    wallet: bt.wallet, base_url: str = const.API_BITADS_DOMAIN
+    wallet: bt.wallet, base_url: str = const.API_BITADS_DOMAIN, neuron_type: str = None
 ) -> BitAdsClient:
     """
     Creates a BitAds client instance configured with the provided wallet and base URL.
@@ -100,11 +107,11 @@ def create_bitads_client(
         The function uses the wallet's hotkey address obtained via `wallet.get_hotkey().ss58_address`.
         It initializes a SyncBitAdsClient with the provided base URL, hotkey, and template version.
     """
-    return create_bitads_client_from_hotkey(wallet.get_hotkey().ss58_address, base_url)
+    return create_bitads_client_from_hotkey(wallet.get_hotkey().ss58_address, base_url, neuron_type)
 
 
 def create_bitads_client_from_hotkey(
-    hotkey: str, base_url: str = const.API_BITADS_DOMAIN
+    hotkey: str, base_url: str = const.API_BITADS_DOMAIN, neuron_type: str = None
 ) -> BitAdsClient:
     """
     Creates a BitAds client instance configured with the provided wallet and base URL.
@@ -126,6 +133,7 @@ def create_bitads_client_from_hotkey(
     return SyncBitAdsClient(
         base_url,
         hot_key=hotkey,
+        neuron_type=neuron_type,
         v=neurons.__version__,
     )
 
@@ -169,25 +177,21 @@ def get_wallet(name: str, hotkey: str) -> bt.wallet:
     return bt.wallet(name, hotkey)
 
 
-def get_storage(neuron_type: str, wallet: bt.wallet) -> BaseStorage:
-    """
-    Creates and returns a storage service instance based on the neuron type and wallet.
-
-    Args:
-        neuron_type (str): Type or category of the neuron.
-        wallet (bt.wallet): Wallet object used for obtaining the hotkey.
-
-    Returns:
-        BaseStorage: Initialized storage service instance.
-
-    Raises:
-        None
-
-    Notes:
-        This function initializes a FileStorage instance with the neuron type and the wallet's hotkey address.
-    """
-    return FileStorage(neuron_type, wallet.get_hotkey().ss58_address)
-
-
 def get_campaign_service(database_manager: DatabaseManager) -> CampaignService:
     return CampaignServiceImpl(database_manager)
+
+
+def get_two_factor_service(database_manager: DatabaseManager) -> TwoFactorService:
+    return TwoFactorServiceImpl(database_manager)
+
+
+def get_miner_unique_link_service(
+    database_manager: DatabaseManager,
+) -> MinerUniqueLinkService:
+    return MinerUniqueLinkServiceImpl(database_manager)
+
+
+def get_miner_assignment_service(
+    database_manager: DatabaseManager
+) -> MinerAssignmentService:
+    return MinerAssignmentServiceImpl(database_manager)

@@ -30,14 +30,27 @@ cd BitAds.ai
 
 After cloning the repository, create and activate a Python virtual environment to manage dependencies:
 
-1. **Create a Virtual Environment**:
+1. **Install Python 3.11+**:
+
+   Ensure that Python 3.11+ is installed on your system. You can download it from
+   the [official Python website](https://www.python.org/downloads/).
+
+
+2. **Create a Virtual Environment**:
    Run the following command to create a virtual environment:
 
    ```bash
    python3 -m venv venv
    ```
 
-2. **Activate the Virtual Environment**:
+3. **Switch to Root Environment**:
+   After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
+
+   ```bash
+   sudo -s
+   ```
+
+4. **Activate the Virtual Environment**:
     - On Windows:
 
       ```bash
@@ -49,13 +62,6 @@ After cloning the repository, create and activate a Python virtual environment t
       ```bash
       source venv/bin/activate
       ```
-
-3. **Switch to Root Environment**:
-   After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
-
-   ```bash
-   sudo -s
-   ```
 
 ---
 
@@ -89,15 +95,68 @@ For example:
 
 Once the build script completes, the system will be ready for the next steps in launching the validator using the PM2 ecosystem file.
 
-### Create Account on BitAds.ai (Mandatory)
 
-Validator registration is required. This allows the server to ping, informing us of your activity so we can include it in the DNS records, ensuring the participant is accessible via x.bitads.ai or v.bitads.ai.  
-Without an account, Validators won't be able to set weights on the subnet. Having an account gives Validators easy access to miner and campaign statistics, as well as the API key needed to build their own application on the BitAds subnet.  
-Validators will be manually approved after we receive written confirmation on Discord regarding their registration.
+### Create account on BitAds.ai (Optional)
 
-For any inquiries regarding script usage or registration, please refer to the official documentation on BitAds.ai or contact our support team.
+Registration is no longer necessary for validators. However, you can still create an account to conveniently view statistics and access other platform features.
 
-You can register here: [BitAds.ai](https://bitads.ai/register)
+Having an account provides users with easy access to miner and campaign statistics, as well as the API key needed to build their own applications on the BitAds subnet.
+
+If you wish to register for additional features, you can do so here: [BitAds.ai](https://bitads.ai/sign-up)
+
+
+#### Receiving 2FA Codes
+
+Once the full application setup is complete and the proxy is operational (you should see the following log message:
+
+```
+Uvicorn running on https://0.0.0.0:443 (Press CTRL+C to quit)
+```
+
+), you can retrieve your 2FA codes for registration by running the following command:
+
+```bash
+bacli 2fa list
+```
+
+**If you encounter the error `command not found: bacli`:**
+
+1. **Ensure the Virtual Environment is Activated**:
+
+   Make sure that your virtual environment is active. If not, activate it using:
+
+   - On Windows:
+
+     ```bash
+     .\venv\Scripts\activate
+     ```
+
+   - On macOS and Linux:
+
+     ```bash
+     source venv/bin/activate
+     ```
+
+2. **Install the Package Locally**:
+
+   Run the following command to install the necessary package:
+
+   ```bash
+   pip install .
+   ```
+
+   After successful installation, retry the `bacli 2fa list` command.
+
+
+## Launch
+
+To ensure that the `validator_proxy` has started correctly, you can include a step in the documentation that verifies the presence of the log message:
+
+```
+INFO:     Uvicorn running on https://0.0.0.0:443 (Press CTRL+C to quit)
+```
+
+This log indicates that Uvicorn, the ASGI server, is running successfully on port 443. Here's how you can update the documentation to check for this log message:
 
 ---
 
@@ -115,7 +174,36 @@ To run the validator and ensure it automatically updates, you will use the PM2 e
    export $(cat .env | xargs) && pm2 start validator-ecosystem.config.js
    ```
 
-This ecosystem file contains all the necessary configurations, including auto-update functionality, so there's no need to manually run any separate update command. PM2 will handle process management and updates automatically.
+   This ecosystem file contains all the necessary configurations, including auto-update functionality, so there's no need to manually run any separate update command. PM2 will handle process management and updates automatically.
+
+2. **Ensure `validator_proxy` is Running Correctly**:
+
+   After starting the validator, it's critical to verify that the `validator_proxy` service has started successfully, as it directly affects the operation of the VTrust mechanism.
+
+   To check the status of `validator_proxy`, run the following command:
+
+   ```bash
+   pm2 status validator_proxy_$WALLET_HOTKEY
+   ```
+
+   Ensure that its status is listed as `online`. If the status is different (e.g., `stopped` or `errored`), troubleshoot immediately to avoid impacting VTrust.
+
+3. **Verify Uvicorn is Running**:
+
+   To further confirm that the `validator_proxy` is functioning correctly, check the logs to see the following message, which indicates that Uvicorn is running on the expected port (443):
+
+   ```bash
+   pm2 logs validator_proxy_$WALLET_HOTKEY
+   ```
+
+   Look for the log entry:
+
+   ```
+   INFO:     Uvicorn running on https://0.0.0.0:443 (Press CTRL+C to quit)
+   ```
+
+   If this log is not present, Uvicorn might not have started correctly, and you should investigate further.
+
 
 For more information on PM2 ecosystem configuration, you can refer to the [PM2 documentation](https://pm2.keymetrics.io/docs/usage/application-declaration/).
 

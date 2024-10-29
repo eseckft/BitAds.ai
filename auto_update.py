@@ -157,7 +157,7 @@ def main():
     running_proxy_version, local_proxy_version = get_proxy_version()
 
     # Step 7: Restart proxy service if versions differ
-    if running_proxy_version and running_proxy_version != local_proxy_version:
+    if running_proxy_version != local_proxy_version:
         logging.info(
             "Proxy service version mismatch detected. Restarting proxy service..."
         )

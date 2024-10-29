@@ -29,14 +29,27 @@ cd BitAds.ai
 
 After cloning the repository, create and activate a Python virtual environment to manage dependencies:
 
-1. **Create a Virtual Environment**:
+1. **Install Python 3.11+**:
+
+   Ensure that Python 3.11+ is installed on your system. You can download it from
+   the [official Python website](https://www.python.org/downloads/).
+
+
+2. **Create a Virtual Environment**:
    Run the following command to create a virtual environment:
 
    ```bash
    python3 -m venv venv
    ```
 
-2. **Activate the Virtual Environment**:
+3. **Switch to Root Environment**:
+   After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
+
+   ```bash
+   sudo -s
+   ```
+
+4. **Activate the Virtual Environment**:
     - On Windows:
 
       ```bash
@@ -48,13 +61,6 @@ After cloning the repository, create and activate a Python virtual environment t
       ```bash
       source venv/bin/activate
       ```
-
-3. **Switch to Root Environment**:
-   After activating the virtual environment, switch to the root environment to avoid permission issues. Run:
-
-   ```bash
-   sudo -s
-   ```
 
 ---
 
@@ -88,11 +94,55 @@ For example:
 
 Once the build script completes, the system will be ready for the next steps in launching the miner using the PM2 ecosystem file.
 
-### Create account on BitAds.ai (Mandatory)
+### Create account on BitAds.ai (Optional)
 
-To generate unique links for active marketing campaigns, register your miner on BitAds.ai. For easy access to links and miner stats, having a registered account is recommended. You can register here: [BitAds.ai](https://bitads.ai/register)  <br>
+You do not need to register on BitAds.ai to generate unique links for active marketing campaigns, as the `bacli` offers a practical and straightforward way to access these links without registration. However, registering an account can enhance your experience by providing additional features and insights into your miner’s statistics. You can register here: [BitAds.ai](https://bitads.ai/sign-up)
 
----
+After starting your miner process in PM2 and allowing sufficient time for unique links to be generated (up to half an hour), you can use the console command `bacli campaigns links` to retrieve your miner’s unique links for active campaigns.
+
+
+#### Receiving 2FA Codes
+
+Once the full application setup is complete and the proxy is operational (you should see the following log message:
+
+```
+Uvicorn running on https://0.0.0.0:443 (Press CTRL+C to quit)
+```
+
+), you can retrieve your 2FA codes for registration by running the following command:
+
+```bash
+bacli 2fa list
+```
+
+**If you encounter the error `command not found: bacli`:**
+
+1. **Ensure the Virtual Environment is Activated**:
+
+   Make sure that your virtual environment is active. If not, activate it using:
+
+   - On Windows:
+
+     ```bash
+     .\venv\Scripts\activate
+     ```
+
+   - On macOS and Linux:
+
+     ```bash
+     source venv/bin/activate
+     ```
+
+2. **Install the Package Locally**:
+
+   Run the following command to install the necessary package:
+
+   ```bash
+   pip install .
+   ```
+
+   After successful installation, retry the `bacli 2fa list` command.
+
 
 ## Launch
 

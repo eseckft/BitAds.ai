@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Record the start time
+start_time=$(date +%s)
+
 # Default values
 subtensor_network=finney
 subtensor_chain_endpoint=wss://entrypoint-finney.opentensor.ai:443
@@ -11,14 +14,12 @@ args=("$@")
 while [[ $# -gt 0 ]]; do
     case $1 in
         --wallet.hotkey)
-            # Move to the value of --wallet.hotkey
             shift
-            wallet_hotkey="$1" # Assign the value to wallet_hotkey
+            wallet_hotkey="$1"
             ;;
         --wallet.name)
-            # Move to the value of --wallet.name
             shift
-            wallet_name="$1" # Assign the value to wallet_name
+            wallet_name="$1"
             ;;
         --subtensor.network)
             shift
@@ -33,7 +34,7 @@ while [[ $# -gt 0 ]]; do
             neuron_type="$1"
             ;;
     esac
-    shift # Move to the next argument
+    shift
 done
 
 # Set the remaining arguments back
@@ -80,14 +81,26 @@ else
     echo "SSL certificate already exists. Skipping generation."
 fi
 
-# Download the GeoLite2 database for country detection
-wget -O GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb -q
+# Download the GeoLite2 database for country detection quietly
+echo "Downloading GeoLite2-Country database..."
+wget -q -O GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb
 
-# Install Python dependencies
-pip3 install --upgrade pip
-python3 -m pip install -r requirements.txt
-python3 -m pip install -e .
-python3 setup.py install_lib
-python3 setup.py build
-python3 get_databases.py
-alembic upgrade head
+# Install Python dependencies quietly
+echo "Installing Python dependencies..."
+pip3 install --upgrade pip -q
+python3 -m pip install -r requirements.txt -q
+python3 -m pip install . -q
+python3 setup.py install_lib > /dev/null 2>&1
+python3 setup.py build > /dev/null 2>&1
+
+# Run the database update quietly
+echo "Updating databases..."
+python3 get_databases.py > /dev/null 2>&1
+alembic upgrade head > /dev/null 2>&1
+
+python3 fix_broken_orders.py
+
+# Calculate and print the total execution time
+end_time=$(date +%s)
+execution_time=$((end_time - start_time))
+echo "Script executed in $execution_time seconds."

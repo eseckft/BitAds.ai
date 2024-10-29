@@ -51,6 +51,7 @@ def add_or_create_campaign(
     id_: str,
     block: int,
     type_: CampaignType = CampaignType.REGULAR,
+    cpa_blocks: int = 7200
 ) -> None:
     """
     Adds a new campaign to the database or updates an existing one.
@@ -68,9 +69,10 @@ def add_or_create_campaign(
         existing_campaign.last_active_block = block
         existing_campaign.status = True
         existing_campaign.type = type_
+        existing_campaign.cpa_blocks = cpa_blocks
     else:
         new_campaign = Campaign(
-            id=id_, status=True, last_active_block=block, type=type_
+            id=id_, status=True, last_active_block=block, type=type_, cpa_blocks=cpa_blocks
         )
         session.add(new_campaign)
 
@@ -140,10 +142,12 @@ def get_active_campaigns(
     query = session.query(Campaign)
 
     conditions = []
-    if from_block is not None:
-        conditions.append(Campaign.last_active_block > from_block)
-    if to_block is not None:
-        conditions.append(Campaign.last_active_block <= to_block)
+    # if from_block is not None:
+    #     conditions.append(Campaign.last_active_block > from_block)
+    # if to_block is not None:
+    #     conditions.append(Campaign.last_active_block <= to_block)
+
+    conditions.append(Campaign.status == True)
 
     if conditions:
         query = query.where(and_(*conditions))

@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from common.schemas.campaign import CampaignType
 from common.schemas.device import Device
@@ -147,6 +147,7 @@ class CampaignSchema(BaseModel):
 
         model_config (ConfigDict): Configuration for model attributes, frozen after initialization.
     """
+
     id: str
     status: bool
     last_active_block: int
@@ -154,5 +155,6 @@ class CampaignSchema(BaseModel):
     updated_at: datetime
     umax: float
     type: CampaignType
+    cpa_blocks: Optional[int] = Field(7200, alias="CPABlocks")
 
     model_config: ConfigDict = ConfigDict(from_attributes=True)

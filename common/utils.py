@@ -146,3 +146,7 @@ def combine_dicts_with_avg(*dicts: Dict[str, float]) -> Dict[str, float]:
 
 def blocks_to_timedelta(blocks: int) -> timedelta:
     return timedelta(seconds=blocks * const.BLOCK_DURATION.total_seconds())
+
+
+def timedelta_to_blocks(td: timedelta) -> int:
+    return td.total_seconds() // const.BLOCK_DURATION.total_seconds()

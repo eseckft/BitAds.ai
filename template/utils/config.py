@@ -20,7 +20,6 @@ import argparse
 import os
 
 import bittensor as bt
-import torch
 from loguru import logger
 
 
@@ -68,7 +67,7 @@ def add_args(cls, parser):
         "--neuron.device",
         type=str,
         help="Device to run on.",
-        default="cuda" if torch.cuda.is_available() else "cpu",
+        default="cpu",
     )
 
     parser.add_argument(

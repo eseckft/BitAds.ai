@@ -53,11 +53,20 @@ class BitAdsService(ABC):
         pass
 
     @abstractmethod
-    async def update_sale_status_if_needed(self, sale_date_from: datetime) -> None:
+    async def update_sale_status_if_needed(self, campaign_id: str, sale_date_from: datetime) -> None:
         pass
 
     @abstractmethod
     async def add_by_queue_items(
         self, validator_block: int, validator_hotkey: str, items: List[OrderQueueSchema]
     ) -> Dict[str, OrderQueueStatus]:
+        pass
+
+    @abstractmethod
+    async def get_by_campaign_items(
+        self,
+        campaign_items: List[str],
+        page_number: int = 1,
+        page_size: int = 500,
+    ) -> List[BitAdsDataSchema]:
         pass

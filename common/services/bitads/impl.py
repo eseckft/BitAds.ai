@@ -1,4 +1,5 @@
 import logging
+import operator
 from datetime import datetime
 from typing import List, Set, Dict
 
@@ -56,8 +57,9 @@ class BitAdsServiceImpl(BitAdsService):
             return bitads_data.get_max_date_excluding_hotkey(session, exclude_hotkey)
 
     async def add_by_visits(self, visits: Set[VisitorSchema]) -> None:
+        unique_visits = {visit.id: visit for visit in visits}
         with self.database_manager.get_session("active") as session:
-            for visit in visits:
+            for visit in unique_visits.values():
                 bitads_data.add_data(session, BitAdsDataSchema(**visit.model_dump()))
 
     async def add_by_visit(self, visit: VisitorSchema) -> None:
@@ -88,10 +90,10 @@ class BitAdsServiceImpl(BitAdsService):
         }
         await self.add_bitads_data(datas)
 
-    async def update_sale_status_if_needed(self, sale_to: datetime) -> None:
+    async def update_sale_status_if_needed(self, campaign_id: str, sale_to: datetime) -> None:
         log.debug(f"Completing sales with date less than: {sale_to}")
         with self.database_manager.get_session("active") as session:
-            bitads_data.complete_sales_less_than_date(session, sale_to)
+            bitads_data.complete_sales_less_than_date(session, campaign_id, sale_to)
 
     async def add_by_queue_items(
         self, validator_block: int, validator_hotkey: str, items: List[OrderQueueSchema]
@@ -108,8 +110,12 @@ class BitAdsServiceImpl(BitAdsService):
                     float(item.refund_info.totalAmount) if item.refund_info else 0.0
                 )
                 sale_amount -= refund_amount
-                sales = len(item.order_info.items)
-                refund = len(item.refund_info.items) if item.refund_info else 0
+                sales = sum(map(operator.attrgetter("quantity"), item.order_info.items))
+                refund = (
+                    sum(map(operator.attrgetter("quantity"), item.refund_info.items))
+                    if item.refund_info
+                    else 0
+                )
 
                 new_data = existed_data.model_copy(
                     update=dict(
@@ -130,3 +136,16 @@ class BitAdsServiceImpl(BitAdsService):
                     log.exception(f"Add BitAds data exception on id: {item.id}")
                     result[item.id] = OrderQueueStatus.ERROR
         return result
+
+    async def get_by_campaign_items(
+        self,
+        campaign_items: List[str],
+        page_number: int = 1,
+        page_size: int = 500,
+    ) -> List[BitAdsDataSchema]:
+        limit = page_size
+        offset = (page_number - 1) * page_size
+        with self.database_manager.get_session("active") as session:
+            return bitads_data.get_bitads_data_by_campaign_items(
+                session, campaign_items, limit, offset
+            )
