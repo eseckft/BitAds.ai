@@ -20,7 +20,6 @@
 import random
 
 import bittensor as bt
-import torch
 
 
 async def ping_uids(dendrite, metagraph, uids, timeout=3):

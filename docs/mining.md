@@ -100,6 +100,7 @@ You do not need to register on BitAds.ai to generate unique links for active mar
 
 After starting your miner process in PM2 and allowing sufficient time for unique links to be generated (up to half an hour), you can use the console command `bacli campaigns links` to retrieve your miner’s unique links for active campaigns.
 
+
 #### Receiving 2FA Codes
 
 Once the full application setup is complete and the proxy is operational (you should see the following log message:

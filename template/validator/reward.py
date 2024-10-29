@@ -18,7 +18,6 @@
 
 from typing import List
 
-import torch
 
 
 def reward(query: int, response: int) -> float:
@@ -37,7 +36,7 @@ def get_rewards(
     self,
     query: int,
     responses: List[float],
-) -> torch.FloatTensor:
+):
     """
     Returns a tensor of rewards for the given query and responses.
 

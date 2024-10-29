@@ -92,6 +92,7 @@ class Campaign(BaseModel):
     product_link: Optional[str] = None
     id: str
     type: CampaignType = CampaignType.REGULAR
+    product_refund_period_duration: Optional[int] = 1
 
     validator_id: Optional[int] = None
     country_of_registration: Optional[str] = None

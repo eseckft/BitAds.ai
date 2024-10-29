@@ -25,7 +25,6 @@ from traceback import print_exception
 from typing import List
 
 import bittensor as bt
-import torch
 
 from template.base.neuron import BaseNeuron
 from template.mock import MockDendrite
@@ -59,9 +58,6 @@ class BaseValidatorNeuron(BaseNeuron):
 
         # Set up initial scoring weights for validation
         bt.logging.info("Building validation weights.")
-        self.scores = torch.zeros(
-            self.metagraph.n, dtype=torch.float32, device=self.device
-        )
 
         # Init sync with the network. Updates the metagraph.
         self.sync()
@@ -308,7 +304,7 @@ class BaseValidatorNeuron(BaseNeuron):
         # Update the hotkeys.
         self.hotkeys = copy.deepcopy(self.metagraph.hotkeys)
 
-    def update_scores(self, rewards: torch.FloatTensor, uids: List[int]):
+    def update_scores(self, rewards, uids: List[int]):
         """Performs exponential moving average on the scores based on the rewards received from the miners."""
 
         # Check if rewards contains NaN values.
@@ -343,21 +339,21 @@ class BaseValidatorNeuron(BaseNeuron):
         bt.logging.info("Saving validator state.")
 
         # Save the state of the validator to file.
-        torch.save(
-            {
-                "step": self.step,
-                "scores": self.scores,
-                "hotkeys": self.hotkeys,
-            },
-            self.config.neuron.full_path + "/state.pt",
-        )
+        # torch.save(
+        #     {
+        #         "step": self.step,
+        #         "scores": self.scores,
+        #         "hotkeys": self.hotkeys,
+        #     },
+        #     self.config.neuron.full_path + "/state.pt",
+        # )
 
     def load_state(self):
         """Loads the state of the validator from a file."""
         bt.logging.info("Loading validator state.")
 
         # Load the state of the validator from file.
-        state = torch.load(self.config.neuron.full_path + "/state.pt")
-        self.step = state["step"]
-        self.scores = state["scores"]
-        self.hotkeys = state["hotkeys"]
+        # state = torch.load(self.config.neuron.full_path + "/state.pt")
+        # self.step = state["step"]
+        # self.scores = state["scores"]
+        # self.hotkeys = state["hotkeys"]

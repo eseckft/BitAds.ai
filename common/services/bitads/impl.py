@@ -1,4 +1,5 @@
 import logging
+import operator
 from datetime import datetime
 from typing import List, Set, Dict
 
@@ -89,10 +90,10 @@ class BitAdsServiceImpl(BitAdsService):
         }
         await self.add_bitads_data(datas)
 
-    async def update_sale_status_if_needed(self, sale_to: datetime) -> None:
+    async def update_sale_status_if_needed(self, campaign_id: str, sale_to: datetime) -> None:
         log.debug(f"Completing sales with date less than: {sale_to}")
         with self.database_manager.get_session("active") as session:
-            bitads_data.complete_sales_less_than_date(session, sale_to)
+            bitads_data.complete_sales_less_than_date(session, campaign_id, sale_to)
 
     async def add_by_queue_items(
         self, validator_block: int, validator_hotkey: str, items: List[OrderQueueSchema]
@@ -109,8 +110,12 @@ class BitAdsServiceImpl(BitAdsService):
                     float(item.refund_info.totalAmount) if item.refund_info else 0.0
                 )
                 sale_amount -= refund_amount
-                sales = len(item.order_info.items)
-                refund = len(item.refund_info.items) if item.refund_info else 0
+                sales = sum(map(operator.attrgetter("quantity"), item.order_info.items))
+                refund = (
+                    sum(map(operator.attrgetter("quantity"), item.refund_info.items))
+                    if item.refund_info
+                    else 0
+                )
 
                 new_data = existed_data.model_copy(
                     update=dict(

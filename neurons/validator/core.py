@@ -5,35 +5,30 @@ import argparse
 import asyncio
 import time
 from datetime import timedelta, datetime
-from typing import List
 
 # Bittensor
 import bittensor as bt
-import torch
-
-from common.helpers import const
 
 from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
+from common.helpers import const
 from common.helpers.logging import LogLevel, log_startup
-from common.schemas.bitads import FormulaParams, UserActivityRequest, Campaign
+from common.schemas.bitads import FormulaParams, UserActivityRequest
 from common.schemas.sales import OrderQueueStatus
 from common.utils import execute_periodically
 from common.validator import dependencies
 from common.validator.environ import Environ
-
+from neurons import __spec_version__
 # Bittensor Validator Template:
 from neurons.protocol import (
     Ping,
     RecentActivity,
     SyncVisits,
 )
-
 # import base validator class which takes care of most of the boilerplate
 from template.base.validator import BaseValidatorNeuron
 from template.utils.config import add_blacklist_args
 from template.validator.forward import forward_each_axon
-from neurons import __spec_version__
 
 
 class CoreValidator(BaseValidatorNeuron):
@@ -125,22 +120,24 @@ class CoreValidator(BaseValidatorNeuron):
             bt.logging.info(
                 f"Start ping miners with active campaigns: {[c.id for c in active_campaigns]}"
             )
-
             responses = await forward_each_axon(
                 self, Ping(active_campaigns=active_campaigns), *self.miners
             )
-
             await self.validator_service.add_miner_ping(
                 current_block,
                 {
-                    t.data.miner_unique_id: hotkey
+                    t.data.miner_unique_id: (
+                        hotkey,
+                        r.active_campaigns[i].product_unique_id,
+                    )
                     for hotkey, r in responses.items()
-                    for t in r.submitted_tasks
+                    for i, t in enumerate(r.submitted_tasks)
                 },
             )
             bt.logging.info("End ping miners")
         except Exception as ex:
             bt.logging.exception(f"Ping miners exception: {str(ex)}")
+            
 
     async def _forward_bitads_data(self, delay: float = 12.0):
         while True:
@@ -155,7 +152,11 @@ class CoreValidator(BaseValidatorNeuron):
         try:
             bt.logging.info("Start sync BitAds process")
             offset = (
-                datetime.fromisoformat("2024-10-01") if not self.offset else self.offset
+                await self.bitads_service.get_last_update_bitads_data(
+                    self.wallet.get_hotkey().ss58_address
+                )
+                if not self.offset
+                else self.offset
             )
             bt.logging.debug(
                 f"Sync visits with offset: {offset} with miners: {self.miners}"
@@ -187,12 +188,13 @@ class CoreValidator(BaseValidatorNeuron):
 
             await self.bitads_service.add_by_visits(visits)
 
-            if hasattr(self, "settings"):
+            for campaign in await self.campaigns_serivce.get_active_campaigns():
                 sale_to = datetime.utcnow() - timedelta(
-                    seconds=self.settings.cpa_blocks
-                    * const.BLOCK_DURATION.total_seconds()
+                    days=campaign.product_refund_period_duration
                 )
-                await self.bitads_service.update_sale_status_if_needed(sale_to)
+                await self.bitads_service.update_sale_status_if_needed(
+                    campaign.product_unique_id, sale_to
+                )
             else:
                 bt.logging.info(
                     "No settings, will update sale status when settings appear"
@@ -233,10 +235,6 @@ class CoreValidator(BaseValidatorNeuron):
             weights=list(miner_ratings.values()),
             version_key=__spec_version__,
         )
-        self.update_scores(
-            torch.FloatTensor(list(miner_ratings.values())).to(self.device),
-            list(miner_ratings.keys()),
-        )
         self.miner_ratings.clear()
         if result is True:
             bt.logging.info("set_weights on chain successfully!")
@@ -254,9 +252,9 @@ class CoreValidator(BaseValidatorNeuron):
             self.miners = response.miners
             self.validators = response.validators
             active_campaigns = response.campaigns or []
-            self.settings = FormulaParams.from_settings(response.settings)
-            self.validator_service.settings = self.settings
-            self.evaluate_miners_blocks = self.settings.evaluate_miners_blocks
+            settings = FormulaParams.from_settings(response.settings)
+            self.validator_service.settings = settings
+            self.evaluate_miners_blocks = settings.evaluate_miners_blocks
             current_block = self.subtensor.get_current_block()
             await self.validator_service.sync_active_campaigns(
                 current_block, active_campaigns

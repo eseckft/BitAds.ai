@@ -133,6 +133,7 @@ def get_max_date_excluding_hotkey(
 
 def complete_sales_less_than_date(
     session: Session,
+    campaign_id: str,
     sales_to: datetime,
 ) -> None:
     # Query the BitAdsData records where sale_date is less than the provided date and refund is 0
@@ -142,6 +143,7 @@ def complete_sales_less_than_date(
             and_(
                 BitAdsData.sale_date < sales_to,
                 BitAdsData.sales_status == SalesStatus.NEW,
+                BitAdsData.campaign_id == campaign_id
             )
         )
         .all()
@@ -195,6 +197,7 @@ def get_aggregated_data(
         conditions.append(BitAdsData.complete_block <= to_block)
     if campaign_ids:
         conditions.append(BitAdsData.campaign_id.in_(campaign_ids))
+        conditions.append(MinerAssignment.campaign_id.in_(campaign_ids))
 
     if conditions:
         query = query.where(and_(*conditions))
@@ -266,6 +269,7 @@ def get_miners_reputation(
         filters.append(BitAdsData.sale_date <= to_date)
     if campaign_ids:
         filters.append(BitAdsData.campaign_id.in_(campaign_ids))
+        filters.append(MinerAssignment.campaign_id.in_(campaign_ids))
 
     if filters:
         query = query.where(and_(*filters))

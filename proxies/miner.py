@@ -32,7 +32,6 @@ from proxies.apis.get_database import router as database_router
 from proxies.apis.logging import router as logs_router
 from proxies.apis.version import router as version_router
 from proxies.apis.two_factor import router as two_factor_router
-import bittensor as bt
 
 
 database_manager = common_dependencies.get_database_manager(
@@ -51,7 +50,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.4.5", lifespan=lifespan)
+app = FastAPI(version="0.5.0", lifespan=lifespan)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
