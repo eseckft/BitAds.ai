@@ -96,7 +96,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.5.0",
+    version="0.5.1",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -189,8 +189,9 @@ async def get_order_ids() -> List[str]:
 
 
 @app.get("/miner_assignments")
-async def get_miner_assignments() -> List[MinerAssignmentModel]:
-    return await miner_assignment_service.get_miner_assignments()
+async def get_miner_assignments() -> SetMinerAssignmentsRequest:
+    assignments = await miner_assignment_service.get_miner_assignments()
+    return SetMinerAssignmentsRequest(assignments=assignments)
 
 
 @app.put("/miner_assignments", dependencies=[Depends(validate_hash)])
