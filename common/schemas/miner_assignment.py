@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 class MinerAssignmentModel(BaseModel):
     unique_id: str
     hotkey: str
-    campaign_item: Optional[str] = None
+    campaign_id: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
