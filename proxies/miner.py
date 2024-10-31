@@ -1,170 +1,166 @@
-import logging
-import os
 import uuid
-from contextlib import asynccontextmanager
 from typing import Annotated, Optional
 
 import uvicorn
-from bittensor.btlogging.defines import DEFAULT_LOG_FILE_NAME
-from fastapi import (
-    FastAPI,
-    Request,
-    Depends,
-    Header,
-    HTTPException,
-    status,
-    Path,
-)
-from fastapi.responses import RedirectResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import Request, Depends, Header, status, Path, HTTPException
+from fastapi.responses import RedirectResponse
+from fiber.logging_utils import get_logger
+from fiber.miner import server
+from fiber.miner.endpoints.subnet import factory_router as get_subnet_router
 
 from common import dependencies as common_dependencies, utils
-from common.environ import Environ as CommonEnviron
 from common.miner import dependencies
 from common.miner.environ import Environ
 from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import Campaign
 from common.schemas.campaign import CampaignType
+from common.services.campaign.base import CampaignService
 from common.services.geoip.base import GeoIpService
-from proxies import __miner_version__
+from common.services.miner.base import MinerService
 from proxies.apis.fetch_from_db_test import router as test_router
 from proxies.apis.get_database import router as database_router
 from proxies.apis.logging import router as logs_router
-from proxies.apis.version import router as version_router
 from proxies.apis.two_factor import router as two_factor_router
+from proxies.apis.version import router as version_router
+
+# Configure the application
+app = server.factory_app()
+app.version = "0.5.0"
+
+# Include all routers in a modular and readable way
+routers = [
+    get_subnet_router(),
+    version_router,
+    test_router,
+    logs_router,
+    database_router,
+    two_factor_router,
+]
+for router in routers:
+    app.include_router(router)
+
+# Initialize logger with the appropriate configuration
+logger = get_logger(__name__)
 
 
-database_manager = common_dependencies.get_database_manager(
-    "miner", CommonEnviron.SUBTENSOR_NETWORK
-)
-campaign_service = common_dependencies.get_campaign_service(database_manager)
-miner_service = dependencies.get_miner_service(database_manager)
-two_factor_service = common_dependencies.get_two_factor_service(database_manager)
-
-
-# noinspection PyUnresolvedReferences
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    app.state.database_manager = database_manager
-    app.state.two_factor_service = two_factor_service
-    yield
-
-
-app = FastAPI(version="0.5.0", lifespan=lifespan)
-
-app.mount("/statics", StaticFiles(directory="statics"), name="statics")
-
-app.include_router(version_router)
-app.include_router(test_router)
-app.include_router(logs_router)
-app.include_router(database_router)
-app.include_router(two_factor_router)
-
-
-log = logging.getLogger(__name__)
-
-
+# Error handling with clear error response
 @app.exception_handler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 async def internal_exception_handler(request: Request, exc: Exception):
-    log.error(exc, exc_info=True)
-    return RedirectResponse(request.url)
+    logger.error(f"Internal server error at {request.url.path}: {exc}", exc_info=True)
+    return RedirectResponse(url="/error", status_code=status.HTTP_302_FOUND)
 
 
-@app.get("/visitors/{id}")
-async def get_visit_by_id(id: str) -> Optional[VisitorSchema]:
-    return await miner_service.get_visit_by_id(id)
+# Handler function to fetch visit by ID, with annotated return type
+@app.get("/visitors/{id}", response_model=Optional[VisitorSchema])
+async def get_visit_by_id(
+    id: str,
+    miner_service: Annotated[MinerService, Depends(dependencies.get_miner_service)],
+) -> Optional[VisitorSchema]:
+    visit = await miner_service.get_visit_by_id(id)
+    if not visit:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Visit not found"
+        )
+    return visit
 
 
+# Main route to fetch campaign data, structured with helper functions for readability
 @app.get("/{campaign_id}/{campaign_item}")
 async def fetch_request_data_and_redirect(
+    request: Request,
     campaign_id: str,
     campaign_item: Annotated[
         str,
         Path(
-            regex=r"^[a-zA-Z0-9]{13}$",  # Alphanumeric characters, exactly 13
+            pattern=r"^[a-zA-Z0-9]{13}$",
             title="Campaign Item",
             description="Must be exactly 13 alphanumeric characters",
         ),
     ],
-    request: Request,
     geoip_service: Annotated[
         GeoIpService, Depends(common_dependencies.get_geo_ip_service)
     ],
+    campaign_service: Annotated[
+        CampaignService, Depends(common_dependencies.get_campaign_service)
+    ],
+    miner_service: Annotated[MinerService, Depends(dependencies.get_miner_service)],
     user_agent: Annotated[str, Header()],
     referer: Annotated[Optional[str], Header()] = None,
-):
-    campaigns = await campaign_service.get_active_campaigns()
-    campaign: Campaign = next(
-        filter(lambda c: c.product_unique_id == campaign_id, campaigns), None
-    )
+) -> RedirectResponse:
+    # Helper function to get campaign and validate its existence
+    campaign = await campaign_service.get_campaign_by_id(campaign_id)
     if not campaign:
-        raise KeyError  # In case when miner neuron not fetched campaigns
-    id_ = str(uuid.uuid4())
+        logger.error(f"Campaign with ID {campaign_id} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Campaign not found"
+        )
+
+    # Generate a unique visit ID
+    visit_id = str(uuid.uuid4())
+
+    # Process IP information and visitor details
     ip = request.headers.get("X-Forwarded-For", request.client.host)
     ipaddr_info = geoip_service.get_ip_info(ip)
+    visitor = await create_visitor_schema(
+        id_=visit_id,
+        referer=referer,
+        ip=request.client.host,
+        campaign_id=campaign_id,
+        user_agent=user_agent,
+        campaign_item=campaign_item,
+        miner_service=miner_service,
+        geoip_info=ipaddr_info,
+    )
+
+    # Save visitor and log result
+    await miner_service.add_visit(visitor)
+    logger.info(f"Saved visit with ID: {visitor.id}")
+
+    # Generate and return the appropriate redirection URL
+    redirect_url = generate_redirect_url(campaign, visit_id, campaign_id)
+    return RedirectResponse(url=redirect_url)
+
+
+# Helper function to create a VisitorSchema object for the visit
+async def create_visitor_schema(
+    id_: str,
+    referer: Optional[str],
+    ip: str,
+    campaign_id: str,
+    user_agent: str,
+    campaign_item: str,
+    miner_service: MinerService,
+    geoip_info,
+) -> VisitorSchema:
     hotkey, block = await miner_service.get_hotkey_and_block()
-    visitor = VisitorSchema(
+    device = utils.determine_device(user_agent)
+    country = geoip_info.country_name if geoip_info else None
+    country_code = geoip_info.country_code if geoip_info else None
+    return VisitorSchema(
         id=id_,
         referer=referer,
-        ip_address=request.client.host,
+        ip_address=ip,
         campaign_id=campaign_id,
         user_agent=user_agent,
         campaign_item=campaign_item,
         miner_hotkey=hotkey,
         miner_block=block,
         at=False,
-        device=utils.determine_device(user_agent),
-        country=ipaddr_info.country_name if ipaddr_info else None,
-        country_code=ipaddr_info.country_code if ipaddr_info else None,
+        device=device,
+        country=country,
+        country_code=country_code,
     )
-    await miner_service.add_visit(visitor)
-    log.info(f"Saved visit: {visitor.id}")
-    url = (
-        f"{campaign.product_link}?visit_hash={id_}"
-        if campaign.type == CampaignType.CPA
-        else f"https://v.bitads.ai/campaigns/{campaign_id}?id={id_}"
-    )
-    return RedirectResponse(url=url)
 
 
-@app.get("/fingerprint")
-async def fingerprint():
-    return HTMLResponse(content=FINGERPRINT_HTML_CONTENT)
+# Helper function to generate the redirect URL
+def generate_redirect_url(campaign: Campaign, visit_id: str, campaign_id: str) -> str:
+    if campaign.type == CampaignType.CPA:
+        return f"{campaign.product_link}?visit_hash={visit_id}"
+    else:
+        return f"https://v.bitads.ai/campaigns/{campaign_id}?id={visit_id}"
 
 
-FINGERPRINT_HTML_CONTENT = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Fingerprinting</title>
-        <script type="module">
-          import FingerprintJS from '/statics/scripts/fingerprint_v4.js';
-          const fpPromise = FingerprintJS.load();
-          fpPromise
-            .then(fp => fp.get())
-            .then(result => {
-                const visitorId = result.visitorId;
-                document.write(visitorId);
-                fetch('/submit_fingerprint', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ fingerprint: visitorId })
-                }).then(response => {
-                    if (response.ok) {
-                        window.location.href = "/final_redirect";
-                    } else {
-                        console.error('Fingerprint submission failed');
-                    }
-                });
-            });
-        </script>
-    </head>
-    </html>
-"""
-
-
+# Entry point for the application
 if __name__ == "__main__":
     uvicorn.run(
         app,

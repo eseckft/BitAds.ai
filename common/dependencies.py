@@ -59,8 +59,8 @@ def get_geo_ip_service() -> GeoIpService:
 
 
 def get_database_manager(
-        neuron_type: Optional[str] = None,
-        subtensor_network: Optional[str] = None,
+    neuron_type: Optional[str] = None,
+    subtensor_network: Optional[str] = None,
 ) -> DatabaseManager:
     """
     Creates and returns a DatabaseManager instance configured with the specified neuron type and Subtensor network.
@@ -107,7 +107,9 @@ def create_bitads_client(
         The function uses the wallet's hotkey address obtained via `wallet.get_hotkey().ss58_address`.
         It initializes a SyncBitAdsClient with the provided base URL, hotkey, and template version.
     """
-    return create_bitads_client_from_hotkey(wallet.get_hotkey().ss58_address, base_url, neuron_type)
+    return create_bitads_client_from_hotkey(
+        wallet.get_hotkey().ss58_address, base_url, neuron_type
+    )
 
 
 def create_bitads_client_from_hotkey(
@@ -177,14 +179,6 @@ def get_wallet(name: str, hotkey: str) -> bt.wallet:
     return bt.wallet(name, hotkey)
 
 
-def get_campaign_service(database_manager: DatabaseManager) -> CampaignService:
-    return CampaignServiceImpl(database_manager)
-
-
-def get_two_factor_service(database_manager: DatabaseManager) -> TwoFactorService:
-    return TwoFactorServiceImpl(database_manager)
-
-
 def get_miner_unique_link_service(
     database_manager: DatabaseManager,
 ) -> MinerUniqueLinkService:
@@ -192,6 +186,22 @@ def get_miner_unique_link_service(
 
 
 def get_miner_assignment_service(
-    database_manager: DatabaseManager
+    database_manager: DatabaseManager,
 ) -> MinerAssignmentService:
     return MinerAssignmentServiceImpl(database_manager)
+
+
+def get_database_manager_from_env() -> DatabaseManager:
+    return get_database_manager(Environ.NEURON_TYPE, Environ.SUBTENSOR_NETWORK)
+
+
+def get_two_factor_service(
+    database_manager: Annotated[DatabaseManager, Depends(get_database_manager_from_env)]
+) -> TwoFactorService:
+    return TwoFactorServiceImpl(database_manager)
+
+
+def get_campaign_service(
+    database_manager: Annotated[DatabaseManager, Depends(get_database_manager_from_env)]
+) -> CampaignService:
+    return CampaignServiceImpl(database_manager)

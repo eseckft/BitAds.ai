@@ -1,6 +1,12 @@
 geoip2==4.8.0
-bittensor==7.4.0
-sqlalchemy==2.0.30
-alembic==1.13.1
-loguru==0.7.2
+sqlalchemy==2.0.36
+alembic==1.13.3
 bitads-security==0.2.0
+
+pydantic==2.9.1
+fastapi[all]==0.112.0
+pycountry==24.6.1
+rich==13.7.1
+
+# Fiber dependency from GitHub
+git+https://github.com/rayonlabs/fiber.git@1.0.0#egg=fiber[full]
