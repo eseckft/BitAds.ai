@@ -242,3 +242,27 @@ def get_max_date_excluding_hotkey(
     result = session.execute(stmt)
     max_date = result.scalar()
     return max_date
+
+
+def get_visits_by_campaign_item(
+    session: Session, campaign_item: str, limit: int = 500, offset: int = 0
+) -> List[VisitorSchema]:
+    """
+    Retrieves a list of new visitor entities from the database.
+
+    Args:
+        session (Session): The database session object.
+        limit (int, optional): Maximum number of entities to retrieve. Defaults to 500.
+        offset (int, optional): Offset for pagination. Defaults to 0.
+
+    Returns:
+        List[VisitorSchema]: List of validated VisitorSchema objects representing new visits.
+    """
+    stmt = (
+        select(Visitor)
+        .where(Visitor.campaign_item == campaign_item)
+        .limit(limit)
+        .offset(offset)
+    )
+    result = session.execute(stmt)
+    return [VisitorSchema.model_validate(r) for r in result.scalars().all()]

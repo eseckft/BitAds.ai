@@ -1,17 +1,14 @@
 import logging
-import os
 import uuid
 from contextlib import asynccontextmanager
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 
 import uvicorn
-from bittensor.btlogging.defines import DEFAULT_LOG_FILE_NAME
 from fastapi import (
     FastAPI,
     Request,
     Depends,
     Header,
-    HTTPException,
     status,
     Path,
 )
@@ -26,13 +23,11 @@ from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import Campaign
 from common.schemas.campaign import CampaignType
 from common.services.geoip.base import GeoIpService
-from proxies import __miner_version__
 from proxies.apis.fetch_from_db_test import router as test_router
 from proxies.apis.get_database import router as database_router
 from proxies.apis.logging import router as logs_router
-from proxies.apis.version import router as version_router
 from proxies.apis.two_factor import router as two_factor_router
-
+from proxies.apis.version import router as version_router
 
 database_manager = common_dependencies.get_database_manager(
     "miner", CommonEnviron.SUBTENSOR_NETWORK
@@ -50,7 +45,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.5.0", lifespan=lifespan)
+app = FastAPI(version="0.5.1", lifespan=lifespan)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
@@ -73,6 +68,11 @@ async def internal_exception_handler(request: Request, exc: Exception):
 @app.get("/visitors/{id}")
 async def get_visit_by_id(id: str) -> Optional[VisitorSchema]:
     return await miner_service.get_visit_by_id(id)
+
+
+@app.get("/visitors/by_campaign_item")
+async def get_visits_by_campaign_item(campaign_item: str) -> List[VisitorSchema]:
+    return await miner_service.get_visits_by_campaign_item(campaign_item)
 
 
 @app.get("/{campaign_id}/{campaign_item}")
