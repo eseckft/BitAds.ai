@@ -99,10 +99,19 @@ class MinerServiceImpl(SettingsContainerImpl, MinerService):
         Args:
             visits (Set[VisitorSchema]): The set of visitor records to add.
         """
-        unique_visits = {visit.id: visit for visit in visits if visit.id is not None}
-        with self.database_manager.get_session("active") as session:
-            for td in unique_visits.values():
-                add_or_update(session, td)
+        unique_visits = {visit.id: visit for visit in visits}
+        try:
+            with self.database_manager.get_session("active") as session:
+                for td in unique_visits.values():
+                    add_or_update(session, td)
+        except Exception:
+            with self.database_manager.get_session("active") as session:
+                for td in visits:
+                    try:
+                        add_or_update(session, td)
+                        session.flush()
+                    except Exception:
+                        session.rollback()
 
     async def get_hotkey_and_block(self) -> Tuple[str, int]:
         with self.database_manager.get_session("main") as session:
