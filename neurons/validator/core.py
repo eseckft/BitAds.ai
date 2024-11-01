@@ -152,7 +152,9 @@ class CoreValidator(BaseValidatorNeuron):
         try:
             bt.logging.info("Start sync BitAds process")
             offset = (
-                datetime.fromisoformat("2024-10-20")
+                await self.bitads_service.get_last_update_bitads_data(
+                    self.wallet.get_hotkey().ss58_address
+                )
                 if not self.offset
                 else self.offset
             )
