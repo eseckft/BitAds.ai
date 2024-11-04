@@ -8,7 +8,7 @@ from common.services.queue.base import OrderQueueService
 from common.services.queue.impl import OrderQueueServiceImpl
 from common.services.validator.base import ValidatorService
 from common.services.validator.impl import ValidatorServiceImpl
-from neurons.validator.core import CoreValidator
+from neurons.old.validator.core import CoreValidator
 
 
 def get_core_validator() -> CoreValidator:

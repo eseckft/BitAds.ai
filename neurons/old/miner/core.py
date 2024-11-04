@@ -16,9 +16,9 @@ from common.miner import dependencies
 from common.miner.environ import Environ
 from common.utils import execute_periodically
 from neurons.base.operations import BaseOperation
-from neurons.miner.operations.ping import PingOperation
-from neurons.miner.operations.recent_activity import RecentActivityOperation
-from neurons.miner.operations.sync_visits import SyncVisitsOperation
+from neurons.old.miner.operations.ping import PingOperation
+from neurons.old.miner.operations.recent_activity import RecentActivityOperation
+from neurons.old.miner.operations.sync_visits import SyncVisitsOperation
 from neurons.protocol import SyncVisits
 
 # import base miner class which takes care of most of the boilerplate

@@ -12,17 +12,8 @@ from common.services.miner.base import MinerService
 from common.services.miner.impl import MinerServiceImpl
 from common.services.recent_activity.base import RecentActivityService
 from common.services.recent_activity.impl import RecentActivityServiceImpl
-from neurons.miner.core import CoreMiner
 
 
-def get_core_miner() -> CoreMiner:
-    """
-    Retrieves an instance of the CoreMiner.
-
-    Returns:
-        CoreMiner: Instance of the CoreMiner.
-    """
-    return CoreMiner()
 
 
 def get_miner_service(
