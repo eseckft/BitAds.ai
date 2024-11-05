@@ -18,7 +18,6 @@ from common.schemas.sales import OrderQueueStatus
 from common.utils import execute_periodically
 from common.validator import dependencies
 from common.validator.environ import Environ
-from neurons import __spec_version__
 # Bittensor Validator Template:
 from neurons.protocol import (
     Ping,
@@ -137,7 +136,6 @@ class CoreValidator(BaseValidatorNeuron):
             bt.logging.info("End ping miners")
         except Exception as ex:
             bt.logging.exception(f"Ping miners exception: {str(ex)}")
-            
 
     async def _forward_bitads_data(self, delay: float = 12.0):
         while True:
@@ -227,7 +225,7 @@ class CoreValidator(BaseValidatorNeuron):
             netuid=self.config.netuid,
             uids=list(miner_ratings.keys()),
             weights=list(miner_ratings.values()),
-            version_key=__spec_version__,
+            version_key=self.spec_version,
         )
         self.miner_ratings.clear()
         if result is True:
