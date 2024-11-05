@@ -2,6 +2,12 @@ import argparse
 import asyncio
 import json
 
+from common.schemas.bitads import FormulaParams
+
+from common.helpers import const
+
+from common.dependencies import create_bitads_client_from_hotkey
+
 from common.environ import Environ
 from common.validator import dependencies
 from neurons import __spec_version__ as version_key
@@ -33,6 +39,12 @@ async def main():
     wallet = bt.wallet(config=config)
     subtensor = bt.subtensor(subtensor_network, config)
     metagraph = bt.metagraph(config.netuid, subtensor_network)
+
+    bitads_client = create_bitads_client_from_hotkey(
+        wallet.get_hotkey().ss58_address, const.BITADS_API_URLS[subtensor_network]
+    )
+    ping_response = bitads_client.subnet_ping()
+    validator_service.settings = FormulaParams.from_settings(ping_response.settings)
 
     current_block = subtensor.get_current_block()
     miner_ratings = await validator_service.calculate_ratings(to_block=current_block)

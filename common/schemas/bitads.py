@@ -151,6 +151,21 @@ class GetMinerUniqueIdResponse(BaseResponse):
     data: UniqueIdData
 
 
+class ConversionRateLimit(BaseModel):
+    """
+    Model representing a conversion rate rule with minimum, maximum, and penalty multiplier.
+
+    Attributes:
+        min (float): Minimum conversion rate for the rule.
+        max (float): Maximum conversion rate for the rule.
+        penalty (float): Penalty multiplier for the rule.
+    """
+
+    min: float
+    max: float
+    penalty: float
+
+
 class FormulaParams(BaseModel):
     """
     Model representing parameters for a formula.
@@ -193,6 +208,7 @@ class FormulaParams(BaseModel):
     cpa_blocks: int = Field(7200, alias="CPABlocks")
     mr_blocks: int = Field(216000, alias="MRBlocks")
     evaluate_miners_blocks: int = Field(100, alias="EvaluateMinersBlocks")
+    conversion_rate_limits: List[ConversionRateLimit] = Field([])
 
     @classmethod
     def default_instance(cls):
@@ -216,7 +232,35 @@ class FormulaParams(BaseModel):
             FormulaParams: Instance of FormulaParams initialized from settings.
         """
         settings_dict = {setting.name: setting.value for setting in settings}
-        return cls(**settings_dict)
+
+        # Helper to add normalized min, max, and penalty values to limits_dict
+        def add_to_limits(field, key, limits_dict, value, normalize=False):
+            index = key.split("_")[-1]  # Extract the index
+            limits_dict.setdefault(index, {"min": 0.0, "max": 0.0, "penalty": 0.0})
+
+            # Normalize cr_max values by dividing by 100 if needed
+            limits_dict[index][field] = (
+                float(value) / 100 if normalize else float(value)
+            )
+
+        # Populate limits_dict with min, max, and penalty values, normalize cr_max
+        limits_dict = {}
+        for key, value in settings_dict.items():
+            if key.startswith("cr_min_"):
+                add_to_limits("min", key, limits_dict, value)
+            elif key.startswith("cr_max_"):
+                add_to_limits("max", key, limits_dict, value, normalize=True)
+            elif key.startswith("penalty_multiplier_"):
+                add_to_limits("penalty", key, limits_dict, value)
+
+        # Filter out any rules with all zero values and create ConversionRateLimit instances
+        conversion_rate_limits = [
+            ConversionRateLimit(**rule)
+            for rule in limits_dict.values()
+            if any(val > 0 for val in rule.values())
+        ]
+
+        return cls(conversion_rate_limits=conversion_rate_limits, **settings_dict)
 
 
 class SystemLoad(BaseModel):
