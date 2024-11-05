@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.5.2", lifespan=lifespan)
+app = FastAPI(version="0.5.3", lifespan=lifespan)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
@@ -65,14 +65,14 @@ async def internal_exception_handler(request: Request, exc: Exception):
     return RedirectResponse(request.url)
 
 
-@app.get("/visitors/{id}")
-async def get_visit_by_id(id: str) -> Optional[VisitorSchema]:
-    return await miner_service.get_visit_by_id(id)
-
-
 @app.get("/visitors/by_campaign_item")
 async def get_visits_by_campaign_item(campaign_item: str) -> List[VisitorSchema]:
     return await miner_service.get_visits_by_campaign_item(campaign_item)
+
+
+@app.get("/visitors/{id}")
+async def get_visit_by_id(id: str) -> Optional[VisitorSchema]:
+    return await miner_service.get_visit_by_id(id)
 
 
 @app.get("/{campaign_id}/{campaign_item}")
