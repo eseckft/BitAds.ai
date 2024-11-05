@@ -93,6 +93,8 @@ python3 -m pip install . -q
 python3 setup.py install_lib > /dev/null 2>&1
 python3 setup.py build > /dev/null 2>&1
 
+mkdir -p databases && mv *.db databases/
+
 # Run the database update quietly
 echo "Updating databases..."
 python3 get_databases.py > /dev/null 2>&1
