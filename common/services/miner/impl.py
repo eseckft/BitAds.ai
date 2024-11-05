@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Set, Tuple, Optional
+from typing import Set, Tuple, Optional, List
 
 from common.db.database import DatabaseManager
 from common.db.repositories import recent_activity, user_agent_activity, hotkey_to_block
@@ -9,6 +9,7 @@ from common.db.repositories.visitor import (
     get_max_date_excluding_hotkey,
     add_or_update,
     get_visitor,
+    get_visits_by_campaign_item,
 )
 from common.miner.schemas import VisitorSchema
 from common.services.miner.base import MinerService
@@ -98,10 +99,19 @@ class MinerServiceImpl(SettingsContainerImpl, MinerService):
         Args:
             visits (Set[VisitorSchema]): The set of visitor records to add.
         """
-        unique_visits = {visit.id: visit for visit in visits if visit.id is not None}
-        with self.database_manager.get_session("active") as session:
-            for td in unique_visits.values():
-                add_or_update(session, td)
+        unique_visits = {visit.id: visit for visit in visits}
+        try:
+            with self.database_manager.get_session("active") as session:
+                for td in unique_visits.values():
+                    add_or_update(session, td)
+        except Exception:
+            with self.database_manager.get_session("active") as session:
+                for td in visits:
+                    try:
+                        add_or_update(session, td)
+                        session.flush()
+                    except Exception:
+                        session.rollback()
 
     async def get_hotkey_and_block(self) -> Tuple[str, int]:
         with self.database_manager.get_session("main") as session:
@@ -117,3 +127,9 @@ class MinerServiceImpl(SettingsContainerImpl, MinerService):
     async def get_visit_by_id(self, id_: str) -> Optional[VisitorSchema]:
         with self.database_manager.get_session("active") as session:
             return get_visitor(session, id_)
+
+    async def get_visits_by_campaign_item(
+        self, campaign_item: str
+    ) -> List[VisitorSchema]:
+        with self.database_manager.get_session("active") as session:
+            return get_visits_by_campaign_item(session, campaign_item)

@@ -35,6 +35,7 @@ function generateArgs() {
     "--wallet.name", process.env.WALLET_NAME || 'default',
     "--subtensor.network", process.env.SUBTENSOR_NETWORK || 'finney',
     "--subtensor.chain_endpoint", process.env.SUBTENSOR_CHAIN_ENDPOINT || 'wss://entrypoint-finney.opentensor.ai:443',
+    "--axon.port", process.env.AXON_PORT || 8091
   ];
 }
 
@@ -45,5 +46,6 @@ function getEnvVariables() {
     WALLET_NAME: process.env.WALLET_NAME || "default",     // Default to "default"
     SUBTENSOR_NETWORK: process.env.SUBTENSOR_NETWORK || "finney", // Default to "finney"
     SUBTENSOR_CHAIN_ENDPOINT: process.env.SUBTENSOR_CHAIN_ENDPOINT || "wss://entrypoint-finney.opentensor.ai:443", // Default endpoint
+    AXON_PORT: process.env.AXON_PORT || 8091
   };
 }

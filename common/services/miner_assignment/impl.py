@@ -19,4 +19,9 @@ class MinerAssignmentServiceImpl(MinerAssignmentService):
     async def set_miner_assignments(self, assignments: List[MinerAssignmentModel]):
         with self.database_manager.get_session("active") as session:
             for assignment in assignments:
-                miner_assignment.create_or_update_miner_assignment(session, assignment.unique_id, assignment.hotkey)
+                miner_assignment.create_or_update_miner_assignment(
+                    session,
+                    assignment.unique_id,
+                    assignment.hotkey,
+                    assignment.campaign_id,
+                )

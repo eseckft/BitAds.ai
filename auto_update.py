@@ -124,9 +124,6 @@ def main():
     # Step 1: Update Git repository
     updated = update_git_repo()
 
-    if not updated:
-        logging.info("No update received, skipping version checks and rebuilds.")
-        return
     # Only proceed with version checks and builds if an update was received
 
     # Step 2: Load environment variables
@@ -143,15 +140,14 @@ def main():
 
     local_core_version = get_local_core_version()
 
-    # Step 4: Build project with updated code
-    build_project(wallet_name, wallet_hotkey, neuron_type)
-
     # Step 5: Restart core service if versions differ
     if running_core_version != local_core_version:
+        build_project(wallet_name, wallet_hotkey, neuron_type)
+
         logging.info(
             "Core service version mismatch or update detected. Restarting core service..."
         )
-        restart_pm2_process(f"validator_server_{wallet_hotkey}")
+        restart_pm2_process(f"{neuron_type}_server_{wallet_hotkey}")
 
     # Step 6: Fetch proxy service versions
     running_proxy_version, local_proxy_version = get_proxy_version()
@@ -161,7 +157,7 @@ def main():
         logging.info(
             "Proxy service version mismatch detected. Restarting proxy service..."
         )
-        restart_pm2_process(f"validator_proxy_server_{wallet_hotkey}")
+        restart_pm2_process(f"{neuron_type}_proxy_server_{wallet_hotkey}")
     else:
         logging.info("Proxy service versions are the same. No restart required.")
 

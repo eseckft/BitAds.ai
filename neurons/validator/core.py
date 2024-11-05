@@ -152,9 +152,7 @@ class CoreValidator(BaseValidatorNeuron):
         try:
             bt.logging.info("Start sync BitAds process")
             offset = (
-                await self.bitads_service.get_last_update_bitads_data(
-                    self.wallet.get_hotkey().ss58_address
-                )
+                datetime.fromisoformat("2024-11-01")
                 if not self.offset
                 else self.offset
             )
@@ -194,10 +192,6 @@ class CoreValidator(BaseValidatorNeuron):
                 )
                 await self.bitads_service.update_sale_status_if_needed(
                     campaign.product_unique_id, sale_to
-                )
-            else:
-                bt.logging.info(
-                    "No settings, will update sale status when settings appear"
                 )
 
             bt.logging.info("End sync BitAds process")

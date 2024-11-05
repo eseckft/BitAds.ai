@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Set, Tuple
+from typing import Set, Tuple, List
 
 from common.miner.schemas import VisitorSchema
 from common.services.settings.base import SettingsContainer
@@ -82,4 +82,10 @@ class MinerService(SettingsContainer, ABC):
 
     @abstractmethod
     async def get_visit_by_id(self, id_: str) -> VisitorSchema:
+        pass
+
+    @abstractmethod
+    async def get_visits_by_campaign_item(
+        self, campaign_item: str
+    ) -> List[VisitorSchema]:
         pass
