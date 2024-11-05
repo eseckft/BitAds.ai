@@ -47,6 +47,8 @@ python3 -m pip install -r requirements.txt
 python3 -m pip install .
 python3 setup.py install_lib
 python3 setup.py build
+
+mkdir -p databases && mv *.db databases/
 python3 get_databases.py
 alembic upgrade head
 python3 fix_broken_orders.py
