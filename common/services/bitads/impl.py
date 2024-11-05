@@ -110,12 +110,8 @@ class BitAdsServiceImpl(BitAdsService):
                     float(item.refund_info.totalAmount) if item.refund_info else 0.0
                 )
                 sale_amount -= refund_amount
-                sales = sum(map(operator.attrgetter("quantity"), item.order_info.items))
-                refund = (
-                    sum(map(operator.attrgetter("quantity"), item.refund_info.items))
-                    if item.refund_info
-                    else 0
-                )
+                sales = len(item.order_info.items)
+                refund = len(item.refund_info.items) if item.refund_info else 0
 
                 new_data = existed_data.model_copy(
                     update=dict(
