@@ -22,6 +22,7 @@ import bittensor as bt
 
 from common.environ import Environ
 from common.helpers import const
+from neurons import __spec_version__ as spec_version
 from template.mock import MockSubtensor, MockMetagraph
 
 # Sync calls set weights and also resyncs the metagraph.
@@ -80,6 +81,7 @@ class BaseNeuron(ABC):
     subtensor: "bt.subtensor"
     wallet: "bt.wallet"
     metagraph: "bt.metagraph"
+    spec_version: int = spec_version
 
     @property
     def block(self):
