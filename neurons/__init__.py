@@ -1,7 +1,7 @@
 # TODO(developer): Change this value when updating your code base.
 # Define the version of the template module.
 
-__version__ = "3.2.5"
+__version__ = "3.2.6"
 version_split = __version__.split(".")
 __spec_version__ = (
     (100000 * int(version_split[0]))
