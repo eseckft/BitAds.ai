@@ -1,4 +1,5 @@
 from common.schemas.aggregated import AggregationSchema
+from common.schemas.bitads import ConversionRateLimit
 
 
 def process_aggregation(
@@ -68,6 +69,7 @@ def process_aggregation(
 
 def process_cpa(
     aggregation: AggregationSchema,
+    *cr_limits: ConversionRateLimit,
     MR: float,
     SALESmax: float,
     CRmax: float,
@@ -76,7 +78,7 @@ def process_cpa(
     Wcr: float,
     Wmr: float,
     ndigits: int = 5,  # ignored
-    miner_hotkey: str = None
+    miner_hotkey: str = None  # ignored
 ) -> float:
     """
     Processes Cost-Per-Action (CPA) related data to calculate a rating based on sales, conversion rate,
@@ -121,5 +123,10 @@ def process_cpa(
 
     # Ensure the Miner Score is within the range [0, 1] and rounded to 5 decimal places
     RATING = min(RATING, 1.0)
+
+    for cr_limit in cr_limits:
+        if cr_limit.min <= CRnorm < cr_limit.max:
+            RATING *= cr_limit.penalty
+            break
 
     return RATING

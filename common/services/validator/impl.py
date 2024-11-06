@@ -468,6 +468,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         """
         return formula.process_cpa(
             aggregation,
+            *self.settings.conversion_rate_limits,
             MR=MR,
             SALESmax=self._params.sales_max,
             MRmax=self._params.mr_max,
