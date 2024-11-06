@@ -247,7 +247,7 @@ class FormulaParams(BaseModel):
         limits_dict = {}
         for key, value in settings_dict.items():
             if key.startswith("cr_min_"):
-                add_to_limits("min", key, limits_dict, value)
+                add_to_limits("min", key, limits_dict, value, normalize=True)
             elif key.startswith("cr_max_"):
                 add_to_limits("max", key, limits_dict, value, normalize=True)
             elif key.startswith("penalty_multiplier_"):

@@ -125,7 +125,7 @@ def process_cpa(
     RATING = min(RATING, 1.0)
 
     for cr_limit in cr_limits:
-        if RATING >= cr_limit.min and CRnorm >= cr_limit.max:
+        if cr_limit.min <= CRnorm < cr_limit.max:
             RATING *= cr_limit.penalty
             break
 
