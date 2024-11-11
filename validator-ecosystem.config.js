@@ -13,6 +13,7 @@ module.exports = {
       interpreter: "python3",
       args: generateArgs(),
       env: getEnvVariables(),
+      max_memory_restart: '3000M',
     },
     {
       name: "auto_update",
