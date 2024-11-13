@@ -132,4 +132,12 @@ def log_startup(neuron_type: str):
 class BittensorLoggingFilter(logging.Filter):
 
     def filter(self, record):
-        return all(f not in record.getMessage() for f in ("TimeoutError", "ClientConnectorError", "ClientOSError"))
+        return all(f not in record.getMessage() for f in (
+            # Client errors
+            "TimeoutError",
+            "ClientConnectorError",
+            "ClientOSError",
+            "ServerDisconnectedError",
+            "ClientPayloadError",
+            "NotVerifiedException"  # From slow miners
+        ))
