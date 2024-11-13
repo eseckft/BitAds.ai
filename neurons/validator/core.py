@@ -3,6 +3,7 @@
 # Copyright © 2023 bittensor.com
 import argparse
 import asyncio
+import logging
 import time
 from datetime import timedelta, datetime
 
@@ -12,18 +13,20 @@ import bittensor as bt
 from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
 from common.helpers import const
-from common.helpers.logging import LogLevel, log_startup
+from common.helpers.logging import LogLevel, log_startup, BittensorLoggingFilter
 from common.schemas.bitads import FormulaParams, UserActivityRequest
 from common.schemas.sales import OrderQueueStatus
 from common.utils import execute_periodically
 from common.validator import dependencies
 from common.validator.environ import Environ
+
 # Bittensor Validator Template:
 from neurons.protocol import (
     Ping,
     RecentActivity,
     SyncVisits,
 )
+
 # import base validator class which takes care of most of the boilerplate
 from template.base.validator import BaseValidatorNeuron
 from template.utils.config import add_blacklist_args
@@ -310,6 +313,7 @@ class CoreValidator(BaseValidatorNeuron):
 if __name__ == "__main__":
     bt.logging.on()
     log_startup("Validator")
+    logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
     with dependencies.get_core_validator() as validator:
         while True:
             try:

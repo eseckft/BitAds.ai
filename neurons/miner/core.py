@@ -2,6 +2,7 @@
 # Copyright © 2023 Yuma Rao
 # Copyright © 2023 bittensor.com
 import asyncio
+import logging
 import time
 from datetime import timedelta
 from typing import Type
@@ -11,7 +12,7 @@ from common.helpers import const
 
 from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
-from common.helpers.logging import log_startup
+from common.helpers.logging import log_startup, BittensorLoggingFilter
 from common.miner import dependencies
 from common.miner.environ import Environ
 from common.utils import execute_periodically
@@ -131,7 +132,9 @@ class CoreMiner(BaseMinerNeuron):
                 *self.miners,
                 timeout=timeout,
             )
-            visits = {visit for synapse in responses.values() for visit in synapse.visits}
+            visits = {
+                visit for synapse in responses.values() for visit in synapse.visits
+            }
             try:
                 await self.miner_service.add_visits(visits)
             except Exception as e:
@@ -169,6 +172,7 @@ class CoreMiner(BaseMinerNeuron):
 if __name__ == "__main__":
     bt.logging.on()
     log_startup("Miner")
+    logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
     with dependencies.get_core_miner() as miner:
         while True:
             try:
