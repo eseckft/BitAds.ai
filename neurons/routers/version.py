@@ -10,4 +10,4 @@ router = APIRouter()
 async def version(request: Request) -> Dict[str, str]:
     """Retrieve version information"""
 
-    return {"version": request.app.version, "sqlite_version": sqlite3.sqlite_version}
+    return {"version": request.app.version}

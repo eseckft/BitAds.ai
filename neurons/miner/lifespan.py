@@ -113,7 +113,6 @@ async def bitads_lifespan(app: FastAPI) -> AsyncIterator[None]:
     post_miner_ip_to_chain()
     asyncio.create_task(infinite_task())  # Start the background task
     yield
-    print("End Two")
 
 
 lifespan = Lifespans([fiber_lifespan, bitads_lifespan])

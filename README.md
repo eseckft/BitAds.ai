@@ -2,7 +2,7 @@
 
 **Revolutionizing the online marketing landscape through the power of decentralization.**
 **Discover how BitAds leverages the Bittensor Network to offer cost-effective, high-quality marketing through a unique incentive mechanism for miners and validators.** <br><br>
-![alt text](docs/BitAds_Ecommerce_Integration.png)
+![alt text](assets/BitAds_Ecommerce_Integration.png)
 
 
 :no_entry_sign:**The Problem:**

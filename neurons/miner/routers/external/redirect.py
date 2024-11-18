@@ -47,38 +47,41 @@ async def fetch_request_data_and_redirect(
     user_agent: Annotated[str, Header()],
     referer: Annotated[Optional[str], Header()] = None,
 ) -> RedirectResponse:
-    # Helper function to get campaign and validate its existence
-    campaign = await campaign_service.get_campaign_by_id(campaign_id)
-    if not campaign:
-        logger.error(f"Campaign with ID {campaign_id} not found")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Campaign not found"
+    try:
+        # Helper function to get campaign and validate its existence
+        campaign = await campaign_service.get_campaign_by_id(campaign_id)
+        if not campaign:
+            logger.error(f"Campaign with ID {campaign_id} not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Campaign not found"
+            )
+
+        # Generate a unique visit ID
+        visit_id = str(uuid.uuid4())
+
+        # Process IP information and visitor details
+        ip = request.headers.get("X-Forwarded-For", request.client.host)
+        ipaddr_info = geoip_service.get_ip_info(ip)
+        visitor = await create_visitor_schema(
+            id_=visit_id,
+            referer=referer,
+            ip=request.client.host,
+            campaign_id=campaign_id,
+            user_agent=user_agent,
+            campaign_item=campaign_item,
+            miner_service=miner_service,
+            geoip_info=ipaddr_info,
         )
 
-    # Generate a unique visit ID
-    visit_id = str(uuid.uuid4())
+        # Save visitor and log result
+        await miner_service.add_visit(visitor)
+        logger.info(f"Saved visit with ID: {visitor.id}")
 
-    # Process IP information and visitor details
-    ip = request.headers.get("X-Forwarded-For", request.client.host)
-    ipaddr_info = geoip_service.get_ip_info(ip)
-    visitor = await create_visitor_schema(
-        id_=visit_id,
-        referer=referer,
-        ip=request.client.host,
-        campaign_id=campaign_id,
-        user_agent=user_agent,
-        campaign_item=campaign_item,
-        miner_service=miner_service,
-        geoip_info=ipaddr_info,
-    )
-
-    # Save visitor and log result
-    await miner_service.add_visit(visitor)
-    logger.info(f"Saved visit with ID: {visitor.id}")
-
-    # Generate and return the appropriate redirection URL
-    redirect_url = generate_redirect_url(campaign, visit_id, campaign_id)
-    return RedirectResponse(url=redirect_url)
+        # Generate and return the appropriate redirection URL
+        redirect_url = generate_redirect_url(campaign, visit_id, campaign_id)
+        return RedirectResponse(url=redirect_url)
+    except:
+        return RedirectResponse(url=request.url)
 
 
 # Helper function to create a VisitorSchema object for the visit

@@ -14,18 +14,17 @@ from common.environ import Environ as CommonEnviron
 from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
 from common.schemas.miner_assignment import (
-    MinerAssignmentModel,
     SetMinerAssignmentsRequest,
 )
 from common.schemas.shopify import ShopifyBody, SaleData
 from common.services.queue.exceptions import RefundNotExpectedWithoutOrder
 from common.validator import dependencies
 from common.validator.environ import Environ
-from proxies.apis.fetch_from_db_test import router as test_router
-from proxies.apis.get_database import router as database_router
-from proxies.apis.logging import router as logs_router
-from proxies.apis.version import router as version_router
-from proxies.apis.two_factor import router as two_factor_router
+from neurons.routers.fetch_from_db_test import router as test_router
+from neurons.routers.get_database import router as database_router
+from neurons.routers.logging import router as logs_router
+from neurons.routers.version import router as version_router
+from neurons.routers.two_factor import router as two_factor_router
 from proxies.utils.validation import validate_hash
 from template.api.metagraph import check_axon_exists
 
