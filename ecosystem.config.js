@@ -5,7 +5,7 @@ module.exports = {
   deploy: {
     local: {
       host: 'localhost',
-      ref: 'origin/main',
+      ref: 'origin/fiber',
       repo: 'https://github.com/eseckft/BitAds.ai.git',
       path: 'BitAds.ai',
       'pre-setup': 'echo "This is a pre-setup command"',
