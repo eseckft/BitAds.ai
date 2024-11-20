@@ -245,7 +245,7 @@ class CoreValidator(BaseValidatorNeuron):
             response = self.bitads_client.subnet_ping()
             if not response or not response.result:
                 return
-
+            bt.logging.debug(f"Miners received from ping: {response.miners}")
             self.miners = response.miners
             self.validators = response.validators
             active_campaigns = response.campaigns or []
@@ -313,7 +313,7 @@ class CoreValidator(BaseValidatorNeuron):
 
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
-    bt.logging.on()
+    bt.logging.set_debug()
     log_startup("Validator")
     logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
     with dependencies.get_core_validator() as validator:
