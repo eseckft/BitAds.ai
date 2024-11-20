@@ -315,7 +315,7 @@ class CoreValidator(BaseValidatorNeuron):
 if __name__ == "__main__":
     bt.logging.set_debug()
     log_startup("Validator")
-    logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
+    # logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
     with dependencies.get_core_validator() as validator:
         while True:
             try:
