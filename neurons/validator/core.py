@@ -140,7 +140,7 @@ class CoreValidator(BaseValidatorNeuron):
         except Exception as ex:
             bt.logging.exception(f"Ping miners exception: {str(ex)}")
 
-    async def _forward_bitads_data(self, delay: float = 12.0):
+    async def _forward_bitads_data(self, delay: float = 14.0):
         while True:
             try:
                 await self.__forward_bitads_data()
@@ -149,7 +149,7 @@ class CoreValidator(BaseValidatorNeuron):
             finally:
                 await asyncio.sleep(delay)
 
-    async def __forward_bitads_data(self, timeout: float = 6.0):
+    async def __forward_bitads_data(self, timeout: float = 12.0):
         try:
             bt.logging.info("Start sync BitAds process")
             offset = (
