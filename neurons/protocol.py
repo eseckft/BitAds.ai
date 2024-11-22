@@ -78,3 +78,8 @@ class SyncTrackingData(BaseSynapse):
     offset: Optional[datetime] = None
     tracking_data: Optional[Set[ValidatorTrackingData]] = set()
     bitads_data: Optional[Set[BitAdsDataSchema]] = set()
+
+
+class NotifyOrder(BaseSynapse):
+    data: BitAdsDataSchema
+    result: Optional[bool] = False

@@ -66,7 +66,7 @@ def add_or_update(
     session: Session,
     data: BitAdsDataSchema,
     exclude_fields=("created_at",),
-    include_none=("refund_info",),
+    include_none=(),
 ):
     """
     Adds or updates tracking data in the database.
@@ -97,6 +97,7 @@ def add_or_update(
         # Create a new entity if it doesn't exist
         entity = BitAdsData(**dict(data))
         session.add(entity)
+    return BitAdsDataSchema.model_validate(entity)
 
 
 def add_data(session: Session, data: BitAdsDataSchema) -> None:

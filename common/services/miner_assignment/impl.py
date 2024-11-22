@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from common.db.repositories import miner_assignment
 
@@ -25,3 +25,7 @@ class MinerAssignmentServiceImpl(MinerAssignmentService):
                     assignment.hotkey,
                     assignment.campaign_id,
                 )
+
+    async def get_hotkey_by_campaign_item(self, campaign_item: str) -> Optional[str]:
+        with self.database_manager.get_session("active") as session:
+            return miner_assignment.get_hotkey_by_campaign_item(session, campaign_item)

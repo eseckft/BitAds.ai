@@ -27,3 +27,9 @@ class OrderQueueSchema(BaseModel):
     status: OrderQueueStatus = OrderQueueStatus.PENDING
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class OrderNotificationStatus(IntEnum):
+    NEW = 0
+    PROCESSED = 1
+    ERROR = -1
