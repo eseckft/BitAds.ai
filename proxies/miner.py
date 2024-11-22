@@ -46,9 +46,9 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.6.2", lifespan=lifespan)
+app = FastAPI(version="0.6.3", lifespan=lifespan)
 
-app.mount("/statics", StaticFiles(directory="statics"), name="statics")
+app.mount("/statics", StaticFiles(directory="statics", html=True), name="statics")
 
 app.include_router(version_router)
 app.include_router(test_router)
@@ -104,9 +104,8 @@ async def fetch_request_data_and_redirect(
     ip = request.headers.get("X-Forwarded-For", request.client.host)
     ipaddr_info = geoip_service.get_ip_info(ip)
     if ipaddr_info.country_code not in json.loads(campaign.countries_approved_for_product_sales):
-        return HTMLResponse(
-            "The country of your IP is not on the whitelist to purchase this item",
-            status_code=403
+        return RedirectResponse(
+            "/statics/403",
         )
     hotkey, block = await miner_service.get_hotkey_and_block()
     visitor = VisitorSchema(

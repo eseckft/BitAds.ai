@@ -1,0 +1,193 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    font-family: Montserrat;
+    background-color: #222529;
+    color: #333;
+    text-align: center;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    width: 100%;
+}
+.content{
+    margin: 0px 60px;
+    color: white;
+    background: #26292D;
+    border-radius: 15px;
+    height: 100%;
+    margin-bottom: 70px;
+    display: block;
+    align-content: center;
+    overflow: auto;
+}
+p{
+    font-size: 16px;
+    line-height: 19.5px;
+    font-weight: 700;
+    text-align: center;
+}
+h1{
+    margin: 0 0 40px 0;
+    font-size: 32px;
+    line-height: 39px;
+    font-weight: 800;
+    text-align: center;
+}
+.logo-text{
+    font-size: 200px;
+    line-height: 244px;
+    font-weight: 800;
+}
+
+.logo-block{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+
+.photo-1{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.photo-2{
+    position: absolute;
+    top: 32px;
+    left: 36px;
+    width: 175px;
+    height: 179px;
+}
+.photo-3{
+    position: absolute;
+    top: -11%;
+    left: 0;
+    width: 100%;
+    height: 100%
+}
+
+.img-block{
+    position: relative;
+    width: 264px;
+    margin: 10px;
+}
+
+.header{
+    padding: 20px;
+    display: flex;
+    margin-left: 90px;
+}
+
+.logo{
+    height: 30px;
+}
+
+
+@media (max-width: 768px)
+{
+    .header{
+        margin-left: 0;
+        z-index: 2;
+        background-color: #222529;
+    }
+    .logo-text{
+        font-size: 150px;
+    }
+    .img-block{
+        width: 150px;
+    }
+    .photo-2{
+        top: -21px;
+        left: 25px;
+        width: 87px;
+        height: 179px;
+    }
+    .photo-3{
+        top: -6%;
+    }
+    .logo-text {
+        font-size: 100px;
+        line-height: 140px;
+    }
+    h1{
+     font-size: 18px;
+     margin: 0 0 20px 0;
+    }
+    .logo-block{
+        margin-bottom: 10px;
+    }
+    p{
+    font-size: 12px;
+    }
+    .content{
+        margin: 0;
+        border-radius: 0;
+        width: 100%;
+/*        position: fixed;*/
+    }
+}
+
+@media (max-width: 500px)
+{
+   .logo-text{
+      font-size: 100px;
+      line-height: 120px;
+   }
+   .img-block{
+      width: 120px;
+   }
+   .photo-2{
+      top: -31px;
+      left: 18px;
+      width: 79px;
+      height: 170px;
+   }
+   .photo-3{
+      top: -10%;
+   }
+    h1{
+      font-size: 12px;
+      margin: 0 0 10px 0;
+   }
+   .logo-block{
+      margin-bottom: 5px;
+   }
+   p{
+      font-size: 8px;
+   }
+}
+
+@media (max-width: 350px){
+   .logo-text{
+      font-size: 50px;
+      line-height: 50px;
+   }
+   .img-block{
+      width: 80px;
+      margin: 0;
+   }
+   .photo-2{
+      top: -58px;
+      left: 19px;
+      width: 38px;
+      height: 170px;
+   }
+   .logo-block{
+      margin-top: 5px;
+   }
+   h1{
+      font-size: 6px;
+      margin: 0;
+      line-height: 10px;
+  }
+   p{
+    font-size: 5px;
+   }
+}
+
