@@ -12,7 +12,7 @@ services:
       - AXON_PORT
       - NEURON_TYPE
     command: >
-      sh -c "python validate_setup.py && python get_databases.py"  # Run validation and database setup
+      sh -c "python validate_setup.py && python get_databases.py && alembic upgrade head"  # Run validation and database setup
     # Optional: You can add health checks or other configurations if needed
 
   # Service to run migrations and the core application

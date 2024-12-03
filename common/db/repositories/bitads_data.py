@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import List, Optional, Dict
 
-from sqlalchemy import select, func, and_, case, desc
+from sqlalchemy import select, func, and_, case, desc, asc
 from sqlalchemy.orm import Session
 
 from common.schemas.aggregated import AggregationSchema, AggregatedData
@@ -39,10 +39,11 @@ def get_data_between(
     if updated_to:
         stmt = stmt.where(BitAdsData.updated_at < updated_to)
 
-    stmt = stmt.limit(limit).offset(offset).order_by(desc(BitAdsData.updated_at))
+    stmt = stmt.limit(limit).offset(offset).order_by(asc(BitAdsData.updated_at))
 
     result = session.execute(stmt)
-    return [BitAdsDataSchema.model_validate(r) for r in result.scalars().all()]
+    data = [BitAdsDataSchema.model_validate(r) for r in result.scalars().all()]
+    return data
 
 
 def get_data(session: Session, id_: str) -> Optional[BitAdsDataSchema]:
@@ -144,7 +145,7 @@ def complete_sales_less_than_date(
             and_(
                 BitAdsData.sale_date < sales_to,
                 BitAdsData.sales_status == SalesStatus.NEW,
-                BitAdsData.campaign_id == campaign_id
+                BitAdsData.campaign_id == campaign_id,
             )
         )
         .all()

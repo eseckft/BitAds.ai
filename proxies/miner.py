@@ -1,3 +1,4 @@
+import json
 import logging
 import uuid
 from contextlib import asynccontextmanager
@@ -45,9 +46,9 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.6.1", lifespan=lifespan)
+app = FastAPI(version="0.6.3", lifespan=lifespan)
 
-app.mount("/statics", StaticFiles(directory="statics"), name="statics")
+app.mount("/statics", StaticFiles(directory="statics", html=True), name="statics")
 
 app.include_router(version_router)
 app.include_router(test_router)
@@ -97,11 +98,15 @@ async def fetch_request_data_and_redirect(
     campaign: Campaign = next(
         filter(lambda c: c.product_unique_id == campaign_id, campaigns), None
     )
-    if not campaign:
+    if not campaign or not campaign.countries_approved_for_product_sales:
         raise KeyError  # In case when miner neuron not fetched campaigns
     id_ = str(uuid.uuid4())
     ip = request.headers.get("X-Forwarded-For", request.client.host)
     ipaddr_info = geoip_service.get_ip_info(ip)
+    if ipaddr_info.country_code not in json.loads(campaign.countries_approved_for_product_sales):
+        return RedirectResponse(
+            "/statics/403",
+        )
     hotkey, block = await miner_service.get_hotkey_and_block()
     visitor = VisitorSchema(
         id=id_,
