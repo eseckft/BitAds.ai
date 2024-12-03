@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Optional
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from common.schemas.miner_assignment import MinerAssignmentModel
@@ -12,7 +13,9 @@ def create_or_update_miner_assignment(
     # Try to find an existing record with the given unique_id
     miner_assignment = session.get(MinerAssignment, unique_id)
     if not miner_assignment:
-        miner_assignment = MinerAssignment(unique_id=unique_id, hotkey=hotkey, campaign_id=campaign_id)
+        miner_assignment = MinerAssignment(
+            unique_id=unique_id, hotkey=hotkey, campaign_id=campaign_id
+        )
         session.add(miner_assignment)
     else:
         # If found, update the hotkey
@@ -30,3 +33,25 @@ def get_assignments(session: Session) -> List[MinerAssignmentModel]:
     ]
 
     return assignment_models
+
+
+def get_hotkey_by_campaign_item(session: Session, campaign_item: str) -> Optional[str]:
+    """
+    Fetches the hotkey associated with a given campaign item.
+
+    Args:
+        session (Session): The SQLAlchemy session to use for the query.
+        campaign_item (str): The campaign item to search for.
+
+    Returns:
+        str: The hotkey associated with the campaign item.
+
+    Raises:
+        ValueError: If no record is found for the given campaign item.
+    """
+    stmt = select(MinerAssignment.hotkey).where(
+        MinerAssignment.unique_id == campaign_item
+    )
+    result = session.execute(stmt).scalar_one_or_none()
+
+    return result

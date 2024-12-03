@@ -17,6 +17,7 @@ from common.miner import dependencies
 from common.miner.environ import Environ
 from common.utils import execute_periodically
 from neurons.base.operations import BaseOperation
+from neurons.miner.operations.notify_order import NotifyOrderOperation
 from neurons.miner.operations.ping import PingOperation
 from neurons.miner.operations.recent_activity import RecentActivityOperation
 from neurons.miner.operations.sync_visits import SyncVisitsOperation
@@ -69,6 +70,9 @@ class CoreMiner(BaseMinerNeuron):
         self.unique_link_service = common_dependencies.get_miner_unique_link_service(
             self.database_manager
         )
+        self.order_history_service = common_dependencies.get_order_history_service(
+            self.database_manager
+        )
 
         if self.config.mock:
             self.dendrite = MockDendrite(wallet=self.wallet)
@@ -80,6 +84,7 @@ class CoreMiner(BaseMinerNeuron):
             PingOperation,
             RecentActivityOperation,
             SyncVisitsOperation,
+            NotifyOrderOperation,
         ]
 
         for operation in map(self._create_operation, operations):

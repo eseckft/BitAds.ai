@@ -1,7 +1,7 @@
 import logging
 import operator
 from datetime import datetime
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Tuple, Optional
 
 from common import converters
 from common.db.database import DatabaseManager
@@ -90,20 +90,22 @@ class BitAdsServiceImpl(BitAdsService):
         }
         await self.add_bitads_data(datas)
 
-    async def update_sale_status_if_needed(self, campaign_id: str, sale_to: datetime) -> None:
+    async def update_sale_status_if_needed(
+        self, campaign_id: str, sale_to: datetime
+    ) -> None:
         log.debug(f"Completing sales with date less than: {sale_to}")
         with self.database_manager.get_session("active") as session:
             bitads_data.complete_sales_less_than_date(session, campaign_id, sale_to)
 
     async def add_by_queue_items(
         self, validator_block: int, validator_hotkey: str, items: List[OrderQueueSchema]
-    ) -> Dict[str, OrderQueueStatus]:
+    ) -> Dict[str, Tuple[OrderQueueStatus, Optional[BitAdsDataSchema]]]:
         result = {}
         with self.database_manager.get_session("active") as session:
             for item in items:
                 existed_data = bitads_data.get_data(session, item.id)
                 if not existed_data:
-                    result[item.id] = OrderQueueStatus.VISIT_NOT_FOUND
+                    result[item.id] = OrderQueueStatus.VISIT_NOT_FOUND, None
                     continue
                 sale_amount = float(item.order_info.totalAmount)
                 refund_amount = (
@@ -126,11 +128,11 @@ class BitAdsServiceImpl(BitAdsService):
                     )
                 )
                 try:
-                    bitads_data.add_or_update(session, new_data)
-                    result[item.id] = OrderQueueStatus.PROCESSED
+                    new_data = bitads_data.add_or_update(session, new_data)
+                    result[item.id] = OrderQueueStatus.PROCESSED, new_data
                 except Exception:
                     log.exception(f"Add BitAds data exception on id: {item.id}")
-                    result[item.id] = OrderQueueStatus.ERROR
+                    result[item.id] = OrderQueueStatus.ERROR, None
         return result
 
     async def get_by_campaign_items(

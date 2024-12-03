@@ -25,6 +25,7 @@ from neurons.protocol import (
     Ping,
     RecentActivity,
     SyncVisits,
+    NotifyOrder,
 )
 
 # import base validator class which takes care of most of the boilerplate
@@ -68,6 +69,9 @@ class CoreValidator(BaseValidatorNeuron):
         )
         self.campaigns_serivce = common_dependencies.get_campaign_service(
             self.database_manager
+        )
+        self.miner_assignments_service = (
+            common_dependencies.get_miner_assignment_service(self.database_manager)
         )
         self.miners = CommonEnviron.MINERS
         self.validators = CommonEnviron.VALIDATORS
@@ -286,9 +290,9 @@ class CoreValidator(BaseValidatorNeuron):
         except Exception as ex:
             bt.logging.exception(f"Evaluate miners exception: {str(ex)}")
 
-    async def _try_process_order_queue(self):
+    async def _try_process_order_queue(self, timeout: float = 1, limit: int = 10):
         try:
-            data_to_process = await self.order_queue_service.get_data_to_process()
+            data_to_process = await self.order_queue_service.get_data_to_process(limit)
             if not data_to_process:
                 bt.logging.info("No data to process in order queue")
                 return
@@ -297,7 +301,21 @@ class CoreValidator(BaseValidatorNeuron):
             result = await self.bitads_service.add_by_queue_items(
                 current_block, hotkey, data_to_process
             )
-            await self.order_queue_service.update_queue_status(result)
+            result_to_status = {id_: status for id_, (status, _) in result.items()}
+            await self.order_queue_service.update_queue_status(result_to_status)
+            for _, data in result.values():
+                if not data:
+                    continue
+                hotkey = (
+                    await self.miner_assignments_service.get_hotkey_by_campaign_item(
+                        data.campaign_item
+                    )
+                )
+                if not hotkey:
+                    continue
+                await forward_each_axon(
+                    self, NotifyOrder(bitads_data={data}), hotkey, timeout=timeout
+                )
         except Exception as ex:
             bt.logging.exception(f"Order queue processing exception: {str(ex)}")
 

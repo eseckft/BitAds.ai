@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Tuple, Optional
 
 from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
@@ -53,13 +53,15 @@ class BitAdsService(ABC):
         pass
 
     @abstractmethod
-    async def update_sale_status_if_needed(self, campaign_id: str, sale_date_from: datetime) -> None:
+    async def update_sale_status_if_needed(
+        self, campaign_id: str, sale_date_from: datetime
+    ) -> None:
         pass
 
     @abstractmethod
     async def add_by_queue_items(
         self, validator_block: int, validator_hotkey: str, items: List[OrderQueueSchema]
-    ) -> Dict[str, OrderQueueStatus]:
+    ) -> Dict[str, Tuple[OrderQueueStatus, Optional[BitAdsDataSchema]]]:
         pass
 
     @abstractmethod
