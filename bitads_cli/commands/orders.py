@@ -9,6 +9,12 @@ console = rich.get_console()
 async def async_miner_order_history(order_history_service):
     histories = await order_history_service.get_history()
 
+    if not histories:
+        console.print(
+            "[bold red]No orders found[/bold red]"
+        )
+        return
+
     grouped_by_hotkey = defaultdict(list)
     for record in histories:
         grouped_by_hotkey[record.hotkey].append(record)
@@ -37,7 +43,10 @@ async def async_miner_order_history(order_history_service):
                 history.data.campaign_id or "N/A",
                 history.data.ip_address or "N/A",
                 history.data.user_agent or "N/A",
-                "\n".join(f"{i.name} x{i.quantity}" for i in history.data.order_info.items)
+                "\n".join(
+                    f"{i.name} x{i.quantity}" for i in history.data.order_info.items
+                ),
+                end_section=True,
             )
 
         # Print the table to the console
