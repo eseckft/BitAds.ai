@@ -70,6 +70,9 @@ class CoreMiner(BaseMinerNeuron):
         self.unique_link_service = common_dependencies.get_miner_unique_link_service(
             self.database_manager
         )
+        self.order_history_service = common_dependencies.get_order_history_service(
+            self.database_manager
+        )
 
         if self.config.mock:
             self.dendrite = MockDendrite(wallet=self.wallet)

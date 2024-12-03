@@ -25,11 +25,12 @@ class NotifyOrderOperation(BaseOperation[NotifyOrder]):
 
     async def forward(self, synapse: NotifyOrder) -> NotifyOrder:
         hotkey = self.wallet.get_hotkey().ss58_address
-        try:
-            await self.order_history_service.add_to_history(synapse.data, hotkey)
-            synapse.result = True
-        except Exception as ex:
-            logger.error(f"Unable to add order to history: {ex}")
+        for data in synapse.bitads_data:
+            try:
+                await self.order_history_service.add_to_history(data, hotkey)
+            except Exception as ex:
+                logger.error(f"Unable to add order to history: {ex}")
+        synapse.result = True
         return synapse
 
     async def blacklist(self, synapse: NotifyOrder) -> Tuple[bool, str]:

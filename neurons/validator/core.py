@@ -290,9 +290,9 @@ class CoreValidator(BaseValidatorNeuron):
         except Exception as ex:
             bt.logging.exception(f"Evaluate miners exception: {str(ex)}")
 
-    async def _try_process_order_queue(self, timeout: float = 1):
+    async def _try_process_order_queue(self, timeout: float = 1, limit: int = 10):
         try:
-            data_to_process = await self.order_queue_service.get_data_to_process()
+            data_to_process = await self.order_queue_service.get_data_to_process(limit)
             if not data_to_process:
                 bt.logging.info("No data to process in order queue")
                 return
@@ -314,7 +314,7 @@ class CoreValidator(BaseValidatorNeuron):
                 if not hotkey:
                     continue
                 await forward_each_axon(
-                    self, NotifyOrder(data=data), hotkey, timeout=timeout
+                    self, NotifyOrder(bitads_data={data}), hotkey, timeout=timeout
                 )
         except Exception as ex:
             bt.logging.exception(f"Order queue processing exception: {str(ex)}")

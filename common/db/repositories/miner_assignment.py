@@ -50,7 +50,7 @@ def get_hotkey_by_campaign_item(session: Session, campaign_item: str) -> Optiona
         ValueError: If no record is found for the given campaign item.
     """
     stmt = select(MinerAssignment.hotkey).where(
-        MinerAssignment.campaign_id == campaign_item
+        MinerAssignment.unique_id == campaign_item
     )
     result = session.execute(stmt).scalar_one_or_none()
 

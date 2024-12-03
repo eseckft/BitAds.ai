@@ -131,19 +131,11 @@ class MinerOrderHistory(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+    last_processing_date: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow
+    )
     hotkey: Mapped[str]
     data: Mapped[Dict[str, Any]] = mapped_column(PickleType)
     status: Mapped[OrderNotificationStatus] = mapped_column(
         Enum(OrderNotificationStatus), default=OrderNotificationStatus.NEW
     )
-
-
-class OrderNotificationSettings(Base):
-    __tablename__ = "order_notification_settings"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    base_url: Mapped[str]
-    method: Mapped[str]
-    headers: Mapped[Dict[str, Any]] = mapped_column(PickleType)
-    body_template: Mapped[str]

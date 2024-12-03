@@ -1,12 +1,9 @@
 """
 Miner Dependencies
 """
-from fastapi import Depends
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from common.db.database import Database, DatabaseManager
+from common.db.database import DatabaseManager
 from common.helpers import const
-from common.miner.environ import Environ
 from common.services.miner.base import MinerService
 from common.services.miner.impl import MinerServiceImpl
 from common.services.recent_activity.base import RecentActivityService

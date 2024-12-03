@@ -81,5 +81,5 @@ class SyncTrackingData(BaseSynapse):
 
 
 class NotifyOrder(BaseSynapse):
-    data: BitAdsDataSchema
+    bitads_data: Set[BitAdsDataSchema]
     result: Optional[bool] = False

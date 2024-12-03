@@ -31,5 +31,6 @@ class OrderQueueSchema(BaseModel):
 
 class OrderNotificationStatus(IntEnum):
     NEW = 0
-    PROCESSED = 1
+    ORDER = 1
+    REFUND = 2
     ERROR = -1

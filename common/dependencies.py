@@ -17,6 +17,8 @@ from common.services.geoip.base import GeoIpService
 from common.services.geoip.impl import GeoIpServiceImpl
 from common.services.miner_assignment.base import MinerAssignmentService
 from common.services.miner_assignment.impl import MinerAssignmentServiceImpl
+from common.services.order_history.base import OrderHistoryService
+from common.services.order_history.impl import OrderHistoryServiceImpl
 from common.services.two_factor.base import TwoFactorService
 from common.services.two_factor.impl import TwoFactorServiceImpl
 from common.services.unique_link.base import MinerUniqueLinkService
@@ -59,8 +61,8 @@ def get_geo_ip_service() -> GeoIpService:
 
 
 def get_database_manager(
-        neuron_type: Optional[str] = None,
-        subtensor_network: Optional[str] = None,
+    neuron_type: Optional[str] = None,
+    subtensor_network: Optional[str] = None,
 ) -> DatabaseManager:
     """
     Creates and returns a DatabaseManager instance configured with the specified neuron type and Subtensor network.
@@ -107,7 +109,9 @@ def create_bitads_client(
         The function uses the wallet's hotkey address obtained via `wallet.get_hotkey().ss58_address`.
         It initializes a SyncBitAdsClient with the provided base URL, hotkey, and template version.
     """
-    return create_bitads_client_from_hotkey(wallet.get_hotkey().ss58_address, base_url, neuron_type)
+    return create_bitads_client_from_hotkey(
+        wallet.get_hotkey().ss58_address, base_url, neuron_type
+    )
 
 
 def create_bitads_client_from_hotkey(
@@ -192,6 +196,10 @@ def get_miner_unique_link_service(
 
 
 def get_miner_assignment_service(
-    database_manager: DatabaseManager
+    database_manager: DatabaseManager,
 ) -> MinerAssignmentService:
     return MinerAssignmentServiceImpl(database_manager)
+
+
+def get_order_history_service(database_manager: DatabaseManager) -> OrderHistoryService:
+    return OrderHistoryServiceImpl(database_manager)
