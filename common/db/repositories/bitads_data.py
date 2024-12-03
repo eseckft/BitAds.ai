@@ -67,7 +67,7 @@ def add_or_update(
     session: Session,
     data: BitAdsDataSchema,
     exclude_fields=("created_at",),
-    include_none=(),
+    include_none=("refund_info",),
 ):
     """
     Adds or updates tracking data in the database.
