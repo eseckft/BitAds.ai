@@ -3,18 +3,17 @@ import threading
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Annotated, List, Optional, Dict
+from typing import Annotated, List, Optional, Dict, Any
 
 import uvicorn
-from common.helpers import const
 from fastapi import FastAPI, Depends, HTTPException, Header, status, Query
 
 from common import dependencies as common_dependencies
 from common.environ import Environ as CommonEnviron
+from common.helpers import const
 from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
 from common.schemas.miner_assignment import (
-    MinerAssignmentModel,
     SetMinerAssignmentsRequest,
 )
 from common.schemas.shopify import ShopifyBody, SaleData
@@ -24,10 +23,10 @@ from common.validator.environ import Environ
 from proxies.apis.fetch_from_db_test import router as test_router
 from proxies.apis.get_database import router as database_router
 from proxies.apis.logging import router as logs_router
-from proxies.apis.version import router as version_router
 from proxies.apis.two_factor import router as two_factor_router
+from proxies.apis.version import router as version_router
 from proxies.utils.validation import validate_hash
-from template.api.metagraph import check_axon_exists
+from template.api.metagraph import get_axon_data
 
 database_manager = common_dependencies.get_database_manager(
     "validator", CommonEnviron.SUBTENSOR_NETWORK
@@ -96,7 +95,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.6.8",
+    version="0.6.9",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -170,7 +169,7 @@ async def put_visit(body: VisitorSchema) -> None:
 @app.get("/is_axon_exists")
 async def is_axon_exists(
     hotkey: str, ip_address: Optional[str] = None, coldkey: Optional[str] = None
-) -> Dict[str, bool]:
+) -> Dict[str, Any]:
     global metagraph_initialized
 
     if not metagraph_initialized:
@@ -180,7 +179,7 @@ async def is_axon_exists(
         )
 
     # Once initialized, reuse the metagraph for the request
-    return {"exists": check_axon_exists(metagraph, hotkey, ip_address, coldkey)}
+    return get_axon_data(metagraph, hotkey, ip_address, coldkey)
 
 
 @app.get("/order_ids")

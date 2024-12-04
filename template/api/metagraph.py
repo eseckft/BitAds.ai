@@ -2,12 +2,12 @@ from typing import Optional
 
 
 
-def check_axon_exists(
+def get_axon_data(
     metagraph: "bittensor.metagraph",
     hotkey: str,
     ip_address: Optional[str] = None,
     coldkey: Optional[str] = None,
-) -> bool:
+) -> dict:
     # Iterate through all axons in the metagraph
     for axon in metagraph.axons:
         # If an ip_address is provided, check it
@@ -23,7 +23,7 @@ def check_axon_exists(
             continue  # Skip this axon if the coldkey doesn't match
 
         # If all checks pass, return True
-        return True
+        return dict(exists=True, stake=float(metagraph.stake[i]))
 
     # If no matching axon was found, return False
-    return False
+    return dict(exists=False)
