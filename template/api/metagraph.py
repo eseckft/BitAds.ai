@@ -9,7 +9,7 @@ def get_axon_data(
     coldkey: Optional[str] = None,
 ) -> dict:
     # Iterate through all axons in the metagraph
-    for axon in metagraph.axons:
+    for i, axon in enumerate(metagraph.axons):
         # If an ip_address is provided, check it
         if axon.hotkey != hotkey:
             continue
