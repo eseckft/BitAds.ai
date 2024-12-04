@@ -43,7 +43,11 @@ subtensor: Optional["bittensor.subtensor"] = None
 
 metagraph_initialized: bool = False
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 log = logging.getLogger(__name__)
 
 
@@ -95,7 +99,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.6.12",
+    version="0.6.13",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
