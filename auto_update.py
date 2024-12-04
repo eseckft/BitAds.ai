@@ -76,7 +76,7 @@ def get_proxy_version():
     try:
         response = requests.get(PROXY_VERSION_URL, verify=False)
         running_proxy_version = response.json().get("version")
-    except (requests.RequestException, json.JSONDecodeError) as e:
+    except (requests.RequestException, json.JSONDecodeError, Exception) as e:
         logging.error(f"Error fetching running proxy version: {e}")
         running_proxy_version = None
 
