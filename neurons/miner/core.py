@@ -4,7 +4,7 @@
 import asyncio
 import logging
 import time
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import Type
 
 import bittensor as bt
@@ -15,6 +15,7 @@ from common.environ import Environ as CommonEnviron
 from common.helpers.logging import log_startup, BittensorLoggingFilter
 from common.miner import dependencies
 from common.miner.environ import Environ
+from common.validator.environ import Environ as ValidatorEnviron
 from common.utils import execute_periodically
 from neurons.base.operations import BaseOperation
 from neurons.miner.operations.notify_order import NotifyOrderOperation
@@ -73,6 +74,9 @@ class CoreMiner(BaseMinerNeuron):
         self.order_history_service = common_dependencies.get_order_history_service(
             self.database_manager
         )
+        self.migration_service = dependencies.get_migration_service(
+            self.database_manager
+        )
 
         if self.config.mock:
             self.dendrite = MockDendrite(wallet=self.wallet)
@@ -93,6 +97,7 @@ class CoreMiner(BaseMinerNeuron):
     def sync(self):
         try:
             super().sync()
+            self.loop.run_until_complete(self._migrate_old_data())
             self.loop.run_until_complete(self._set_hotkey_and_block())
             self.loop.run_until_complete(self._ping_bitads())
             self.loop.run_until_complete(self.__sync_visits())
@@ -122,6 +127,16 @@ class CoreMiner(BaseMinerNeuron):
             bt.logging.info("End clear recent activity")
         except Exception as e:
             bt.logging.exception(f"Error in _clear_recent_activity: {str(e)}")
+
+    @execute_periodically(const.MIGRATE_OLD_DATA_PERIOD)
+    async def _migrate_old_data(self):
+        try:
+            created_at_from = datetime.utcnow() - timedelta(
+                seconds=ValidatorEnviron.MR_DAYS.total_seconds() * 2
+            )
+            await self.migration_service.migrate(created_at_from)
+        except Exception:
+            bt.logging.exception("Error while data migration")
 
     async def __sync_visits(self, timeout: float = 11.0):
         try:

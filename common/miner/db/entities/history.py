@@ -1,3 +1,3 @@
-from sqlalchemy.orm import declarative_base
+from .active import Base as ActiveBase
 
-Base = declarative_base()
+Base = ActiveBase

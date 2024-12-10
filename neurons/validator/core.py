@@ -73,6 +73,9 @@ class CoreValidator(BaseValidatorNeuron):
         self.miner_assignments_service = (
             common_dependencies.get_miner_assignment_service(self.database_manager)
         )
+        self.migration_service = dependencies.get_migration_service(
+            self.database_manager
+        )
         self.miners = CommonEnviron.MINERS
         self.validators = CommonEnviron.VALIDATORS
         self.evaluate_miners_blocks = Environ.EVALUATE_MINERS_BLOCK_N
@@ -92,6 +95,7 @@ class CoreValidator(BaseValidatorNeuron):
         - Rewarding the miners
         - Updating the scores
         """
+        await self._migrate_old_data()
         await self.forward_ping()
         await self.__forward_bitads_data()
         await self._try_process_order_queue()
@@ -268,6 +272,16 @@ class CoreValidator(BaseValidatorNeuron):
     @execute_periodically(timedelta(minutes=15))
     async def _send_load_data(self):
         self.bitads_client.send_system_load(utils.get_load_average_json())
+
+    @execute_periodically(const.MIGRATE_OLD_DATA_PERIOD)
+    async def _migrate_old_data(self):
+        try:
+            created_at_from = datetime.utcnow() - timedelta(
+                seconds=Environ.MR_DAYS.total_seconds() * 2
+            )
+            await self.migration_service.migrate(created_at_from)
+        except Exception:
+            bt.logging.exception("Error while data migration")
 
     async def _try_evaluate_miners(self):
         try:

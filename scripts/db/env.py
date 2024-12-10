@@ -45,8 +45,8 @@ db_names = config.get_main_option("databases", "")
 target_metadata = {
     "miner_active_engine": MinerActiveBase.metadata,
     "validator_active_engine": ValidatorActiveBase.metadata,
-    "miner_history_engine": MinerHistoryBase.metadata,
-    "validator_history_engine": ValidatorHistoryBase.metadata,
+    "miner_history_engine": MinerActiveBase.metadata,
+    "validator_history_engine": ValidatorActiveBase.metadata,
     "main_engine": MainBase.metadata,
 }
 

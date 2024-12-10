@@ -4,6 +4,8 @@ from fastapi import Depends
 
 from common.db.database import DatabaseManager
 from common.dependencies import get_database_manager
+from common.services.migration.base import MigrationService
+from common.services.migration.validator import ValidatorMigrationService
 from common.services.queue.base import OrderQueueService
 from common.services.queue.impl import OrderQueueServiceImpl
 from common.services.validator.base import ValidatorService
@@ -40,3 +42,9 @@ def get_order_queue_service(
     database_manager: Annotated[DatabaseManager, Depends(get_database_manager)]
 ) -> OrderQueueService:
     return OrderQueueServiceImpl(database_manager)
+
+
+def get_migration_service(
+    database_manager: Annotated[DatabaseManager, Depends(get_database_manager)]
+) -> MigrationService:
+    return ValidatorMigrationService(database_manager)
