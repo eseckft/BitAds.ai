@@ -4,6 +4,8 @@ Miner Dependencies
 
 from common.db.database import DatabaseManager
 from common.helpers import const
+from common.services.migration.base import MigrationService
+from common.services.migration.miner import MinerMigrationService
 from common.services.miner.base import MinerService
 from common.services.miner.impl import MinerServiceImpl
 from common.services.recent_activity.base import RecentActivityService
@@ -34,5 +36,11 @@ def get_miner_service(database_manager: DatabaseManager) -> MinerService:
     return MinerServiceImpl(database_manager, const.RETURN_IN_SITE_DELTA)
 
 
-def get_recent_activity_service(database_manager: DatabaseManager) -> RecentActivityService:
+def get_recent_activity_service(
+    database_manager: DatabaseManager,
+) -> RecentActivityService:
     return RecentActivityServiceImpl(database_manager)
+
+
+def get_migration_service(database_manager: DatabaseManager) -> MigrationService:
+    return MinerMigrationService(database_manager)
