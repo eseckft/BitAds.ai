@@ -59,3 +59,5 @@ REWARD_SALE_PERIOD = timedelta(days=30)
 PING_PERIOD: timedelta = timedelta(minutes=30)
 
 MIGRATE_OLD_DATA_PERIOD: timedelta = timedelta(days=1)
+
+TEST_REDIRECT: str = "testredirect1"

@@ -18,10 +18,10 @@ from fastapi.staticfiles import StaticFiles
 
 from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
+from common.helpers import const
 from common.miner import dependencies
 from common.miner.environ import Environ
 from common.miner.schemas import VisitorSchema
-from common.schemas.bitads import Campaign
 from common.schemas.campaign import CampaignType
 from common.services.geoip.base import GeoIpService
 from proxies.apis.fetch_from_db_test import router as test_router
@@ -35,7 +35,9 @@ database_manager = common_dependencies.get_database_manager(
 )
 campaign_service = common_dependencies.get_campaign_service(database_manager)
 miner_service = dependencies.get_miner_service(database_manager)
-two_factor_service = common_dependencies.get_two_factor_service(database_manager)
+two_factor_service = common_dependencies.get_two_factor_service(
+    database_manager
+)
 
 
 # noinspection PyUnresolvedReferences
@@ -43,12 +45,15 @@ two_factor_service = common_dependencies.get_two_factor_service(database_manager
 async def lifespan(app: FastAPI):
     app.state.database_manager = database_manager
     app.state.two_factor_service = two_factor_service
+    app.state.campaign_service = campaign_service
     yield
 
 
-app = FastAPI(version="0.6.4", lifespan=lifespan)
+app = FastAPI(version="0.6.5", lifespan=lifespan)
 
-app.mount("/statics", StaticFiles(directory="statics", html=True), name="statics")
+app.mount(
+    "/statics", StaticFiles(directory="statics", html=True), name="statics"
+)
 
 app.include_router(version_router)
 app.include_router(test_router)
@@ -57,6 +62,7 @@ app.include_router(database_router)
 app.include_router(two_factor_router)
 
 
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 
@@ -67,7 +73,9 @@ async def internal_exception_handler(request: Request, exc: Exception):
 
 
 @app.get("/visitors/by_campaign_item")
-async def get_visits_by_campaign_item(campaign_item: str) -> List[VisitorSchema]:
+async def get_visits_by_campaign_item(
+    campaign_item: str,
+) -> List[VisitorSchema]:
     return await miner_service.get_visits_by_campaign_item(campaign_item)
 
 
@@ -94,16 +102,18 @@ async def fetch_request_data_and_redirect(
     user_agent: Annotated[str, Header()],
     referer: Annotated[Optional[str], Header()] = None,
 ):
-    campaigns = await campaign_service.get_active_campaigns()
-    campaign: Campaign = next(
-        filter(lambda c: c.product_unique_id == campaign_id, campaigns), None
-    )
+    campaign = await campaign_service.get_campaign_by_id(campaign_id)
     if not campaign or not campaign.countries_approved_for_product_sales:
+        logging.warning(
+            f"Campaign by id {campaign_id} not found. Maybe another miner can"
+        )
         raise KeyError  # In case when miner neuron not fetched campaigns
     id_ = str(uuid.uuid4())
     ip = request.headers.get("X-Forwarded-For", request.client.host)
     ipaddr_info = geoip_service.get_ip_info(ip)
-    if ipaddr_info.country_code not in json.loads(campaign.countries_approved_for_product_sales):
+    if ipaddr_info and ipaddr_info.country_code not in json.loads(
+        campaign.countries_approved_for_product_sales
+    ):
         return RedirectResponse(
             "/statics/403",
         )
@@ -122,7 +132,8 @@ async def fetch_request_data_and_redirect(
         country=ipaddr_info.country_name if ipaddr_info else None,
         country_code=ipaddr_info.country_code if ipaddr_info else None,
     )
-    await miner_service.add_visit(visitor)
+    if const.TEST_REDIRECT != campaign_item:
+        await miner_service.add_visit(visitor)
     log.info(f"Saved visit: {visitor.id}")
     url = (
         f"{campaign.product_link}?visit_hash={id_}"
