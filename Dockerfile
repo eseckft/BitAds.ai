@@ -25,7 +25,7 @@ RUN pip install -r requirements.txt --no-cache-dir
 COPY . .
 
 # Download GeoLite2-Country.mmdb
-RUN wget -O GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb -q
+RUN wget -O GeoLite2-Country.mmdb https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-Country.mmdb -q
 
 
 # Generate SSL certificates (key.pem and cert.pem)

@@ -83,7 +83,7 @@ fi
 
 # Download the GeoLite2 database for country detection quietly
 echo "Downloading GeoLite2-Country database..."
-wget -q -O GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb
+wget -q -O GeoLite2-Country.mmdb https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-Country.mmdb
 
 # Install Python dependencies quietly
 echo "Installing Python dependencies..."
