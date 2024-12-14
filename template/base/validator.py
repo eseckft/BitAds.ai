@@ -25,6 +25,9 @@ from traceback import print_exception
 from typing import List
 
 import bittensor as bt
+import websocket
+import websockets
+from websocket import WebSocketConnectionClosedException
 
 from template.base.neuron import BaseNeuron
 from template.mock import MockDendrite
@@ -157,13 +160,16 @@ class BaseValidatorNeuron(BaseNeuron):
             bt.logging.success("Validator killed by keyboard interrupt.")
             exit()
 
+        except WebSocketConnectionClosedException:
+            bt.logging.error("Websocket connection was lost. Restarting...")
+            exit(-1)
         # In case of unforeseen errors, the validator will log the error and continue operations.
         except Exception as err:
             bt.logging.error("Error during validation", str(err))
             bt.logging.debug(
                 print_exception(type(err), err, err.__traceback__)
             )
-            exit(-1)
+
 
     def run_in_background_thread(self):
         """
