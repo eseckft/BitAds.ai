@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Redirect all output (stdout and stderr) to the log file
+exec > >(tee -a ~/.bittensor/miners/bittensor.log) 2>&1
+
 # Record the start time
 start_time=$(date +%s)
 
