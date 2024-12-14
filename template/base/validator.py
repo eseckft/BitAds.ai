@@ -25,8 +25,6 @@ from traceback import print_exception
 from typing import List
 
 import bittensor as bt
-import websocket
-import websockets
 from websocket import WebSocketConnectionClosedException
 
 from template.base.neuron import BaseNeuron
