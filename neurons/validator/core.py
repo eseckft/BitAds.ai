@@ -275,6 +275,7 @@ class CoreValidator(BaseValidatorNeuron):
 
     @execute_periodically(const.MIGRATE_OLD_DATA_PERIOD)
     async def _migrate_old_data(self):
+        bt.logging.info("Start migrate old data")
         try:
             created_at_from = datetime.utcnow() - timedelta(
                 seconds=Environ.MR_DAYS.total_seconds() * 2
@@ -282,6 +283,7 @@ class CoreValidator(BaseValidatorNeuron):
             await self.migration_service.migrate(created_at_from)
         except Exception:
             bt.logging.exception("Error while data migration")
+        bt.logging.info("End migrate old data")
 
     async def _try_evaluate_miners(self):
         try:
@@ -345,9 +347,9 @@ class CoreValidator(BaseValidatorNeuron):
 
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
-    bt.logging.on()
+    bt.logging.set_debug(True)
     log_startup("Validator")
-    logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
+    # logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
     with dependencies.get_core_validator() as validator:
         while True:
             try:
