@@ -163,6 +163,7 @@ class BaseValidatorNeuron(BaseNeuron):
             bt.logging.debug(
                 print_exception(type(err), err, err.__traceback__)
             )
+            exit(-1)
 
     def run_in_background_thread(self):
         """
