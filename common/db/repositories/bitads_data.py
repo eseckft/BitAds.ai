@@ -23,7 +23,8 @@ def get_data_between(
 
     Args:
         session (Session): The SQLAlchemy session object.
-        updated_at_deadline (datetime): The deadline for updated_at attribute.
+        updated_from (datetime, optional): Start date for filtering records (inclusive).
+        updated_to (datetime, optional): End date for filtering records (exclusive).
         limit (int, optional): The maximum number of results to retrieve (default: 500).
         offset (int, optional): The number of results to skip (default: 0).
 
@@ -44,6 +45,47 @@ def get_data_between(
     result = session.execute(stmt)
     data = [BitAdsDataSchema.model_validate(r) for r in result.scalars().all()]
     return data
+
+
+def get_data_between_paged(
+    session: Session,
+    updated_from: datetime = None,
+    updated_to: datetime = None,
+    limit: int = 500,
+    offset: int = 0,
+) -> (List[BitAdsDataSchema], int):
+    """
+    Retrieves tracking data between dates with pagination info.
+
+    Args:
+        session (Session): The SQLAlchemy session object.
+        updated_from (datetime, optional): Start date for filtering records (inclusive).
+        updated_to (datetime, optional): End date for filtering records (exclusive).
+        limit (int, optional): The maximum number of results to retrieve (default: 500).
+        offset (int, optional): The number of results to skip (default: 0).
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the list of data and pagination info.
+    """
+    # Base query to filter the data
+    base_query = select(BitAdsData)
+
+    if updated_from:
+        base_query = base_query.where(BitAdsData.updated_at >= updated_from)
+    if updated_to:
+        base_query = base_query.where(BitAdsData.updated_at < updated_to)
+
+    # Query for total count (ignores limit and offset)
+    total_stmt = select(func.count()).select_from(base_query.subquery())
+    total = session.execute(total_stmt).scalar()
+
+    # Apply limit and offset to the base query
+    stmt = base_query.limit(limit).offset(offset).order_by(asc(BitAdsData.updated_at))
+    result = session.execute(stmt)
+    data = [BitAdsDataSchema.model_validate(r) for r in result.scalars().all()]
+
+    # Calculate the next offset (if applicable)
+    return data, total
 
 
 def get_data(session: Session, id_: str) -> Optional[BitAdsDataSchema]:

@@ -26,7 +26,7 @@ from proxies.apis.logging import router as logs_router
 from proxies.apis.two_factor import router as two_factor_router
 from proxies.apis.version import router as version_router
 from proxies.utils.validation import validate_hash
-from template.api.metagraph import get_axon_data
+from template.api.metagraph import get_axon_data, get_hotkey_to_uid
 
 database_manager = common_dependencies.get_database_manager(
     "validator", CommonEnviron.SUBTENSOR_NETWORK
@@ -45,8 +45,8 @@ metagraph_initialized: bool = False
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 log = logging.getLogger(__name__)
 
@@ -99,7 +99,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.6.14",
+    version="0.6.15",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -148,6 +148,28 @@ async def get_tracking_data(
     )
 
 
+@app.get(
+    "/tracking_data/paged",
+    summary="Retrieve tracking data within a date range",
+    description="""
+         Retrieve BitAds data that has been updated within the specified date range.
+         - `updated_from`: The start date of the range (inclusive).
+         - `updated_to`: The end date of the range (exclusive).
+         - `page_number`: The page number to retrieve.
+         - `page_size`: The number of records per page.
+         """,
+)
+async def get_tracking_data(
+    updated_from: datetime = None,
+    updated_to: datetime = None,
+    page_number: int = 1,
+    page_size: int = 500,
+) -> Dict[str, Any]:
+    return await bitads_service.get_bitads_data_between_paged(
+        updated_from, updated_to, page_number, page_size
+    )
+
+
 @app.get("/tracking_data/by_campaign_item")
 async def get_bidads_data_by_campaign_item(
     campaign_item: Annotated[list, Query()],
@@ -184,6 +206,21 @@ async def is_axon_exists(
 
     # Once initialized, reuse the metagraph for the request
     return get_axon_data(metagraph, hotkey, ip_address, coldkey)
+
+
+@app.get("/hotkey_to_uid")
+async def hotkey_to_uid(
+) -> List[Dict[str, Any]]:
+    global metagraph_initialized
+
+    if not metagraph_initialized:
+        raise HTTPException(
+            status.HTTP_406_NOT_ACCEPTABLE,
+            detail="Metagraph is still initializing, please try again later.",
+        )
+
+    # Once initialized, reuse the metagraph for the request
+    return get_hotkey_to_uid(metagraph)
 
 
 @app.get("/order_ids")
