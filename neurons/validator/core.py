@@ -347,7 +347,7 @@ class CoreValidator(BaseValidatorNeuron):
 
 # The main function parses the configuration and runs the validator.
 if __name__ == "__main__":
-    bt.logging.on()
+    bt.logging.set_info()
     log_startup("Validator")
     logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
     with dependencies.get_core_validator() as validator:
