@@ -1,7 +1,6 @@
 import logging
-import operator
 from datetime import datetime
-from typing import List, Set, Dict, Tuple, Optional
+from typing import List, Set, Dict, Tuple, Optional, Any
 
 from common import converters
 from common.db.database import DatabaseManager
@@ -9,11 +8,11 @@ from common.db.repositories import bitads_data
 from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
 from common.schemas.completed_visit import CompletedVisitSchema
+from common.schemas.paged import PaginationInfo
 from common.schemas.sales import SalesStatus, OrderQueueSchema, OrderQueueStatus
 from common.schemas.shopify import SaleData
 from common.services.bitads.base import BitAdsService
 from common.validator.schemas import ValidatorTrackingData
-
 
 log = logging.getLogger(__name__)
 
@@ -50,6 +49,29 @@ class BitAdsServiceImpl(BitAdsService):
         with self.database_manager.get_session("active") as session:
             return bitads_data.get_data_between(
                 session, updated_from, updated_to, limit, offset
+            )
+
+    async def get_bitads_data_between_paged(
+        self,
+        updated_from: datetime = None,
+        updated_to: datetime = None,
+        page_number: int = 1,
+        page_size: int = 500,
+    ) -> Dict[str, Any]:
+        limit = page_size
+        offset = (page_number - 1) * page_size
+        with self.database_manager.get_session("active") as session:
+            data, total = bitads_data.get_data_between_paged(
+                session, updated_from, updated_to, limit, offset
+            )
+            return dict(
+                data=data,
+                pagination=PaginationInfo(
+                    total=total,
+                    page_size=page_size,
+                    page_number=page_number,
+                    next_page_number=page_number + 1,
+                ),
             )
 
     async def get_last_update_bitads_data(self, exclude_hotkey: str):

@@ -46,6 +46,7 @@ class OrderDetails(BaseModel):
     customer_info: CustomerInfo = Field(alias="customerInfo")
     client_info: ClientInfo = Field(alias="clientInfo")
     payment_method: str = Field(alias="paymentMethod")
+    shop: Optional[str] = None
     sale_date: datetime = None
 
     model_config = ConfigDict(populate_by_name=True, frozen=True)

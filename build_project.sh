@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Redirect all output (stdout and stderr) to the log file
-exec > >(tee -a ~/.bittensor/miners/bittensor.log) 2>&1
 
 # Record the start time
 start_time=$(date +%s)
@@ -93,8 +91,8 @@ echo "Installing Python dependencies..."
 pip3 install --upgrade pip -q
 python3 -m pip install -r requirements.txt -q
 python3 -m pip install . -q
-python3 setup.py install_lib
-python3 setup.py build
+python3 setup.py install_lib > /dev/null 2>&1
+python3 setup.py build > /dev/null 2>&1
 
 mkdir -p databases && mv *.db databases/
 

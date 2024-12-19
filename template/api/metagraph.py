@@ -1,5 +1,4 @@
-from typing import Optional
-
+from typing import Optional, Any, Dict, List
 
 
 def get_axon_data(
@@ -27,3 +26,7 @@ def get_axon_data(
 
     # If no matching axon was found, return False
     return dict(exists=False)
+
+
+def get_hotkey_to_uid(metagraph: "bittensor.metagraph") -> List[Dict[str, Any]]:
+    return [dict(uid=i, hotkey=a.hotkey) for i, a in enumerate(metagraph.axons)]
