@@ -131,7 +131,7 @@ Wmr = 0.10
 ```
 **Miner Score:**
 ```bash
-MINER SCORE = ((Wsales * SALESnorm) + (Wcr * CRnorm) + (Wmr * MRnorm)) * RF
+MINER SCORE = ((Wsales * SALESnorm) + (Wcr * CRnorm) + (Wmr * MRnorm)) * RS
 ```
 
 **Conditions:**
