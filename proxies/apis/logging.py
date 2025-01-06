@@ -1,7 +1,6 @@
 import os
 
 import bittensor as bt
-from bittensor.btlogging.defines import DEFAULT_LOG_FILE_NAME
 from fastapi import APIRouter
 from fastapi.responses import FileResponse
 
@@ -16,5 +15,5 @@ async def get_logs():
     except:
         logging_dir = "~/.bittensor/miners"
     expanded_dir = os.path.expanduser(logging_dir)
-    logfile = os.path.abspath(os.path.join(expanded_dir, DEFAULT_LOG_FILE_NAME))
+    logfile = os.path.abspath(os.path.join(expanded_dir, "bittensor.log"))
     return FileResponse(logfile)
