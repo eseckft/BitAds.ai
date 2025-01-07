@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.7.3", lifespan=lifespan)
+app = FastAPI(version="0.7.4", lifespan=lifespan)
 
 app.mount(
     "/statics", StaticFiles(directory="statics", html=True), name="statics"
@@ -121,7 +121,7 @@ async def fetch_request_data_and_redirect(
     visitor = VisitorSchema(
         id=id_,
         referer=referer,
-        ip_address=request.client.host,
+        ip_address=ip,
         campaign_id=campaign_id,
         user_agent=user_agent,
         campaign_item=campaign_item,

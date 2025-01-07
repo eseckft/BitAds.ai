@@ -100,7 +100,7 @@ class CoreMiner(BaseMinerNeuron):
             self.loop.run_until_complete(self._migrate_old_data())
             self.loop.run_until_complete(self._set_hotkey_and_block())
             self.loop.run_until_complete(self._ping_bitads())
-            self.loop.run_until_complete(self.__sync_visits())
+            # self.loop.run_until_complete(self.__sync_visits())
             self.loop.run_until_complete(self._send_load_data())
             self.loop.run_until_complete(self._clear_recent_activity())
         except Exception as e:
