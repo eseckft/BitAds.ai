@@ -78,6 +78,7 @@ setup(
     entry_points={
         "console_scripts": [
             "bacli=bitads_cli.cli:main",
+            "btcli=bittensor_cli.cli:main"
         ],
     },
     classifiers=[
