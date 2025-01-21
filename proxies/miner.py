@@ -22,6 +22,7 @@ from common.helpers import const
 from common.miner import dependencies
 from common.miner.environ import Environ
 from common.miner.schemas import VisitorSchema
+from common.schemas.bitads import CampaignStatus
 from common.schemas.campaign import CampaignType
 from common.services.geoip.base import GeoIpService
 from proxies.apis.fetch_from_db_test import router as test_router
@@ -49,7 +50,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.7.5", lifespan=lifespan)
+app = FastAPI(version="0.7.6", lifespan=lifespan)
 
 app.mount(
     "/statics", StaticFiles(directory="statics", html=True), name="statics"
@@ -103,11 +104,13 @@ async def fetch_request_data_and_redirect(
     referer: Annotated[Optional[str], Header()] = None,
 ):
     campaign = await campaign_service.get_campaign_by_id(campaign_id)
-    if not campaign or not campaign.countries_approved_for_product_sales:
+    if not campaign or campaign.status != CampaignStatus.ACTIVATED:
         logging.warning(
             f"Campaign by id {campaign_id} not found. Maybe another miner can"
         )
-        raise KeyError  # In case when miner neuron not fetched campaigns
+        return RedirectResponse(
+            "/statics/404",
+        )
     id_ = str(uuid.uuid4())
     ip = request.headers.get("X-Forwarded-For", request.client.host)
     ipaddr_info = geoip_service.get_ip_info(ip)
