@@ -28,14 +28,17 @@ class PingOperation(BaseOperation[Ping]):
         self.unique_link_service = unique_link_service
         self.bit_ads_client = bit_ads_client
         self.wallet = wallet
+        self.cache = {}
+        self.reload_cache = True
 
     async def forward(self, synapse: Ping) -> Ping:
-        for campaign in synapse.active_campaigns:
-            unique_link = (
-                await self.unique_link_service.get_unique_link_for_campaign_and_hotkey(
-                    campaign.product_unique_id, self.wallet.get_hotkey().ss58_address
-                )
+        if self.reload_cache:
+            assignments = await self.unique_link_service.get_unique_links_for_hotkey(
+                self.wallet.get_hotkey().ss58_address
             )
+            self.cache = {a.campaign_id: a for a in assignments}
+        for campaign in synapse.active_campaigns:
+            unique_link = self.cache.get(campaign.product_unique_id)
             if unique_link:
                 synapse.submitted_tasks.append(
                     GetMinerUniqueIdResponse(
@@ -52,7 +55,9 @@ class PingOperation(BaseOperation[Ping]):
                     ),
                 )
             else:
-                response = await self._get_campaign_unique_id(campaign.product_unique_id)
+                response = await self._get_campaign_unique_id(
+                    campaign.product_unique_id
+                )
                 if response:
                     synapse.submitted_tasks.append(response)
                     bt.logging.info(
@@ -62,6 +67,7 @@ class PingOperation(BaseOperation[Ping]):
                             f"and forwarded it to the Validator: {synapse.dendrite.hotkey}",
                         ),
                     )
+                    self.reload_cache = True
         synapse.result = True
         return synapse
 
@@ -76,11 +82,13 @@ class PingOperation(BaseOperation[Ping]):
         if not response:
             return
 
-        await self.unique_link_service.add_unique_link(MinerUniqueLinkSchema(
-            id=response.data.miner_unique_id,
-            campaign_id=campaign_id,
-            hotkey=self.wallet.get_hotkey().ss58_address,
-            link=response.data.link
-        ))
+        await self.unique_link_service.add_unique_link(
+            MinerUniqueLinkSchema(
+                id=response.data.miner_unique_id,
+                campaign_id=campaign_id,
+                hotkey=self.wallet.get_hotkey().ss58_address,
+                link=response.data.link,
+            )
+        )
 
         return response

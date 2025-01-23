@@ -42,6 +42,25 @@ def get_unique_link_for_campaign_and_hotkey(
     return MinerUniqueLinkSchema.model_validate(result) if result else None
 
 
+def get_unique_link_for_hotkey(
+    session: Session, hotkey: str
+) -> List[MinerUniqueLinkSchema]:
+    # Query the database to fetch the matching records based on campaign_id
+    stmt = (
+        select(MinerUniqueLink)
+        .where(MinerUniqueLink.campaign_id == hotkey)
+        .order_by(desc(MinerUniqueLink.created_at))
+    )
+
+    # Execute the query
+    result = session.execute(stmt).scalars().all()
+
+    # Convert the result to a list of UniqueIdData models
+    unique_links = [MinerUniqueLinkSchema.model_validate(row) for row in result]
+
+    return unique_links
+
+
 def add_by_unique_data(session: Session, model: MinerUniqueLinkSchema):
     entity = MinerUniqueLink(**model.model_dump())
     session.add(entity)

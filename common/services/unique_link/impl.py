@@ -27,6 +27,10 @@ class MinerUniqueLinkServiceImpl(MinerUniqueLinkService):
                 session, campaign_id, hotkey
             )
 
+    async def get_unique_links_for_hotkey(self, hotkey: str) -> List[MinerUniqueLinkSchema]:
+        with self.database_manager.get_session("main") as session:
+            return unique_link.get_unique_link_for_hotkey(session, hotkey)
+
     async def add_unique_link(self, data: MinerUniqueLinkSchema):
         with self.database_manager.get_session("main") as session:
             return unique_link.add_by_unique_data(

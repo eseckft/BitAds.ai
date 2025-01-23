@@ -18,5 +18,9 @@ class MinerUniqueLinkService(ABC):
         pass
 
     @abstractmethod
+    async def get_unique_links_for_hotkey(self, hotkey: str) -> List[MinerUniqueLinkSchema]:
+        pass
+
+    @abstractmethod
     async def add_unique_link(self, data: MinerUniqueLinkSchema):
         pass
