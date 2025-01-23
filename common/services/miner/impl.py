@@ -10,6 +10,7 @@ from common.db.repositories.visitor import (
     add_or_update,
     get_visitor,
     get_visits_by_campaign_item,
+    get_visits_by_ip
 )
 from common.miner.schemas import VisitorSchema
 from common.services.miner.base import MinerService
@@ -127,6 +128,12 @@ class MinerServiceImpl(SettingsContainerImpl, MinerService):
     async def get_visit_by_id(self, id_: str) -> Optional[VisitorSchema]:
         with self.database_manager.get_session("active") as session:
             return get_visitor(session, id_)
+
+    async def get_by_ip_address(
+        self, ip_address: str, limit: int = 50
+    ) -> List[VisitorSchema]:
+        with self.database_manager.get_session("active") as session:
+            return get_visits_by_ip(session, ip_address, limit)
 
     async def get_visits_by_campaign_item(
         self, campaign_item: str

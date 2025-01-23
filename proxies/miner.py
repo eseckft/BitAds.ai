@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.7.7", lifespan=lifespan)
+app = FastAPI(version="0.7.8", lifespan=lifespan)
 
 app.mount(
     "/statics", StaticFiles(directory="statics", html=True), name="statics"
@@ -78,6 +78,14 @@ async def get_visits_by_campaign_item(
     campaign_item: str,
 ) -> List[VisitorSchema]:
     return await miner_service.get_visits_by_campaign_item(campaign_item)
+
+
+@app.get("/visitors/by_ip")
+async def get_visits_by_campaign_item(
+    ip_address: str,
+) -> List[VisitorSchema]:
+    return await miner_service.get_by_ip_address(ip_address)
+
 
 
 @app.get("/visitors/{id}")

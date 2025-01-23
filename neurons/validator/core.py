@@ -6,6 +6,7 @@ import asyncio
 import logging
 import time
 from datetime import timedelta, datetime
+from typing import Dict, Set
 
 # Bittensor
 import bittensor as bt
@@ -14,7 +15,9 @@ from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
 from common.helpers import const
 from common.helpers.logging import LogLevel, log_startup, BittensorLoggingFilter
+from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import FormulaParams, UserActivityRequest
+from common.schemas.metadata import MinersMetadataSchema
 from common.schemas.sales import OrderQueueStatus
 from common.utils import execute_periodically
 from common.validator import dependencies
@@ -160,50 +163,59 @@ class CoreValidator(BaseValidatorNeuron):
     async def __forward_bitads_data(self, timeout: float = 12.0):
         try:
             bt.logging.info("Start sync BitAds process")
-            offset = (
-                await self.bitads_service.get_last_update_bitads_data(
-                    self.wallet.get_hotkey().ss58_address
+
+            miners_metadata = await self.validator_service.get_miners_metadata()
+            hotkey_to_axon_info: Dict[str, bt.AxonInfo] = {
+                info.hotkey: info for info in self.metagraph.axons
+            }
+
+            async def forward(
+                hotkey: str,
+            ) -> (str, SyncVisits):
+                axon = hotkey_to_axon_info.get(hotkey)
+                if not axon:
+                    return hotkey, SyncVisits()
+
+                metadata = miners_metadata.get(
+                    hotkey, MinersMetadataSchema.default_instance(hotkey)
                 )
-                if not self.offset
-                else self.offset
-            )
-            bt.logging.debug(
-                f"Sync visits with offset: {offset} with miners: {self.miners}"
+                response = await self.dendrite.forward(
+                    axon,
+                    SyncVisits(offset=metadata.last_offset),
+                    timeout=timeout,
+                )
+                return response.axon.hotkey, response
+
+            responses = dict(
+                await asyncio.gather(*[forward(miner) for miner in self.miners])
             )
 
-            responses = await forward_each_axon(
-                self, SyncVisits(offset=offset), *self.miners, timeout=timeout
-            )
+            for hotkey, response in responses.items():
+                metadata = miners_metadata.get(
+                    hotkey, MinersMetadataSchema.default_instance(hotkey)
+                )
+                newest_visit = max(
+                    response.visits, key=lambda item: item.created_at, default=None
+                )
+                if metadata.last_offset and not response.visits:
+                    continue
+                metadata.last_offset = newest_visit.created_at if newest_visit else None
+                await self.validator_service.add_miner_metadata(metadata)
+
+            await self._update_sales_status_if_needed()
+
             visits = {
                 visits for synapse in responses.values() for visits in synapse.visits
             }
             if not visits:
-                bt.logging.debug("No visits received from miners")
+                bt.logging.info("No visits received from miners")
                 return
 
             bt.logging.debug(
                 f"Received visits from miners with ids: {[v.id for v in visits]}"
             )
 
-            max_created_at_per_response = [
-                max(v.created_at for v in synapse.visits)
-                for synapse in responses.values()
-                if synapse.visits
-            ]
-            if max_created_at_per_response:
-                new_offset = min(max_created_at_per_response)
-                self.offset = new_offset
-                bt.logging.debug(f"Updated offset: {self.offset}")
-
             await self.bitads_service.add_by_visits(visits)
-
-            for campaign in await self.campaigns_serivce.get_active_campaigns():
-                sale_to = datetime.utcnow() - timedelta(
-                    days=campaign.product_refund_period_duration
-                )
-                await self.bitads_service.update_sale_status_if_needed(
-                    campaign.product_unique_id, sale_to
-                )
 
             bt.logging.info("End sync BitAds process")
         except Exception as ex:
@@ -305,6 +317,15 @@ class CoreValidator(BaseValidatorNeuron):
             bt.logging.warning(*ex.args)
         except Exception as ex:
             bt.logging.exception(f"Evaluate miners exception: {str(ex)}")
+
+    async def _update_sales_status_if_needed(self):
+        for campaign in await self.campaigns_serivce.get_active_campaigns():
+            sale_to = datetime.utcnow() - timedelta(
+                days=campaign.product_refund_period_duration
+            )
+            await self.bitads_service.update_sale_status_if_needed(
+                campaign.product_unique_id, sale_to
+            )
 
     async def _try_process_order_queue(self, timeout: float = 1, limit: int = 10):
         try:

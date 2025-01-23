@@ -11,7 +11,7 @@ from common.db.repositories import (
     tracking_data,
     miner_ping,
     completed_visit,
-    miner_assignment,
+    miner_assignment, miners_metadata,
 )
 from common.db.repositories.bitads_data import (
     get_aggregated_data,
@@ -26,6 +26,7 @@ from common.schemas.aggregated import AggregationSchema, AggregatedData
 from common.schemas.bitads import Campaign, BitAdsDataSchema
 from common.schemas.campaign import CampaignType
 from common.schemas.completed_visit import CompletedVisitSchema
+from common.schemas.metadata import MinersMetadataSchema
 from common.schemas.visit import VisitStatus
 from common.services.settings.impl import SettingsContainerImpl
 from common.services.validator.base import ValidatorService
@@ -182,7 +183,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
                     active_campaign.product_unique_id,
                     current_block,
                     active_campaign.type,
-                    cpa_blocks
+                    cpa_blocks,
                 )
 
     async def send_action(
@@ -375,6 +376,15 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
                 miner_assignment.create_or_update_miner_assignment(
                     session, unique_id, hotkey, campaign_id
                 )
+
+    async def get_miners_metadata(self) -> Dict[str, MinersMetadataSchema]:
+        with self.database_manager.get_session("active") as session:
+            metadatas = miners_metadata.get_miners_metadata(session)
+            return {m.hotkey: m for m in metadatas}
+
+    async def add_miner_metadata(self, metadata: MinersMetadataSchema) -> None:
+        with self.database_manager.get_session("active") as session:
+            miners_metadata.add_or_update(session, metadata)
 
     def _calculate_miner_scores(
         self, aggregated_data: AggregatedData, campaigns: Dict[str, float]

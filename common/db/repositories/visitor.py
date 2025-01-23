@@ -266,3 +266,27 @@ def get_visits_by_campaign_item(
     )
     result = session.execute(stmt)
     return [VisitorSchema.model_validate(r) for r in result.scalars().all()]
+
+
+def get_visits_by_ip(
+    session: Session, ip_address: str, limit: int = 50, offset: int = 0
+) -> List[VisitorSchema]:
+    """
+    Retrieves a list of new visitor entities from the database.
+
+    Args:
+        session (Session): The database session object.
+        limit (int, optional): Maximum number of entities to retrieve. Defaults to 500.
+        offset (int, optional): Offset for pagination. Defaults to 0.
+
+    Returns:
+        List[VisitorSchema]: List of validated VisitorSchema objects representing new visits.
+    """
+    stmt = (
+        select(Visitor)
+        .where(Visitor.ip_address == ip_address)
+        .limit(limit)
+        .offset(offset)
+    )
+    result = session.execute(stmt)
+    return [VisitorSchema.model_validate(r) for r in result.scalars().all()]

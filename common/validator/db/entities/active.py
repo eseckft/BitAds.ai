@@ -205,3 +205,11 @@ class OrderQueue(Base):
     status: Mapped[OrderQueueStatus] = mapped_column(
         Enum(OrderQueueStatus), default=OrderQueueStatus.PENDING
     )
+
+
+class MinersMetadata(Base):
+    __tablename__ = "miners_metadata"
+
+    hotkey: Mapped[str] = mapped_column(String, primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    last_offset: Mapped[Optional[datetime]]

@@ -85,6 +85,10 @@ class MinerService(SettingsContainer, ABC):
         pass
 
     @abstractmethod
+    async def get_by_ip_address(self, ip_address: str, limit: int = 50) -> List[VisitorSchema]:
+        pass
+
+    @abstractmethod
     async def get_visits_by_campaign_item(
         self, campaign_item: str
     ) -> List[VisitorSchema]:

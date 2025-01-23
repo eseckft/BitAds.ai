@@ -4,6 +4,7 @@ from typing import Dict, Set, List, Optional, Tuple
 
 from common.schemas.bitads import Campaign, BitAdsDataSchema
 from common.schemas.completed_visit import CompletedVisitSchema
+from common.schemas.metadata import MinersMetadataSchema
 from common.services.settings.base import SettingsContainer
 from common.validator.schemas import Action, ValidatorTrackingData
 
@@ -175,4 +176,12 @@ class ValidatorService(SettingsContainer, ABC):
     async def add_miner_ping(
         self, current_block: int, unique_id_to_hotkey: Dict[str, Tuple[str, str]]
     ):
+        pass
+
+    @abstractmethod
+    async def get_miners_metadata(self) -> Dict[str, MinersMetadataSchema]:
+        pass
+
+    @abstractmethod
+    async def add_miner_metadata(self, metadata: MinersMetadataSchema) -> None:
         pass
