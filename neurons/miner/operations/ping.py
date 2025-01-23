@@ -48,7 +48,7 @@ class PingOperation(BaseOperation[Ping]):
                     prefix=LogLevel.VALIDATOR,
                     msg=green(
                         f"Unique link for campaign ID: {campaign.product_unique_id} already generated. "
-                        f"Sending it to the Validator: {campaign.id}",
+                        f"Sending it to the Validator: {synapse.dendrite.hotkey}",
                     ),
                 )
             else:
@@ -59,7 +59,7 @@ class PingOperation(BaseOperation[Ping]):
                         prefix=LogLevel.BITADS,
                         msg=green(
                             f"Successfully created a unique link for campaign ID: {campaign.product_unique_id} "
-                            f"and forwarded it to the Validator: {campaign.product_unique_id}",
+                            f"and forwarded it to the Validator: {synapse.dendrite.hotkey}",
                         ),
                     )
         synapse.result = True
