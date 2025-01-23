@@ -48,7 +48,7 @@ def get_unique_link_for_hotkey(
     # Query the database to fetch the matching records based on campaign_id
     stmt = (
         select(MinerUniqueLink)
-        .where(MinerUniqueLink.campaign_id == hotkey)
+        .where(MinerUniqueLink.hotkey == hotkey)
         .order_by(desc(MinerUniqueLink.created_at))
     )
 
