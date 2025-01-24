@@ -22,6 +22,7 @@ from common.schemas.sales import OrderQueueStatus
 from common.utils import execute_periodically
 from common.validator import dependencies
 from common.validator.environ import Environ
+
 # Bittensor Validator Template:
 from neurons.protocol import (
     Ping,
@@ -29,6 +30,7 @@ from neurons.protocol import (
     SyncVisits,
     NotifyOrder,
 )
+
 # import base validator class which takes care of most of the boilerplate
 from template.base.validator import BaseValidatorNeuron
 from template.utils.config import add_blacklist_args
@@ -167,9 +169,9 @@ class CoreValidator(BaseValidatorNeuron):
                 info.hotkey: info for info in self.metagraph.axons
             }
 
-            async def forward(
-                hotkey: str,
-            ) -> (str, SyncVisits):
+            semaphore = asyncio.Semaphore(20)
+
+            async def forward(hotkey: str) -> (str, SyncVisits):
                 axon = hotkey_to_axon_info.get(hotkey)
                 if not axon:
                     return hotkey, SyncVisits()
@@ -184,12 +186,18 @@ class CoreValidator(BaseValidatorNeuron):
                 )
                 return response.axon.hotkey, response
 
+            async def forward_with_limit(hotkey: str):
+                async with semaphore:
+                    return await forward(hotkey)
+
             miners = list(self.miners)
             random.shuffle(miners)
 
-            responses = dict(
-                await asyncio.gather(*[forward(miner) for miner in miners])
+            responses_list = await asyncio.gather(
+                *[forward_with_limit(miner) for miner in miners]
             )
+
+            responses = dict(responses_list)
 
             for hotkey, response in responses.items():
                 metadata = miners_metadata.get(
