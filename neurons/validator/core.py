@@ -160,7 +160,7 @@ class CoreValidator(BaseValidatorNeuron):
             finally:
                 await asyncio.sleep(delay)
 
-    async def __forward_bitads_data(self, timeout: float = 12.0, limit: int = 5000):
+    async def __forward_bitads_data(self, timeout: float = 12.0, limit: int = 2500):
         try:
             bt.logging.info("Start sync BitAds process")
 
