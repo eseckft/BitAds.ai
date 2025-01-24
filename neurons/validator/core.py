@@ -160,7 +160,7 @@ class CoreValidator(BaseValidatorNeuron):
             finally:
                 await asyncio.sleep(delay)
 
-    async def __forward_bitads_data(self, timeout: float = 12.0):
+    async def __forward_bitads_data(self, timeout: float = 12.0, limit: int = 5000):
         try:
             bt.logging.info("Start sync BitAds process")
 
@@ -169,7 +169,7 @@ class CoreValidator(BaseValidatorNeuron):
                 info.hotkey: info for info in self.metagraph.axons
             }
 
-            semaphore = asyncio.Semaphore(20)
+            semaphore = asyncio.Semaphore(30)
 
             async def forward(hotkey: str) -> (str, SyncVisits):
                 axon = hotkey_to_axon_info.get(hotkey)
@@ -181,7 +181,7 @@ class CoreValidator(BaseValidatorNeuron):
                 )
                 response = await self.dendrite.forward(
                     axon,
-                    SyncVisits(offset=metadata.last_offset),
+                    SyncVisits(offset=metadata.last_offset, limit=limit),
                     timeout=timeout,
                 )
                 return response.axon.hotkey, response
