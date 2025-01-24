@@ -4,9 +4,10 @@
 import argparse
 import asyncio
 import logging
+import random
 import time
 from datetime import timedelta, datetime
-from typing import Dict, Set
+from typing import Dict
 
 # Bittensor
 import bittensor as bt
@@ -15,14 +16,12 @@ from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
 from common.helpers import const
 from common.helpers.logging import LogLevel, log_startup, BittensorLoggingFilter
-from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import FormulaParams, UserActivityRequest
 from common.schemas.metadata import MinersMetadataSchema
 from common.schemas.sales import OrderQueueStatus
 from common.utils import execute_periodically
 from common.validator import dependencies
 from common.validator.environ import Environ
-
 # Bittensor Validator Template:
 from neurons.protocol import (
     Ping,
@@ -30,7 +29,6 @@ from neurons.protocol import (
     SyncVisits,
     NotifyOrder,
 )
-
 # import base validator class which takes care of most of the boilerplate
 from template.base.validator import BaseValidatorNeuron
 from template.utils.config import add_blacklist_args
@@ -186,8 +184,11 @@ class CoreValidator(BaseValidatorNeuron):
                 )
                 return response.axon.hotkey, response
 
+            miners = list(self.miners)
+            random.shuffle(miners)
+
             responses = dict(
-                await asyncio.gather(*[forward(miner) for miner in self.miners])
+                await asyncio.gather(*[forward(miner) for miner in miners])
             )
 
             for hotkey, response in responses.items():

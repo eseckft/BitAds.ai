@@ -14,4 +14,3 @@ class MinerMigrationService(MigrationService):
         ) as history_session:
             migration.transfer_data(active_session, history_session, Visitor, created_at_from)
             migration.transfer_data(active_session, history_session, VisitorActivity, created_at_from)
-            migration.transfer_data(active_session, history_session, UserAgent, created_at_from)

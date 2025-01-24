@@ -2,6 +2,7 @@
 # Copyright © 2023 Yuma Rao
 # Copyright © 2023 bittensor.com
 import asyncio
+import random
 import time
 from typing import TypeVar, Dict, List
 
@@ -76,6 +77,8 @@ async def forward_each_axon(
 
     # Step 1: Get axons
     step_start_time = time.time()
+    hotkeys = list(hotkeys)
+    random.shuffle(hotkeys)
     axons = uids.get_axons(self, *hotkeys)
     log_elapsed_time(step_start_time, "Get axons")
 
