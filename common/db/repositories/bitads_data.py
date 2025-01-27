@@ -152,6 +152,21 @@ def add_data(session: Session, data: BitAdsDataSchema) -> None:
     session.add(entity)
 
 
+def filter_existing_ids(session: Session, ids: set[int]) -> set[str]:
+    """
+    Filters a set of IDs and returns a list of IDs that already exist in the table.
+
+    Args:
+        session (Session): SQLAlchemy session.
+        ids (set[int]): Set of IDs to check.
+    Returns:
+        list[int]: List of IDs that exist in the table.
+    """
+    stmt = select(BitAdsData.id).where(BitAdsData.id.in_(ids))
+    result = session.execute(stmt)
+    existing_ids = {row[0] for row in result}  # Extract existing IDs
+    return set(existing_ids)
+
 def get_max_date_excluding_hotkey(
     session: Session, exclude_hotkey: str
 ) -> Optional[datetime]:
