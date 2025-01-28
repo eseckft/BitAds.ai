@@ -95,14 +95,16 @@ class CoreMiner(BaseMinerNeuron):
             self.axon.attach(operation.forward, operation.blacklist, operation.priority)
 
     def sync(self):
-        super().sync()
-        self.loop.run_until_complete(self._set_hotkey_and_block())
-
-    async def bitads_lifetime(self):
-        await self._migrate_old_data()
-        await self._ping_bitads()
-        await self._send_load_data()
-        await self._clear_recent_activity()
+        try:
+            super().sync()
+            self.loop.run_until_complete(self._migrate_old_data())
+            self.loop.run_until_complete(self._set_hotkey_and_block())
+            self.loop.run_until_complete(self._ping_bitads())
+            # self.loop.run_until_complete(self.__sync_visits())
+            self.loop.run_until_complete(self._send_load_data())
+            self.loop.run_until_complete(self._clear_recent_activity())
+        except Exception as e:
+            bt.logging.exception(f"Error during sync: {str(e)}")
 
     @execute_periodically(const.PING_PERIOD)
     async def _ping_bitads(self):
@@ -187,18 +189,15 @@ class CoreMiner(BaseMinerNeuron):
         return op_type(**self.__dict__)
 
 
-async def async_main_loop(miner: CoreMiner):
-    while True:
-        await miner.bitads_lifetime()
-        await asyncio.sleep(6)
-
-
 if __name__ == "__main__":
-    bt.logging.set_info()
+    bt.logging.set_debug()
     log_startup("Miner")
     logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
     with dependencies.get_core_miner() as miner:
-        try:
-            asyncio.run(async_main_loop(miner))
-        except KeyboardInterrupt:
-            pass
+        while True:
+            try:
+                time.sleep(5)
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                bt.logging.exception(f"Error in main loop: {str(e)}")
