@@ -190,7 +190,7 @@ class CoreMiner(BaseMinerNeuron):
 
 
 if __name__ == "__main__":
-    bt.logging.set_debug()
+    bt.logging.set_info()
     log_startup("Miner")
     logging.getLogger(bt.__name__).addFilter(BittensorLoggingFilter())
     with dependencies.get_core_miner() as miner:
