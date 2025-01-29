@@ -142,6 +142,8 @@ class BitAdsServiceImpl(BitAdsService):
                 sales = len(item.order_info.items)
                 refund = len(item.refund_info.items) if item.refund_info else 0
 
+                extra_fields = dict(sales_status=SalesStatus.COMPLETED) if refund else dict()
+
                 new_data = existed_data.model_copy(
                     update=dict(
                         sale_date=item.order_info.sale_date,
@@ -152,6 +154,7 @@ class BitAdsServiceImpl(BitAdsService):
                         sales=sales,
                         sale_amount=sale_amount,
                         refund=refund,
+                        **extra_fields
                     )
                 )
                 try:
