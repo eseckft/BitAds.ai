@@ -1,2 +1,2 @@
-__validator_version__ = "0.7.4"
-__miner_version__ = "0.7.8"
+__validator_version__ = "0.7.5"
+__miner_version__ = "0.7.9"
