@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from common.db import migration
-from common.miner.db.entities.active import Visitor, VisitorActivity, UserAgent
+from common.miner.db.entities.active import Visitor, VisitorActivity
 from common.services.migration.base import MigrationService
 
 

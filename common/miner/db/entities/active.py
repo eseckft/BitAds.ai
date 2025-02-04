@@ -74,6 +74,10 @@ class Visitor(Base):
         DateTime, default=datetime.utcnow
     )
 
+    __mapper_args__ = {
+        "confirm_deleted_rows": False
+    }
+
 
 class VisitorActivity(Base):
     """
@@ -92,6 +96,10 @@ class VisitorActivity(Base):
         Date, primary_key=True, default=datetime.utcnow().date
     )
     count: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+
+    __mapper_args__ = {
+        "confirm_deleted_rows": False
+    }
 
 
 class UserAgent(Base):

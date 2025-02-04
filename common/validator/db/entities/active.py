@@ -180,6 +180,9 @@ class BitAdsData(Base):
     miner_block: Mapped[Optional[str]]
     return_in_site: Mapped[Optional[bool]]
 
+    __mapper_args__ = {
+        "confirm_deleted_rows": False
+    }
 
 class MinerAssignment(Base):
     __tablename__ = "miner_assignment"
@@ -205,6 +208,10 @@ class OrderQueue(Base):
     status: Mapped[OrderQueueStatus] = mapped_column(
         Enum(OrderQueueStatus), default=OrderQueueStatus.PENDING
     )
+
+    __mapper_args__ = {
+        "confirm_deleted_rows": False
+    }
 
 
 class MinersMetadata(Base):
