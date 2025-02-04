@@ -12,7 +12,7 @@ async def stream_pm2_logs(websocket: WebSocket):
     """Asynchronously stream PM2 logs to WebSocket clients."""
 
     process = await asyncio.create_subprocess_exec(
-        "pm2", "logs", f"miner_server_{Environ.WALLET_HOTKEY}", "--raw",
+        "pm2", "logs", f"{Environ.NEURON_TYPE}_server_{Environ.WALLET_HOTKEY}", "--raw",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE
     )
