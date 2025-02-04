@@ -131,6 +131,9 @@ def main():
     wallet_hotkey = os.getenv("WALLET_HOTKEY")
     neuron_type = os.getenv("NEURON_TYPE")
 
+    if updated:
+        build_project(wallet_name, wallet_hotkey, neuron_type)
+
     # Step 3: Fetch core service version
     running_core_version = read_file(LOCAL_CORE_VERSION_FILE)
     if running_core_version is None:
@@ -142,8 +145,6 @@ def main():
 
     # Step 5: Restart core service if versions differ
     if running_core_version != local_core_version:
-        build_project(wallet_name, wallet_hotkey, neuron_type)
-
         logging.info(
             "Core service version mismatch or update detected. Restarting core service..."
         )
