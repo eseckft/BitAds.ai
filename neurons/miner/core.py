@@ -8,22 +8,21 @@ from datetime import timedelta, datetime
 from typing import Type
 
 import bittensor as bt
-from common.helpers import const
 
 from common import dependencies as common_dependencies, utils
 from common.environ import Environ as CommonEnviron
+from common.helpers import const
 from common.helpers.logging import log_startup, BittensorLoggingFilter
 from common.miner import dependencies
 from common.miner.environ import Environ
-from common.validator.environ import Environ as ValidatorEnviron
 from common.utils import execute_periodically
+from common.validator.environ import Environ as ValidatorEnviron
 from neurons.base.operations import BaseOperation
 from neurons.miner.operations.notify_order import NotifyOrderOperation
 from neurons.miner.operations.ping import PingOperation
 from neurons.miner.operations.recent_activity import RecentActivityOperation
 from neurons.miner.operations.sync_visits import SyncVisitsOperation
 from neurons.protocol import SyncVisits
-
 # import base miner class which takes care of most of the boilerplate
 from template.base.miner import BaseMinerNeuron
 from template.mock import MockDendrite
@@ -135,7 +134,7 @@ class CoreMiner(BaseMinerNeuron):
                 seconds=ValidatorEnviron.MR_DAYS.total_seconds() * 2
             )
             await self.migration_service.migrate(created_at_from)
-        except Exception:
+        except:
             bt.logging.exception("Error while data migration")
 
     async def __sync_visits(self, timeout: float = 11.0):
