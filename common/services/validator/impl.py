@@ -132,11 +132,10 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         reputation_from = now - utils.blocks_to_timedelta(self.settings.mr_blocks)
         scores = []
         for campaign_id, c in cpa_campaign_to_id.items():
-            sale_to = now - utils.blocks_to_timedelta(c.cpa_blocks)
             cpa_aggregated_data = self._get_aggregated_data(
                 campaign_id,
                 sale_from=sale_from,
-                sale_to=sale_to,
+                sale_to=now,
             )
             miners_reputation = self._get_miners_reputation(
                 campaign_id, sale_from=reputation_from, sale_to=now

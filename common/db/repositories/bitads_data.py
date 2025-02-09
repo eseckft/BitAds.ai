@@ -240,9 +240,27 @@ def get_aggregated_data(
         func.sum(case((BitAdsData.is_unique, 1), else_=0)).label("visits_unique"),
         func.sum(case((BitAdsData.at, 1), else_=0)).label("at_count"),
         func.sum(BitAdsData.count_through_rate_click).label("count_through_rate_click"),
-        func.sum(BitAdsData.refund).label("total_refunds"),
-        func.sum(BitAdsData.sales).label("total_sales"),
-        func.sum(BitAdsData.sale_amount).label("sales_amount"),
+        func.sum(
+            case(
+                (BitAdsData.sales_status == SalesStatus.COMPLETED, BitAdsData.refund),
+                else_=0,
+            )
+        ).label("total_refunds"),
+        func.sum(
+            case(
+                (BitAdsData.sales_status == SalesStatus.COMPLETED, BitAdsData.sales),
+                else_=0,
+            )
+        ).label("total_sales"),
+        func.sum(
+            case(
+                (
+                    BitAdsData.sales_status == SalesStatus.COMPLETED,
+                    BitAdsData.sale_amount,
+                ),
+                else_=0,
+            )
+        ).label("sales_amount"),
     ).join(MinerAssignment, BitAdsData.campaign_item == MinerAssignment.unique_id)
 
     conditions = []
