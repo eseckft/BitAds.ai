@@ -33,29 +33,38 @@ def record_exists(history_session: Session, target_entity: Type[T], record: T) -
 def transfer_data(
     active_session: Session, history_session: Session, target_entity: Type[T], created_at_from: datetime
 ):
-    offset = 0
     while True:
+        # Fetch batch of records to transfer
         data_batch = (
             active_session.query(target_entity)
             .where(target_entity.created_at < created_at_from)
             .order_by(asc(target_entity.created_at))
             .limit(BATCH_SIZE)
-            # .offset(offset) This is not necessary because the next query will have the required data at offset = 0.
             .all()
         )
         if not data_batch:
             break
 
+        # Fetch existing record IDs in history to prevent duplication
+        existing_ids = set(
+            history_session.query(target_entity.id)
+            .filter(target_entity.id.in_([record.id for record in data_batch]))
+            .all()
+        )
+
+        # Transfer records that don't exist in history
         for record in data_batch:
-            if not record_exists(history_session, target_entity, record):
+            if record.id not in existing_ids:
                 historical_record = target_entity()
                 map_entity_fields(record, historical_record)
                 history_session.add(historical_record)
 
         history_session.commit()
 
+        # Ensure records still exist before deleting
         for record in data_batch:
-            active_session.delete(record)
-        active_session.commit()
+            existing_record = active_session.query(target_entity).filter_by(id=record.id).first()
+            if existing_record:
+                active_session.delete(existing_record)
 
-        offset += BATCH_SIZE
+        active_session.commit()
