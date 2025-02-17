@@ -96,6 +96,9 @@ class CoreMiner(BaseMinerNeuron):
     def sync(self):
         try:
             super().sync()
+        except Exception as ex:
+            bt.logging.exception(f"Error during sync: {str(e)}")
+        try:
             self.loop.run_until_complete(self._migrate_old_data())
             self.loop.run_until_complete(self._set_hotkey_and_block())
             self.loop.run_until_complete(self._ping_bitads())
