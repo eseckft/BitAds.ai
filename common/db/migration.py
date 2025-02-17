@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from sqlalchemy import inspect, exists, asc, desc
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import TypeVar, Type
 
@@ -34,7 +35,6 @@ def transfer_data(
     active_session: Session, history_session: Session, target_entity: Type[T], created_at_from: datetime
 ):
     while True:
-        # Fetch batch of records to transfer
         data_batch = (
             active_session.query(target_entity)
             .where(target_entity.created_at < created_at_from)
@@ -45,23 +45,24 @@ def transfer_data(
         if not data_batch:
             break
 
-        # Fetch existing record IDs in history to prevent duplication
-        existing_ids = set(
-            history_session.query(target_entity.id)
-            .filter(target_entity.id.in_([record.id for record in data_batch]))
-            .all()
-        )
+        existing_ids = {row[0] for row in history_session.query(target_entity.id)
+                        .filter(target_entity.id.in_([record.id for record in data_batch]))
+                        .all()}
 
-        # Transfer records that don't exist in history
         for record in data_batch:
             if record.id not in existing_ids:
                 historical_record = target_entity()
                 map_entity_fields(record, historical_record)
-                history_session.add(historical_record)
+
+                try:
+                    history_session.add(historical_record)
+                    history_session.flush()  # Ensures data is inserted before commit
+                except IntegrityError:
+                    history_session.rollback()
+                    print(f"Duplicate detected for ID: {record.id}, skipping.")
 
         history_session.commit()
 
-        # Ensure records still exist before deleting
         for record in data_batch:
             existing_record = active_session.query(target_entity).filter_by(id=record.id).first()
             if existing_record:
