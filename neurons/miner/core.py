@@ -176,7 +176,7 @@ class CoreMiner(BaseMinerNeuron):
 
     async def _set_hotkey_and_block(self):
         try:
-            current_block = self.subtensor.get_current_block()
+            current_block = self.block
             hotkey = self.wallet.get_hotkey().ss58_address
             await self.miner_service.set_hotkey_and_block(hotkey, current_block)
         except Exception as e:

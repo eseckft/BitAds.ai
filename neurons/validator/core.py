@@ -122,7 +122,7 @@ class CoreValidator(BaseValidatorNeuron):
             bt.logging.exception(f"Recent activity forward exception: {str(ex)}")
 
     async def forward_ping(self):
-        current_block = self.subtensor.get_current_block()
+        current_block = self.block
         if current_block % Environ.PING_MINERS_N != 0:
             bt.logging.debug(
                 f"It's not time to ping miners yet. Current block: {current_block}"
@@ -308,7 +308,7 @@ class CoreValidator(BaseValidatorNeuron):
 
     async def _try_evaluate_miners(self):
         try:
-            current_block = self.subtensor.get_current_block()
+            current_block = self.block
             if (current_block % self.evaluate_miners_blocks == 0) or (
                 current_block - self.last_evaluate_block >= self.evaluate_miners_blocks
             ):
@@ -342,7 +342,7 @@ class CoreValidator(BaseValidatorNeuron):
             if not data_to_process:
                 bt.logging.info("No data to process in order queue")
                 return
-            current_block = self.subtensor.get_current_block()
+            current_block = self.block
             hotkey = self.wallet.get_hotkey().ss58_address
             result = await self.bitads_service.add_by_queue_items(
                 current_block, hotkey, data_to_process
