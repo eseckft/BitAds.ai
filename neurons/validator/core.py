@@ -281,7 +281,7 @@ class CoreValidator(BaseValidatorNeuron):
             settings = FormulaParams.from_settings(response.settings)
             self.validator_service.settings = settings
             self.evaluate_miners_blocks = settings.evaluate_miners_blocks
-            current_block = self.subtensor.get_current_block()
+            current_block = self.block
             await self.validator_service.sync_active_campaigns(
                 current_block, active_campaigns
             )
