@@ -6,6 +6,7 @@ module.exports = {
       interpreter: "python3",
       args: generateArgs(),
       env: getEnvVariables(),
+      max_memory_restart: '2000M',
     },
     {
       name: `validator_server_${process.env.WALLET_HOTKEY || 'default'}`,
