@@ -23,6 +23,7 @@ from neurons.miner.operations.ping import PingOperation
 from neurons.miner.operations.recent_activity import RecentActivityOperation
 from neurons.miner.operations.sync_visits import SyncVisitsOperation
 from neurons.protocol import SyncVisits
+
 # import base miner class which takes care of most of the boilerplate
 from template.base.miner import BaseMinerNeuron
 from template.mock import MockDendrite
@@ -94,6 +95,7 @@ class CoreMiner(BaseMinerNeuron):
             self.axon.attach(operation.forward, operation.blacklist, operation.priority)
 
     def sync(self):
+        bt.logging.info("Start sync")
         try:
             super().sync()
         except Exception as ex:
@@ -107,6 +109,7 @@ class CoreMiner(BaseMinerNeuron):
             self.loop.run_until_complete(self._clear_recent_activity())
         except Exception as e:
             bt.logging.exception(f"Error during sync: {str(e)}")
+        bt.logging.info("End sync")
 
     @execute_periodically(const.PING_PERIOD)
     async def _ping_bitads(self):
@@ -133,10 +136,12 @@ class CoreMiner(BaseMinerNeuron):
     @execute_periodically(const.MIGRATE_OLD_DATA_PERIOD)
     async def _migrate_old_data(self):
         try:
+            bt.logging.info("Start migrate old data")
             created_at_from = datetime.utcnow() - timedelta(
                 seconds=ValidatorEnviron.MR_DAYS.total_seconds() * 2
             )
             await self.migration_service.migrate(created_at_from)
+            bt.logging.info("End migrate old data")
         except:
             bt.logging.exception("Error while data migration")
 
