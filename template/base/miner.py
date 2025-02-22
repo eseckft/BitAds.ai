@@ -17,6 +17,8 @@
 
 import argparse
 import asyncio
+import os
+import signal
 import threading
 import time
 import traceback
@@ -124,8 +126,17 @@ class BaseMinerNeuron(BaseNeuron):
             exit()
 
         # In case of unforeseen errors, the miner will log the error and continue operations.
-        except Exception as e:
-            bt.logging.error(traceback.format_exc())
+        except Exception as err:
+            # Kill all background threads
+            for thread in threading.enumerate():
+                if thread != threading.current_thread():
+                    thread.join(1)
+
+            bt.logging.error("Error during mining", str(err))
+            bt.logging.debug(traceback.print_exception(type(err), err, err.__traceback__))
+
+            # Send a SIGTERM signal to stop the application completely
+            os.kill(os.getpid(), signal.SIGTERM)
 
     def run_in_background_thread(self):
         """

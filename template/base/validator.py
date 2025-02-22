@@ -20,12 +20,13 @@
 import argparse
 import asyncio
 import copy
+import os
+import signal
 import threading
 from traceback import print_exception
 from typing import List
 
 import bittensor as bt
-# from websocket import WebSocketConnectionClosedException
 
 from template.base.neuron import BaseNeuron
 from template.mock import MockDendrite
@@ -98,15 +99,12 @@ class BaseValidatorNeuron(BaseNeuron):
                 pass
 
         except Exception as e:
-            bt.logging.error(
-                f"Failed to create Axon initialize with exception: {e}"
-            )
+            bt.logging.error(f"Failed to create Axon initialize with exception: {e}")
             pass
 
     async def concurrent_forward(self):
         coroutines = [
-            self.forward()
-            for _ in range(self.config.neuron.num_concurrent_forwards)
+            self.forward() for _ in range(self.config.neuron.num_concurrent_forwards)
         ]
         await asyncio.gather(*coroutines)
 
@@ -139,7 +137,7 @@ class BaseValidatorNeuron(BaseNeuron):
         try:
             while True:
                 bt.logging.info(f"step({self.step}) block({self.block})")
-
+                raise Exception
                 # Run multiple forwards concurrently.
                 self.loop.run_until_complete(self.concurrent_forward())
 
@@ -163,12 +161,16 @@ class BaseValidatorNeuron(BaseNeuron):
         #     exit(-1)
         # In case of unforeseen errors, the validator will log the error and continue operations.
         except Exception as err:
-            bt.logging.error("Error during validation", str(err))
-            bt.logging.debug(
-                print_exception(type(err), err, err.__traceback__)
-            )
-            exit(-1)
+            # Kill all background threads
+            for thread in threading.enumerate():
+                if thread != threading.current_thread():
+                    thread.join(1)
 
+            bt.logging.error("Error during validation", str(err))
+            bt.logging.debug(print_exception(type(err), err, err.__traceback__))
+
+            # Send a SIGTERM signal to stop the application completely
+            os.kill(os.getpid(), signal.SIGTERM)
 
     def run_in_background_thread(self):
         """

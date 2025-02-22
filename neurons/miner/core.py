@@ -95,7 +95,7 @@ class CoreMiner(BaseMinerNeuron):
             self.axon.attach(operation.forward, operation.blacklist, operation.priority)
 
     def sync(self):
-        bt.logging.info("Start sync")
+        bt.logging.debug("Start sync")
         try:
             super().sync()
         except Exception as ex:
@@ -109,7 +109,7 @@ class CoreMiner(BaseMinerNeuron):
             self.loop.run_until_complete(self._clear_recent_activity())
         except Exception as e:
             bt.logging.exception(f"Error during sync: {str(e)}")
-        bt.logging.info("End sync")
+        bt.logging.debug("End sync")
 
     @execute_periodically(const.PING_PERIOD)
     async def _ping_bitads(self):
