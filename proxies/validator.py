@@ -99,7 +99,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.8.3",
+    version="0.8.4",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -241,7 +241,7 @@ async def set_miner_assignments(body: SetMinerAssignmentsRequest):
 @app.get("/rating")
 async def get_rating() -> Dict[str, float]:
     validator_service = dependencies.get_validator_service(database_manager)
-    return await validator_service.calculate_ratings()
+    return await validator_service.calculate_ratings(to_block=subtensor.get_current_block())
 
 
 if __name__ == "__main__":
