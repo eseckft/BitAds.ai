@@ -99,7 +99,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.8.2",
+    version="0.8.3",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -209,8 +209,7 @@ async def is_axon_exists(
 
 
 @app.get("/hotkey_to_uid")
-async def hotkey_to_uid(
-) -> List[Dict[str, Any]]:
+async def hotkey_to_uid() -> List[Dict[str, Any]]:
     global metagraph_initialized
 
     if not metagraph_initialized:
@@ -237,6 +236,12 @@ async def get_miner_assignments() -> SetMinerAssignmentsRequest:
 @app.put("/miner_assignments", dependencies=[Depends(validate_hash)])
 async def set_miner_assignments(body: SetMinerAssignmentsRequest):
     await miner_assignment_service.set_miner_assignments(body.assignments)
+
+
+@app.get("/rating")
+async def get_rating() -> Dict[str, float]:
+    validator_service = dependencies.get_validator_service(database_manager)
+    return await validator_service.calculate_ratings()
 
 
 if __name__ == "__main__":
