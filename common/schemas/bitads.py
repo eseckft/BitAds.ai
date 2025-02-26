@@ -328,7 +328,7 @@ class BitAdsDataSchema(BaseModel):
     miner_block: Optional[int] = None
     return_in_site: Optional[bool] = None
 
-    model_config = ConfigDict(from_attributes=True, frozen=True, use_enum_values=True)
+    model_config = ConfigDict(from_attributes=True, frozen=True, use_enum_values=True, extra="ignore")
 
 
 class TwoFactorRequest(BaseModel):
