@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import List, Optional, Dict
 
-from sqlalchemy import select, func, and_, case, desc, asc
+from sqlalchemy import select, func, and_, case, desc, asc, literal
 from sqlalchemy.orm import Session
 
 from common.schemas.aggregated import AggregationSchema, AggregatedData
@@ -167,6 +167,7 @@ def filter_existing_ids(session: Session, ids: set[int]) -> set[str]:
     existing_ids = {row[0] for row in result}  # Extract existing IDs
     return set(existing_ids)
 
+
 def get_max_date_excluding_hotkey(
     session: Session, exclude_hotkey: str
 ) -> Optional[datetime]:
@@ -238,8 +239,8 @@ def get_aggregated_data(
         MinerAssignment.hotkey,
         func.count().label("visits"),
         func.sum(case((BitAdsData.is_unique, 1), else_=0)).label("visits_unique"),
-        func.literal(0).label("at_count"),
-        func.literal(0).label("count_through_rate_click"),
+        literal(0).label("at_count"),
+        literal(0).label("count_through_rate_click"),
         func.sum(
             case(
                 (BitAdsData.sales_status == SalesStatus.COMPLETED, BitAdsData.refund),
