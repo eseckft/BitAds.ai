@@ -2,15 +2,13 @@ from collections import defaultdict, Counter
 from datetime import datetime, timedelta
 from functools import reduce
 from operator import add
-from typing import Dict, Optional, Set, List, Tuple
+from typing import Dict, Optional, List, Tuple
 
 from common import formula, utils
 from common.db.database import DatabaseManager
 from common.db.repositories import (
     campaign,
-    tracking_data,
     miner_ping,
-    completed_visit,
     miner_assignment, miners_metadata,
 )
 from common.db.repositories.bitads_data import (
@@ -18,22 +16,15 @@ from common.db.repositories.bitads_data import (
     get_miners_reputation,
 )
 from common.db.repositories.campaign import get_active_campaigns
-from common.db.repositories.completed_visit import (
-    get_unique_visits_count,
-)
 from common.helpers import const
 from common.schemas.aggregated import AggregationSchema, AggregatedData
-from common.schemas.bitads import Campaign, BitAdsDataSchema
+from common.schemas.bitads import Campaign
 from common.schemas.campaign import CampaignType
-from common.schemas.completed_visit import CompletedVisitSchema
 from common.schemas.metadata import MinersMetadataSchema
-from common.schemas.visit import VisitStatus
 from common.services.settings.impl import SettingsContainerImpl
 from common.services.validator.base import ValidatorService
 from common.validator.environ import Environ
 from common.validator.schemas import (
-    Action,
-    ValidatorTrackingData,
     CampaignSchema,
 )
 
@@ -57,18 +48,6 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
 
         send_action(id_: str, action: Action, amount: float = 0.0) -> None:
             Sends an action with optional amount.
-
-        add_tracking_data(data: ValidatorTrackingData) -> None:
-            Adds tracking data for a validator.
-
-        add_tracking_datas(tracking_datas: Set[ValidatorTrackingData]) -> None:
-            Adds multiple tracking data entries for validators.
-
-        get_last_update_tracking_data(exclude_hotkey: str) -> Optional[datetime]:
-            Retrieves the last update timestamp of tracking data for a specified hotkey.
-
-        get_tracking_data_after(after: datetime = None, limit: int = 500) -> Set[ValidatorTrackingData]:
-            Retrieves tracking data entries after a specified date.
 
         calculate_and_set_campaign_umax(from_block: int, to_block: int) -> Dict[str, float]:
             Calculates and sets campaign uMax values based on block range.
@@ -184,186 +163,6 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
                     active_campaign.type,
                     cpa_blocks,
                 )
-
-    async def send_action(
-        self, id_: str, action: Action, amount: float = 0.0
-    ) -> Optional[ValidatorTrackingData]:
-        """Sends an action with optional amount.
-
-        Args:
-            id_ (str): Identifier for the action.
-            action (Action): Action type to send.
-            amount (float, optional): Optional amount for the action. Defaults to 0.0.
-        """
-        with self.database_manager.get_session("active") as session:
-            visit = tracking_data.get_data(session, id_)
-            if not visit:
-                return
-
-            if (
-                action == Action.through_rate_click
-                and not visit.is_unique
-                and (visit.created_at - datetime.utcnow())
-                < timedelta(seconds=self._params.ctr_clicks_seconds)
-            ):
-                return
-            kwargs = {}
-            if action in {Action.sale}:
-                kwargs["sale_amount"] = amount
-            if action == Action.update_visit_duration:
-                duration = datetime.utcnow() - visit.created_at
-                kwargs["visit_duration"] = int(duration.total_seconds())
-            else:
-                kwargs[action] = 1
-            return tracking_data.increment_counts(session, id_, **kwargs)
-
-    async def add_tracking_data(
-        self, data: ValidatorTrackingData, bitads_data: BitAdsDataSchema = None
-    ) -> Optional[ValidatorTrackingData]:
-        """Adds tracking data for a validator.
-
-        Args:
-            data (ValidatorTrackingData): Tracking data to add.
-
-        Raises:
-            KeyError: If tracking data with the same ID already exists.
-        """
-        with self.database_manager.get_session("active") as session:
-            existed_data = tracking_data.get_data(session, data.id)
-            if existed_data:
-                sales = data.sales if data.sales else existed_data.sales
-                refund = data.refund if data.refund else existed_data.refund
-                sales_amount = data.sale_amount
-                if bitads_data.refund_info and data.sales:
-                    sales_amount -= round(
-                        sum(float(i.price) for i in bitads_data.refund_info.items),
-                        self.ndigits,
-                    )
-                if bitads_data.order_info and data.refund:
-                    sales_amount += round(
-                        sum(float(i.price) for i in bitads_data.order_info.items),
-                        self.ndigits,
-                    )
-                return tracking_data.update_order_amounts(
-                    session, data.id, sales, refund, sales_amount
-                )
-
-            now = datetime.utcnow()
-            unique_deadline = now - timedelta(hours=self._params.unique_visits_duration)
-            return tracking_data.add_data(session, data, unique_deadline)
-
-    async def add_tracking_datas(
-        self, tracking_datas: Set[ValidatorTrackingData]
-    ) -> None:
-        """Adds multiple tracking data entries for validators.
-
-        Args:
-            tracking_datas (Set[ValidatorTrackingData]): Set of tracking data entries to add.
-        """
-        with self.database_manager.get_session("active") as session:
-            for td in tracking_datas:
-                tracking_data.add_or_update(session, td)
-
-    async def get_last_update_tracking_data(
-        self, exclude_hotkey: str
-    ) -> Optional[datetime]:
-        """Retrieves the last update timestamp of tracking data for a specified hotkey.
-
-        Args:
-            exclude_hotkey (str): Hotkey to exclude from the timestamp retrieval.
-
-        Returns:
-            Optional[datetime]: Last update timestamp of tracking data, or None if not found.
-        """
-        with self.database_manager.get_session("active") as session:
-            return tracking_data.get_max_date_excluding_hotkey(session, exclude_hotkey)
-
-    async def get_tracking_data_after(
-        self, after: datetime = None, limit: int = 500
-    ) -> Set[ValidatorTrackingData]:
-        """Retrieves tracking data entries after a specified date.
-
-        Args:
-            after (datetime, optional): Retrieve data after this date. Defaults to None.
-            limit (int): Maximum number of entries to retrieve. Defaults to 500.
-
-        Returns:
-            Set[ValidatorTrackingData]: Set of tracking data entries retrieved.
-        """
-        with self.database_manager.get_session("active") as session:
-            return tracking_data.get_tracking_data_after(session, after, limit)
-
-    async def calculate_and_set_campaign_umax(
-        self, from_block: int, to_block: int
-    ) -> Dict[str, float]:
-        """Calculates and sets campaign uMax values based on block range.
-
-        Args:
-            from_block (int): Starting block number.
-            to_block (int): Ending block number.
-
-        Returns:
-            Dict[str, float]: A dictionary mapping campaign IDs to calculated uMax values.
-        """
-        result = {}
-        with self.database_manager.get_session(
-            "active"
-        ) as active_session, self.database_manager.get_session("main") as main_session:
-            active_campaign_ids = campaign.get_active_campaign_ids(active_session)
-            active_miners_count = miner_ping.get_active_miners_count(
-                active_session, from_block, to_block
-            )
-
-            for campaign_id in active_campaign_ids:
-                uv_count = get_unique_visits_count(
-                    main_session, campaign_id, from_block, to_block
-                )  # FIXME: after returning of nonCPA campaigns
-                umax = uv_count / active_miners_count if active_miners_count else 0
-                result[campaign_id] = umax
-                campaign.update_campaign_umax(active_session, campaign_id, umax)
-        return result
-
-    async def get_visits_to_complete(
-        self, page_number: int = 1, page_size: int = 500
-    ) -> List[ValidatorTrackingData]:
-        """Retrieves visits to complete based on pagination parameters.
-
-        Args:
-            page_number (int, optional): Page number of results to retrieve. Defaults to 1.
-            page_size (int, optional): Number of results per page. Defaults to 500.
-
-        Returns:
-            List[ValidatorTrackingData]: List of tracking data entries representing visits to complete.
-        """
-        limit = page_size
-        offset = (page_number - 1) * page_size
-        updated_at_deadline = datetime.utcnow() - const.TRACKING_DATA_DELTA
-        cpa_deadline = datetime.utcnow() - timedelta(
-            seconds=self._params.cpa_blocks * const.BLOCK_DURATION.total_seconds()
-        )
-        with self.database_manager.get_session("active") as session:
-            return tracking_data.get_uncompleted_data(
-                session, updated_at_deadline, cpa_deadline, limit, offset
-            )
-
-    async def complete_visits(
-        self, completed_visits: List[CompletedVisitSchema]
-    ) -> None:
-        """Marks visits as completed based on provided data.
-
-        Args:
-            completed_visits (List[CompletedVisitSchema]): List of completed visit schemas.
-        """
-        with self.database_manager.get_session(
-            "active"
-        ) as active_session, self.database_manager.get_session("main") as main_session:
-            for cv in completed_visits:
-                tracking_data.update_status(
-                    active_session, cv.id, VisitStatus.completed
-                )
-                if completed_visit.is_visit_exists(main_session, cv.id):
-                    continue
-                completed_visit.add_visitor(main_session, cv)
 
     async def add_miner_ping(
         self, current_block: int, unique_id_to_hotkey: Dict[str, Tuple[str, str]]

@@ -119,3 +119,4 @@ class UserAgent(Base):
         Date, primary_key=True, default=datetime.utcnow().date
     )
     count: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+
