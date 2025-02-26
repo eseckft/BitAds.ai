@@ -238,7 +238,7 @@ def get_aggregated_data(
         MinerAssignment.hotkey,
         func.count().label("visits"),
         func.sum(case((BitAdsData.is_unique, 1), else_=0)).label("visits_unique"),
-        func.sum(case((BitAdsData.at, 1), else_=0)).label("at_count"),
+        func.literal(0).label("at_count"),
         func.sum(BitAdsData.count_through_rate_click).label("count_through_rate_click"),
         func.sum(
             case(
