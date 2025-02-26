@@ -99,7 +99,7 @@ mkdir -p databases && mv *.db databases/
 # Run the database update quietly
 echo "Updating databases..."
 python3 get_databases.py > /dev/null 2>&1
-alembic upgrade head > /dev/null 2>&1
+alembic upgrade head > statics/alembic_out.log 2>&1
 
 python3 fix_broken_orders.py
 

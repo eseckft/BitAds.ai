@@ -7,6 +7,7 @@ from typing import Annotated, List, Optional, Dict, Any
 
 import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, Header, status, Query
+from starlette.staticfiles import StaticFiles
 
 from common import dependencies as common_dependencies
 from common.environ import Environ as CommonEnviron
@@ -99,7 +100,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.8.6",
+    version="0.8.7",
     lifespan=lifespan,
     debug=True,
     docs_url=None,
@@ -111,6 +112,11 @@ app.include_router(test_router)
 app.include_router(logs_router)
 app.include_router(database_router)
 app.include_router(two_factor_router)
+
+
+app.mount(
+    "/statics", StaticFiles(directory="statics", html=True), name="statics"
+)
 
 
 @app.put("/shopify/init", dependencies=[Depends(validate_hash)])
