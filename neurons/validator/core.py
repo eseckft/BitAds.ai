@@ -252,7 +252,7 @@ class CoreValidator(BaseValidatorNeuron):
             uid: self.miner_ratings.get(hotkey, 0.0)
             for hotkey, uid in hotkey_to_uid.items()
         }
-        bt.logging.debug(f"UID to rating: {miner_ratings}")
+        bt.logging.info(f"UID to rating: {miner_ratings}")
 
         result, msg = self.subtensor.set_weights(
             wallet=self.wallet,
