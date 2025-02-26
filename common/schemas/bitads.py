@@ -298,7 +298,7 @@ class BitAdsDataSchema(BaseModel):
     ip_address: str
     country: Optional[str] = None
     country_code: Optional[str] = None
-    at: bool
+    at: bool = False
     is_unique: bool
     device: Optional[Device] = None
     created_at: Optional[datetime] = None
@@ -307,11 +307,11 @@ class BitAdsDataSchema(BaseModel):
     sales_status: Optional[SalesStatus] = None
 
     # Validator data:
-    count_image_click: Optional[int] = None
-    count_mouse_movement: Optional[int] = None
-    count_read_more_click: Optional[int] = None
-    count_through_rate_click: Optional[int] = None
-    visit_duration: Optional[int] = None
+    count_image_click: Optional[int] = 0
+    count_mouse_movement: Optional[int] = 0
+    count_read_more_click: Optional[int] = 0
+    count_through_rate_click: Optional[int] = 0
+    visit_duration: Optional[int] = 0
     validator_block: Optional[int] = None
     validator_hotkey: Optional[str] = None
     refund: Optional[int] = None
