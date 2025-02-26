@@ -89,21 +89,6 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         campaigns = self._get_active_campaigns(cpa_from_block, to_block)
         if not campaigns:
             raise ValueError("No active campaigns found")
-        # region Non CPA-part
-        regular_from_block = to_block - Environ.CALCULATE_UMAX_BLOCKS
-        campaign_to_umax = {
-            c.id: c.umax
-            for c in campaigns
-            if CampaignType.REGULAR == c.type
-            and c.last_active_block >= regular_from_block
-        }
-        aggregated_data = self._get_aggregated_data(
-            *campaign_to_umax.keys(),
-            from_block=regular_from_block,
-            to_block=to_block,
-        )
-        miner_scores = self._calculate_miner_scores(aggregated_data, campaign_to_umax)
-        # endregion
         # region CPA-part
         cpa_campaign_to_id = {c.id: c for c in campaigns if CampaignType.CPA == c.type}
         now = datetime.utcnow()
@@ -129,9 +114,7 @@ class ValidatorServiceImpl(SettingsContainerImpl, ValidatorService):
         cpa_miner_scores = dict(reduce(add, (Counter(dict(x)) for x in scores)))
         cpa_miner_scores = {k: v / len(scores) for k, v in cpa_miner_scores.items()}
 
-        scores = utils.combine_dicts_with_avg(miner_scores, cpa_miner_scores)
-
-        final_scores = self._normalize_scores(scores)
+        final_scores = self._normalize_scores(cpa_miner_scores)
 
         return final_scores
 
