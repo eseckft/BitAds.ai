@@ -239,7 +239,7 @@ def get_aggregated_data(
         func.count().label("visits"),
         func.sum(case((BitAdsData.is_unique, 1), else_=0)).label("visits_unique"),
         func.literal(0).label("at_count"),
-        func.sum(BitAdsData.count_through_rate_click).label("count_through_rate_click"),
+        func.literal(0).label("count_through_rate_click"),
         func.sum(
             case(
                 (BitAdsData.sales_status == SalesStatus.COMPLETED, BitAdsData.refund),
