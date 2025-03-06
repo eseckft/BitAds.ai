@@ -261,6 +261,7 @@ def get_visits_by_campaign_item(
     stmt = (
         select(Visitor)
         .where(Visitor.campaign_item == campaign_item)
+        .order_by(Visitor.created_at.desc())
         .limit(limit)
         .offset(offset)
     )
@@ -285,6 +286,7 @@ def get_visits_by_ip(
     stmt = (
         select(Visitor)
         .where(Visitor.ip_address == ip_address)
+        .order_by(Visitor.created_at.desc())
         .limit(limit)
         .offset(offset)
     )
