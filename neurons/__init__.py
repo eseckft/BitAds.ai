@@ -2,7 +2,7 @@
 # Define the version of the template module.
 
 
-__version__ = "3.9.25"
+__version__ = "3.9.26"
 
 
 version_split = __version__.split(".")
