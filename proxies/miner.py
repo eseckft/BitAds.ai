@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.8.5", lifespan=lifespan)
+app = FastAPI(version="0.8.6", lifespan=lifespan)
 
 app.mount(
     "/statics", StaticFiles(directory="statics", html=True), name="statics"
