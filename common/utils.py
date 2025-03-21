@@ -5,7 +5,7 @@ import time
 from collections import defaultdict
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Optional, Dict
+from typing import Optional, Dict, Callable, Any
 
 import bittensor as bt
 from common.helpers import const
@@ -150,3 +150,29 @@ def blocks_to_timedelta(blocks: int) -> timedelta:
 
 def timedelta_to_blocks(td: timedelta) -> int:
     return td.total_seconds() // const.BLOCK_DURATION.total_seconds()
+
+
+def cache_result(expiration: timedelta):
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        cache: dict[str, tuple[Any, float]] = {}
+
+        @wraps(func)
+        async def wrapper(*args, **kwargs) -> Any:
+            # Create a cache key from function name and arguments
+            cache_key = f"{func.__name__}:{str(args)}:{str(kwargs)}"
+            current_time = time.time()
+
+            # Check if we have a valid cached result
+            if cache_key in cache:
+                result, timestamp = cache[cache_key]
+                if current_time - timestamp < expiration.total_seconds():
+                    return result
+
+            # If no valid cache, execute the function
+            result = await func(*args, **kwargs)
+            cache[cache_key] = (result, current_time)
+            return result
+
+        return wrapper
+
+    return decorator

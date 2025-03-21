@@ -1,6 +1,4 @@
 import logging
-import threading
-import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Annotated, List, Optional, Dict, Any
@@ -11,7 +9,6 @@ from starlette.staticfiles import StaticFiles
 
 from common import dependencies as common_dependencies
 from common.environ import Environ as CommonEnviron
-from common.helpers import const
 from common.miner.schemas import VisitorSchema
 from common.schemas.bitads import BitAdsDataSchema
 from common.schemas.miner_assignment import (
@@ -27,22 +24,20 @@ from proxies.apis.logging import router as logs_router
 from proxies.apis.two_factor import router as two_factor_router
 from proxies.apis.version import router as version_router
 from proxies.utils.validation import validate_hash
-from template.api.metagraph import get_axon_data, get_hotkey_to_uid
 
 database_manager = common_dependencies.get_database_manager(
     "validator", CommonEnviron.SUBTENSOR_NETWORK
 )
 bitads_service = common_dependencies.get_bitads_service(database_manager)
 order_queue = dependencies.get_order_queue_service(database_manager)
-two_factor_service = common_dependencies.get_two_factor_service(database_manager)
+two_factor_service = common_dependencies.get_two_factor_service(
+    database_manager
+)
 miner_assignment_service = common_dependencies.get_miner_assignment_service(
     database_manager
 )
-metagraph: Optional["bittensor.metagraph"] = None
-subtensor: Optional["bittensor.subtensor"] = None
+metagraph_service = common_dependencies.get_metagraph_service()
 
-
-metagraph_initialized: bool = False
 
 logging.basicConfig(
     level=logging.INFO,
@@ -52,57 +47,18 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
-def init_metagraph_and_start_sync():
-    """Initialize the metagraph and start the sync thread after app startup."""
-    global metagraph, subtensor, metagraph_initialized
-
-    # Import bittensor lazily
-    import bittensor as bt
-
-    # Initialize metagraph and subtensor
-    bt.logging.info("Initializing metagraph...")
-    metagraph = bt.metagraph(const.NETUIDS[CommonEnviron.SUBTENSOR_NETWORK])
-    subtensor = bt.subtensor(CommonEnviron.SUBTENSOR_NETWORK)
-    metagraph_initialized = True
-    bt.logging.info("Metagraph initialized.")
-
-    # Start the background sync thread
-    sync_thread = threading.Thread(target=sync_metagraph_background, daemon=True)
-    sync_thread.start()
-    bt.logging.info("Background sync thread started.")
-
-
-def sync_metagraph_background(sleep: int = 30):
-    """Sync metagraph in the background every N seconds."""
-    global metagraph, subtensor
-
-    while True:
-        if metagraph is not None and subtensor is not None:
-            try:
-                metagraph.sync(subtensor=subtensor)
-                log.info("Metagraph synced successfully.")
-            except Exception as e:
-                log.info(f"Error syncing metagraph: {e}")
-
-        # Wait for 15 seconds before the next sync
-        time.sleep(sleep)
-
-
 # noinspection PyUnresolvedReferences
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Start a background thread that initializes the metagraph after startup."""
-    init_thread = threading.Thread(target=init_metagraph_and_start_sync, daemon=True)
-    init_thread.start()
     app.state.database_manager = database_manager
     app.state.two_factor_service = two_factor_service
     yield
 
 
 app = FastAPI(
-    version="0.8.10",
+    version="0.8.11",
     lifespan=lifespan,
-    debug=True,
     docs_url=None,
     redoc_url=None,
 )
@@ -200,32 +156,16 @@ async def put_visit(body: VisitorSchema) -> None:
 
 @app.get("/is_axon_exists")
 async def is_axon_exists(
-    hotkey: str, ip_address: Optional[str] = None, coldkey: Optional[str] = None
+    hotkey: str,
+    ip_address: Optional[str] = None,
+    coldkey: Optional[str] = None,
 ) -> Dict[str, Any]:
-    global metagraph_initialized
-
-    if not metagraph_initialized:
-        raise HTTPException(
-            status.HTTP_406_NOT_ACCEPTABLE,
-            detail="Metagraph is still initializing, please try again later.",
-        )
-
-    # Once initialized, reuse the metagraph for the request
-    return get_axon_data(metagraph, hotkey, ip_address, coldkey)
+    return await metagraph_service.get_axon_data(hotkey, ip_address, coldkey)
 
 
 @app.get("/hotkey_to_uid")
 async def hotkey_to_uid() -> List[Dict[str, Any]]:
-    global metagraph_initialized
-
-    if not metagraph_initialized:
-        raise HTTPException(
-            status.HTTP_406_NOT_ACCEPTABLE,
-            detail="Metagraph is still initializing, please try again later.",
-        )
-
-    # Once initialized, reuse the metagraph for the request
-    return get_hotkey_to_uid(metagraph)
+    return await metagraph_service.hotkey_to_uid()
 
 
 @app.get("/order_ids")
@@ -242,12 +182,6 @@ async def get_miner_assignments() -> SetMinerAssignmentsRequest:
 @app.put("/miner_assignments", dependencies=[Depends(validate_hash)])
 async def set_miner_assignments(body: SetMinerAssignmentsRequest):
     await miner_assignment_service.set_miner_assignments(body.assignments)
-
-
-@app.get("/rating")
-async def get_rating() -> Dict[str, float]:
-    validator_service = dependencies.get_validator_service(database_manager)
-    return await validator_service.calculate_ratings(to_block=subtensor.get_current_block())
 
 
 if __name__ == "__main__":

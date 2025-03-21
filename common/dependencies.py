@@ -15,6 +15,8 @@ from common.services.campaign.base import CampaignService
 from common.services.campaign.impl import CampaignServiceImpl
 from common.services.geoip.base import GeoIpService
 from common.services.geoip.impl import GeoIpServiceImpl
+from common.services.metagraph.base import MetagraphService
+from common.services.metagraph.impl import BittensorMetagraphService
 from common.services.miner_assignment.base import MinerAssignmentService
 from common.services.miner_assignment.impl import MinerAssignmentServiceImpl
 from common.services.order_history.base import OrderHistoryService
@@ -203,3 +205,7 @@ def get_miner_assignment_service(
 
 def get_order_history_service(database_manager: DatabaseManager) -> OrderHistoryService:
     return OrderHistoryServiceImpl(database_manager)
+
+
+def get_metagraph_service() -> MetagraphService:
+    return BittensorMetagraphService()
