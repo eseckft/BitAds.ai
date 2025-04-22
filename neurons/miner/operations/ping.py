@@ -3,7 +3,7 @@ from typing import Tuple
 import bittensor as bt
 
 from common.clients.bitads.base import BitAdsClient
-from common.helpers.logging import LogLevel, green
+from common.helpers.logging import LogLevel, green, red
 from common.schemas.bitads import (
     GetMinerUniqueIdResponse,
     UniqueIdData,
@@ -55,10 +55,12 @@ class PingOperation(BaseOperation[Ping]):
                     ),
                 )
             else:
-                response = await self._get_campaign_unique_id(
-                    campaign.product_unique_id
-                )
-                if response:
+                try:
+                    response = await self._get_campaign_unique_id(
+                        campaign.product_unique_id
+                    )
+                    if not response:
+                        raise
                     synapse.submitted_tasks.append(response)
                     bt.logging.info(
                         prefix=LogLevel.BITADS,
@@ -68,6 +70,13 @@ class PingOperation(BaseOperation[Ping]):
                         ),
                     )
                     self.reload_cache = True
+                except Exception as e:
+                    bt.logging.warning(
+                        prefix=LogLevel.BITADS,
+                        msg=red(
+                            f"Error creating unique link for campaign ID: {campaign.product_unique_id}"
+                        ),
+                    )
         synapse.result = True
         return synapse
 

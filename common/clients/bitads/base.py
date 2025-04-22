@@ -73,7 +73,7 @@ class BitAdsClient(BaseHTTPClient, ABC):
         """
         response = super()._make_request(method, endpoint, params, json)
         if response and target_model:
-            response = target_model.parse_raw(response)
+            response = target_model.model_validate_json(response)
             log_errors(response.errors)
         return response
 
