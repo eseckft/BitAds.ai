@@ -50,16 +50,19 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(version="0.8.6", lifespan=lifespan)
+app = FastAPI(
+    version="0.8.7",
+    lifespan=lifespan,
+    docs_url=None,
+    redoc_url=None,
+)
 
 app.mount(
     "/statics", StaticFiles(directory="statics", html=True), name="statics"
 )
 
 app.include_router(version_router)
-app.include_router(test_router)
 app.include_router(logs_router)
-app.include_router(database_router)
 app.include_router(two_factor_router)
 
 
@@ -85,7 +88,6 @@ async def get_visits_by_campaign_item(
     ip_address: str,
 ) -> List[VisitorSchema]:
     return await miner_service.get_by_ip_address(ip_address)
-
 
 
 @app.get("/visitors/{id}")
@@ -152,44 +154,6 @@ async def fetch_request_data_and_redirect(
         else f"https://v.bitads.ai/campaigns/{campaign_id}?id={id_}"
     )
     return RedirectResponse(url=url)
-
-
-@app.get("/fingerprint")
-async def fingerprint():
-    return HTMLResponse(content=FINGERPRINT_HTML_CONTENT)
-
-
-FINGERPRINT_HTML_CONTENT = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Fingerprinting</title>
-        <script type="module">
-          import FingerprintJS from '/statics/scripts/fingerprint_v4.js';
-          const fpPromise = FingerprintJS.load();
-          fpPromise
-            .then(fp => fp.get())
-            .then(result => {
-                const visitorId = result.visitorId;
-                document.write(visitorId);
-                fetch('/submit_fingerprint', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ fingerprint: visitorId })
-                }).then(response => {
-                    if (response.ok) {
-                        window.location.href = "/final_redirect";
-                    } else {
-                        console.error('Fingerprint submission failed');
-                    }
-                });
-            });
-        </script>
-    </head>
-    </html>
-"""
 
 
 if __name__ == "__main__":

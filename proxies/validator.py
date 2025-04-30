@@ -57,7 +57,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    version="0.8.11",
+    version="0.8.12",
     lifespan=lifespan,
     docs_url=None,
     redoc_url=None,
@@ -66,7 +66,6 @@ app = FastAPI(
 app.include_router(version_router)
 app.include_router(test_router)
 app.include_router(logs_router)
-app.include_router(database_router)
 app.include_router(two_factor_router)
 
 
