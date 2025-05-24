@@ -164,7 +164,7 @@ async def async_list_unique_links(unique_link_service, campaign_service):
                 campaign.product_unique_id,
                 campaign.store_name,
                 campaign.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-                campaign.date_approved.strftime("%Y-%m-%d %H:%M:%S"),
+                campaign.date_approved.strftime("%Y-%m-%d %H:%M:%S") if campaign.date_approved else 'N/A',
                 campaign.date_started.strftime("%Y-%m-%d %H:%M:%S"),
                 f"[link={link.link}]{link.link}[/link]",
                 end_section=True,
